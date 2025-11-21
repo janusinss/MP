@@ -181,14 +181,12 @@ if (count($reviews) > 0) {
     </div>
 
     <script>
-        // 1. Select all forms that add to cart
         document.querySelectorAll('form[action="add_to_cart.php"]').forEach(form => {
             form.addEventListener('submit', function(e) {
-                e.preventDefault(); // STOP the page reload
+                e.preventDefault(); 
 
                 const formData = new FormData(this);
 
-                // 2. Send data to PHP in the background
                 fetch('add_to_cart.php', {
                     method: 'POST',
                     body: formData
@@ -196,20 +194,22 @@ if (count($reviews) > 0) {
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        // 3. Update the Red Badge Number
+                        // Success Logic (Update Badge + Toast)
+                        // Note: product.php might not have the badge ID if headers differ, 
+                        // but if you use the same header include, it works.
                         const badge = document.getElementById('cart-badge');
-                        badge.innerText = data.cart_count;
+                        if(badge) badge.innerText = data.cart_count;
                         
-                        // 4. Trigger the Pop-up Animation (Toast)
-                        // Reset animation
-                        badge.style.animation = 'none';
-                        badge.offsetHeight; /* trigger reflow */
-                        badge.style.animation = 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-
-                        // Show Bootstrap Toast
-                        const toastElement = document.getElementById('liveToast');
-                        const toast = new bootstrap.Toast(toastElement);
-                        toast.show();
+                        const toastEl = document.getElementById('liveToast');
+                        if(toastEl) {
+                            const toast = new bootstrap.Toast(toastEl);
+                            toast.show();
+                        }
+                    } 
+                    // *** NEW: ALERT BEFORE REDIRECT ***
+                    else if (data.status === 'login_required') {
+                        alert("Log in to add to cart"); 
+                        window.location.href = 'user_login.php';
                     }
                 })
                 .catch(error => console.error('Error:', error));

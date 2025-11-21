@@ -139,32 +139,58 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
             <?php foreach ($products as $product): ?>
                 <div class="col-md-3 mb-4">
                     <div class="card h-100 shadow-sm">
+                        
                         <?php $imgName = $product['image'] ?? 'default.jpg'; ?>
                         <a href="product.php?id=<?= $product['id'] ?>" class="text-decoration-none text-dark">
                             <div class="position-relative">
                                 <img src="assets/images/<?php echo $imgName; ?>" class="card-img-top" alt="img" style="height: 200px; object-fit: cover;">
                                 <span class="position-absolute top-0 start-0 badge bg-info text-dark m-2"><?= $product['category'] ?></span>
                             </div>
+                            
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title text-truncate"><?= $product['name']; ?></h5>
-                        </a>
-                            <div class="d-flex justify-content-between align-items-center mb-3 mt-auto">
-                                <span class="fw-bold fs-5">$<?php echo number_format($product['price'], 2); ?></span>
-                                <?php 
-                                $stock = $product['stock_qty'];
-                                if ($stock == 0) echo '<span class="badge bg-danger">Out of Stock</span>';
-                                elseif ($stock < 5) echo '<span class="text-danger fw-bold small">Only ' . $stock . ' left!</span>';
-                                else echo '<span class="text-muted small">Stock: ' . $stock . '</span>';
+                                <h5 class="card-title text-truncate"><?= htmlspecialchars($product['name']); ?></h5>
+                                
+                                <?php
+                                    $stmtRating = $pdo->prepare("SELECT AVG(rating) FROM reviews WHERE product_id = ?");
+                                    $stmtRating->execute([$product['id']]);
+                                    $avgRating = round($stmtRating->fetchColumn(), 1);
                                 ?>
-                            </div>
-                            <?php if ($stock > 0): ?>
-                                <form action="add_to_cart.php" method="POST">
-                                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                    <button type="submit" class="btn btn-outline-primary w-100">Add to Cart</button>
-                                </form>
-                            <?php else: ?>
-                                <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
-                            <?php endif; ?>
+                                <div class="mb-2">
+                                    <?php if($avgRating > 0): ?>
+                                        <span class="text-warning">
+                                            <?php 
+                                            for($i=1; $i<=5; $i++) {
+                                                if($i <= $avgRating) echo '<i class="bi bi-star-fill"></i>';
+                                                elseif($i - 0.5 <= $avgRating) echo '<i class="bi bi-star-half"></i>';
+                                                else echo '<i class="bi bi-star"></i>';
+                                            } 
+                                            ?>
+                                        </span>
+                                        <span class="text-muted small">(<?= $avgRating ?>)</span>
+                                    <?php else: ?>
+                                        <span class="text-muted small">No reviews yet</span>
+                                    <?php endif; ?>
+                                </div>
+                        </a>
+                        <div class="d-flex justify-content-between align-items-center mb-3 mt-auto">
+                            <span class="fw-bold fs-5">$<?php echo number_format($product['price'], 2); ?></span>
+                            <?php 
+                            $stock = $product['stock_qty'];
+                            if ($stock == 0) echo '<span class="badge bg-danger">Out of Stock</span>';
+                            elseif ($stock < 5) echo '<span class="text-danger fw-bold small">Only ' . $stock . ' left!</span>';
+                            else echo '<span class="text-muted small">Stock: ' . $stock . '</span>';
+                            ?>
+                        </div>
+                        
+                        <?php if ($stock > 0): ?>
+                            <form action="add_to_cart.php" method="POST">
+                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                <button type="submit" class="btn btn-outline-primary w-100">Add to Cart</button>
+                            </form>
+                        <?php else: ?>
+                            <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
+                        <?php endif; ?>
+
                         </div>
                     </div>
                 </div>
@@ -232,6 +258,10 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                         badge.style.animation = 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                         const toast = new bootstrap.Toast(document.getElementById('liveToast'));
                         toast.show();
+                    } 
+                    else if (data.status === 'login_required') {
+                        alert("Log in to add to cart"); 
+                        window.location.href = 'user_login.php';
                     }
                 });
             });

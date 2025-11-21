@@ -1,8 +1,14 @@
 <?php
 session_start();
 
-// Prepare the response array
+// Prepare default response
 $response = ['status' => 'error', 'message' => 'Invalid request'];
+
+// 1. SECURITY CHECK: Must be logged in
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['status' => 'login_required', 'message' => 'Please login first.']);
+    exit;
+}
 
 if (isset($_POST['product_id'])) {
     $productId = $_POST['product_id'];
@@ -19,7 +25,7 @@ if (isset($_POST['product_id'])) {
         $_SESSION['cart'][$productId] = 1;
     }
 
-    // Calculate total items in cart
+    // Calculate total items
     $totalItems = array_sum($_SESSION['cart']);
 
     // Send Success Response
@@ -30,7 +36,7 @@ if (isset($_POST['product_id'])) {
     ];
 }
 
-// Return JSON data (The JavaScript will read this)
+// Return JSON
 header('Content-Type: application/json');
 echo json_encode($response);
 exit;
