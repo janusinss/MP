@@ -1,0 +1,97 @@
+/* style.css */
+
+/* 1. Global Styles */
+body {
+    background-color: #f8f9fa; /* Light gray background for better contrast */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1, h2, h3, h4, h5 {
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+/* 2. Card Styling (Products) */
+.card {
+    border: none;
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden; /* Keeps images inside rounded corners */
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Floats up slightly */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Product Images */
+.card-img-top {
+    border-bottom: 1px solid #f0f0f0;
+    transition: opacity 0.3s;
+}
+
+.card:hover .card-img-top {
+    opacity: 0.9;
+}
+
+/* 3. Buttons & Badges */
+.btn-outline-primary {
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.btn-outline-primary:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-success {
+    background-color: #28a745; /* Fresh Green */
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.8em;
+}
+
+/* 4. Cart Badge Animation */
+#cart-badge {
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0) translate(-50%, -50%); }
+    100% { transform: scale(1) translate(-50%, -50%); }
+}
+
+/* 5. Table Styling (Cart & Admin) */
+.table thead th {
+    background-color: #e9ecef;
+    border-top: none;
+    color: #495057;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0,0,0,0.02);
+}
+
+/* 6. Admin Login Card */
+.login-card {
+    border-top: 5px solid #28a745; /* Green accent on top */
+}
+
+/* 7. Success Page Icon */
+.display-1 {
+    color: #28a745;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Toast Notification Z-Index */
+.toast-container {
+    z-index: 1055; /* Higher than Bootstrap defaults */
+}
