@@ -21,6 +21,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <title>My Orders</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="container mt-5">
@@ -41,15 +42,43 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="card-body">
                             <div class="row">
+                                
                                 <div class="col-md-4">
-                                    <p class="mb-1"><strong>Total:</strong> $<?= number_format($order['total_amount'], 2) ?></p>
-                                    <p class="mb-1"><strong>Status:</strong> 
-                                        <span class="badge bg-secondary"><?= $order['status'] ?></span>
+                                    <p class="mb-2"><strong>Total:</strong> $<?= number_format($order['total_amount'], 2) ?></p>
+                                    
+                                    <p class="mb-2"><strong>Status:</strong> 
+                                        <?php 
+                                            $status = $order['status'];
+                                            
+                                            // SAFETY FIX: If status is empty, assume it's Pending
+                                            if (empty($status)) {
+                                                $status = 'Pending'; 
+                                            }
+
+                                            $badgeClass = 'bg-secondary';
+                                            
+                                            if ($status == 'Pending') $badgeClass = 'bg-warning text-dark';
+                                            if ($status == 'Shipped') $badgeClass = 'bg-info text-dark';
+                                            if ($status == 'Delivered') $badgeClass = 'bg-success';
+                                            if ($status == 'Cancelled') $badgeClass = 'bg-danger';
+                                        ?>
+                                        <span class="badge <?= $badgeClass ?>"><?= $status ?></span>
                                     </p>
+
+                                    <?php if ($order['status'] == 'Pending'): ?>
+                                        <form action="user_cancel_order.php" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                            <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger mt-2">
+                                                <i class="bi bi-x-circle"></i> Cancel Order
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
                                 </div>
+                                
                                 <div class="col-md-8">
                                     <p class="mb-1"><strong>Address:</strong> <?= htmlspecialchars($order['address']) ?></p>
                                 </div>
+
                             </div>
                         </div>
                     </div>

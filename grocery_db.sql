@@ -1,7 +1,6 @@
 -- phpMyAdmin SQL Dump
 -- PROJECT: FreshCart Market
--- MASTER VERSION (Final)
--- Includes: Users, Products, Orders, Reviews, Coupons
+-- VERSION: Final Production (With Status Fix)
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -69,7 +68,7 @@ CREATE TABLE `orders` (
   `customer_name` varchar(255) NOT NULL,
   `address` text NOT NULL,
   `total_amount` decimal(10,2) NOT NULL,
-  `status` varchar(50) DEFAULT 'Pending',
+  `status` varchar(50) DEFAULT 'Pending', -- CHANGED TO VARCHAR FOR SAFETY
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)

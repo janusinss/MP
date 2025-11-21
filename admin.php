@@ -68,6 +68,27 @@ try {
     <?php if (isset($error)): ?>
         <div class="alert alert-danger">Error: <?= $error ?></div>
     <?php endif; ?>
+    <?php
+    // Fetch items with less than 5 stock
+    $stmtLow = $pdo->query("SELECT * FROM products WHERE stock_qty <= 5");
+    $lowStockItems = $stmtLow->fetchAll(PDO::FETCH_ASSOC);
+    ?>
+
+    <?php if (count($lowStockItems) > 0): ?>
+        <div class="alert alert-warning shadow-sm border-warning">
+            <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Low Stock Alert</h5>
+            <p class="mb-0">The following items are running low and need restocking:</p>
+            <ul class="mb-2 mt-2">
+                <?php foreach ($lowStockItems as $item): ?>
+                    <li>
+                        <strong><?= htmlspecialchars($item['name']) ?></strong> 
+                        (Only <?= $item['stock_qty'] ?> left)
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+            <a href="admin_products.php" class="btn btn-sm btn-warning text-dark">Manage Inventory</a>
+        </div>
+    <?php endif; ?>
 
     <div class="row mb-4">
         <div class="col-md-12">
