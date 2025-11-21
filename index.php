@@ -71,6 +71,13 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="container mt-5 mb-5">
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <div class="alert alert-warning text-center mb-4 shadow-sm border-warning alert-dismissible fade show" role="alert">
+            <strong>🎉 Welcome back, <?= htmlspecialchars($_SESSION['user_name']) ?>!</strong> 
+            As a member, use code <span class="badge bg-dark fs-6">WELCOME20</span> at checkout for 20% OFF!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>🛒 FreshCart Market</h1>

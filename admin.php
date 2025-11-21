@@ -57,7 +57,9 @@ try {
         <h2>👮‍♂️ Admin Dashboard</h2>
         <div>
             <a href="export_orders.php" class="btn btn-success me-2">⬇ Export CSV</a>
+            <a href="admin_reviews.php" class="btn btn-warning text-dark me-2">⭐ Reviews</a>
             <a href="admin_products.php" class="btn btn-primary me-2">📦 Products</a>
+            <a href="admin_users.php" class="btn btn-info text-white me-2">👥 Users</a>
             <a href="admin_reviews.php" class="btn btn-warning text-dark me-2">⭐ Reviews</a>
             
             <a href="index.php" class="btn btn-outline-secondary me-2">Go to Shop</a>
