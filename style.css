@@ -1,97 +1,516 @@
-/* style.css */
+/* style.css - Creative Light Mode Aesthetic */
 
-/* 1. Global Styles */
+/* 1. Global Styles & Reset */
+:root {
+        --bg-color: #F5F5F0;
+        /* Off-White/Bone */
+        --card-bg: rgba(230, 216, 195, 0.6);
+        /* Soft Beige Glass */
+        --text-main: #3b3b3b;
+        /* Dark Warm Gray */
+        --text-muted: #8a7a6b;
+        /* Warm Tan/Brown */
+        --accent-color: #5D866C;
+        /* Sage Green */
+        --accent-glow: rgba(93, 134, 108, 0.4);
+        --border-color: #C2A68C;
+        /* Warm Tan */
+        --font-serif: 'Playfair Display', 'Merriweather', serif;
+        --font-sans: 'Inter', 'Helvetica Neue', sans-serif;
+        --font-mono: 'Fira Code', monospace;
+}
+
 body {
-    background-color: #f8f9fa; /* Light gray background for better contrast */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        font-family: var(--font-sans);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
 }
 
-h1, h2, h3, h4, h5 {
-    color: #2c3e50;
-    font-weight: 700;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+        width: 8px;
 }
 
-/* 2. Card Styling (Products) */
+::-webkit-scrollbar-track {
+        background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-color);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+        color: var(--text-main);
+        font-family: var(--font-serif);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+}
+
+a {
+        color: var(--text-main);
+        text-decoration: none;
+        transition: all 0.3s ease;
+}
+
+a:hover {
+        color: var(--accent-color);
+        text-shadow: 0 0 8px var(--accent-glow);
+}
+
+label {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+        display: block;
+}
+
+/* 2. Animations */
+@keyframes float {
+        0% {
+                transform: translateY(0px);
+        }
+
+        50% {
+                transform: translateY(-10px);
+        }
+
+        100% {
+                transform: translateY(0px);
+        }
+}
+
+@keyframes fadeIn {
+        from {
+                opacity: 0;
+                transform: translateY(20px);
+        }
+
+        to {
+                opacity: 1;
+                transform: translateY(0);
+        }
+}
+
+@keyframes gradientBG {
+        0% {
+                background-position: 0% 50%;
+        }
+
+        50% {
+                background-position: 100% 50%;
+        }
+
+        100% {
+                background-position: 0% 50%;
+        }
+}
+
+.animate-fade-in {
+        animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* 3. Hero Section */
+.hero-section {
+        padding: 8rem 0;
+        text-align: center;
+        background: linear-gradient(-45deg, #F5F5F0, #E6D8C3, #fdfbf7, #e8e6e1);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        margin-bottom: 5rem;
+        position: relative;
+        overflow: hidden;
+}
+
+.hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at center, transparent 0%, rgba(245, 245, 240, 0.8) 100%);
+        pointer-events: none;
+}
+
+.hero-title {
+        font-size: 4.5rem;
+        font-family: var(--font-serif);
+        font-weight: 700;
+        background: linear-gradient(135deg, #3b3b3b 0%, #5D866C 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.03em;
+        position: relative;
+        z-index: 1;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.hero-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        max-width: 600px;
+        margin: 0 auto 2rem;
+        position: relative;
+        z-index: 1;
+}
+
+/* 4. Card Styling - Organic Glassmorphism */
 .card {
-    border: none;
-    border-radius: 12px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    overflow: hidden; /* Keeps images inside rounded corners */
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(194, 166, 140, 0.3);
+        border-radius: 16px;
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px -10px rgba(93, 134, 108, 0.1);
+}
+
+.card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+        opacity: 0.6;
+        pointer-events: none;
 }
 
 .card:hover {
-    transform: translateY(-5px); /* Floats up slightly */
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        transform: translateY(-8px) scale(1.02);
+        border-color: var(--accent-color);
+        box-shadow: 0 20px 40px -12px rgba(93, 134, 108, 0.2),
+                0 0 20px rgba(230, 216, 195, 0.4);
+        z-index: 10;
 }
 
-/* Product Images */
 .card-img-top {
-    border-bottom: 1px solid #f0f0f0;
-    transition: opacity 0.3s;
+        border-bottom: 1px solid var(--border-color);
+        filter: contrast(105%);
+        transition: all 0.6s ease;
+        height: 250px;
+        object-fit: cover;
 }
 
 .card:hover .card-img-top {
-    opacity: 0.9;
+        filter: contrast(110%);
+        transform: scale(1.05);
 }
 
-/* 3. Buttons & Badges */
+.card-body {
+        padding: 1.5rem;
+        position: relative;
+        z-index: 2;
+}
+
+.card-title {
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+}
+
+/* 5. Buttons & Inputs */
+.btn {
+        border-radius: 8px;
+        font-family: var(--font-sans);
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        padding: 0.8em 1.5em;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+}
+
+.btn-primary {
+        background: linear-gradient(135deg, var(--accent-color), #4a6b56);
+        border: none;
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(93, 134, 108, 0.3);
+}
+
+.btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(93, 134, 108, 0.5);
+        color: #fff;
+}
+
 .btn-outline-primary {
-    border-color: #28a745;
-    color: #28a745;
+        border: 1px solid var(--accent-color);
+        color: var(--accent-color);
+        background: transparent;
 }
 
 .btn-outline-primary:hover {
-    background-color: #28a745;
-    color: white;
+        border-color: var(--accent-color);
+        background: var(--accent-color);
+        color: #fff;
+        box-shadow: 0 0 15px rgba(93, 134, 108, 0.2);
 }
 
-.btn-success {
-    background-color: #28a745; /* Fresh Green */
-    border: none;
+.btn-outline-secondary {
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
 }
 
-.btn-success:hover {
-    background-color: #218838;
+.form-control,
+.form-select {
+        background-color: transparent;
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-main);
+        border-radius: 0;
+        font-family: var(--font-mono);
+        padding: 0.8rem 0;
 }
 
-.badge {
-    font-weight: 500;
-    padding: 0.5em 0.8em;
+.form-control:focus,
+.form-select:focus {
+        background-color: transparent;
+        border-color: var(--accent-color);
+        color: var(--text-main);
+        box-shadow: none;
 }
 
-/* 4. Cart Badge Animation */
-#cart-badge {
-    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+.input-group-text {
+        background-color: transparent;
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-muted);
 }
 
-@keyframes popIn {
-    0% { transform: scale(0) translate(-50%, -50%); }
-    100% { transform: scale(1) translate(-50%, -50%); }
+/* 6. Tables */
+.table {
+        --bs-table-bg: transparent;
+        --bs-table-color: var(--text-main);
+        border-color: var(--border-color);
 }
 
-/* 5. Table Styling (Cart & Admin) */
 .table thead th {
-    background-color: #e9ecef;
-    border-top: none;
-    color: #495057;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1rem;
 }
 
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: rgba(0,0,0,0.02);
+.table td {
+        padding: 1.5rem 0.5rem;
+        vertical-align: middle;
 }
 
-/* 6. Admin Login Card */
+/* 7. Utilities & Badges */
+.badge {
+        font-family: var(--font-mono);
+        font-weight: 500;
+        border-radius: 4px;
+        padding: 0.4em 0.8em;
+        letter-spacing: 0.05em;
+}
+
+.bg-info {
+        background-color: rgba(230, 216, 195, 0.4) !important;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted) !important;
+}
+
+.bg-primary {
+        background-color: var(--border-color) !important;
+        color: #fff !important;
+}
+
+.bg-danger {
+        background-color: var(--accent-color) !important;
+}
+
+.text-success {
+        color: #5D866C !important;
+}
+
+.text-danger {
+        color: #C2A68C !important;
+}
+
+.text-warning {
+        color: #d4a373 !important;
+}
+
+/* 8. Navbar & Dropdowns */
+.dropdown-menu {
+        background-color: #F5F5F0;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(93, 134, 108, 0.1);
+}
+
+.dropdown-item {
+        color: var(--text-main);
+        font-family: var(--font-mono);
+        padding: 0.8rem 1.5rem;
+}
+
+.dropdown-item:hover {
+        background-color: rgba(93, 134, 108, 0.1);
+        color: var(--accent-color);
+}
+
+.dropdown-divider {
+        border-top-color: var(--border-color);
+}
+
+/* 9. Alerts & Toasts */
+.alert {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        border-left: 3px solid var(--accent-color);
+        color: var(--text-main);
+        border-radius: 0;
+}
+
+.toast {
+        background-color: #F5F5F0;
+        border: 1px solid var(--accent-color);
+        color: var(--text-main);
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(93, 134, 108, 0.15);
+}
+
+.btn-close {
+        /* Default is fine for light mode */
+}
+
+/* 10. Login Page Styling */
+.login-body {
+        background-color: var(--bg-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+}
+
+.login-container {
+        width: 100%;
+        max-width: 450px;
+        padding: 20px;
+}
+
 .login-card {
-    border-top: 5px solid #28a745; /* Green accent on top */
+        background-color: #E6D8C3;
+        /* Soft Beige from palette */
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* 7. Success Page Icon */
-.display-1 {
-    color: #28a745;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+.login-header {
+        margin-bottom: 2.5rem;
 }
 
-/* Toast Notification Z-Index */
-.toast-container {
-    z-index: 1055; /* Higher than Bootstrap defaults */
+.login-icon {
+        font-size: 2.5rem;
+        color: #d4a373;
+        /* Gold/Orange tone for lock */
+        margin-bottom: 1rem;
+        display: block;
+        text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+.login-header h2 {
+        font-family: var(--font-serif);
+        font-size: 2rem;
+        color: var(--text-main);
+        font-weight: 700;
+        margin: 0;
+}
+
+.login-card .form-label {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.5rem;
+        text-align: left;
+        display: block;
+}
+
+.login-card .form-control {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        border-radius: 0;
+        padding: 0.5rem 0;
+        color: var(--text-main);
+        font-family: var(--font-sans);
+        font-size: 1rem;
+}
+
+.login-card .form-control:focus {
+        box-shadow: none;
+        border-color: var(--accent-color);
+}
+
+.btn-login {
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(93, 134, 108, 0.3);
+}
+
+.btn-login:hover {
+        background-color: #4a6b56;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(93, 134, 108, 0.4);
+        color: white;
+}
+
+.login-footer p {
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-main);
+}
+
+.login-footer a {
+        color: var(--text-main);
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.3s ease;
+}
+
+.login-footer a:hover {
+        border-color: var(--text-main);
+        color: var(--text-main);
 }

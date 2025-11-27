@@ -1,0 +1,10 @@
+Request at 2025-11-27 06:44:59
+Session ID: vhl83n6qaae2kppa65rqi1ke41
+User ID: 1
+POST Data: Array
+(
+    [product_id] => 1
+)
+
+Success: Item added. Cart count: 1
+-------------------

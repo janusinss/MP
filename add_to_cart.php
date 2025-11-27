@@ -1,5 +1,7 @@
 <?php
+error_reporting(0); // Suppress all errors to ensure valid JSON
 session_start();
+include 'db.php';
 
 // Prepare default response
 $response = ['status' => 'error', 'message' => 'Invalid request'];

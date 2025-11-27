@@ -2,6 +2,20 @@
 include 'db.php';
 session_start();
 
+// --- NEW: FORCE LOGOUT IF USER IS DELETED ---
+if (isset($_SESSION['user_id'])) {
+    $stmtCheck = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+    $stmtCheck->execute([$_SESSION['user_id']]);
+    
+    // If the user is NOT found in the database...
+    if (!$stmtCheck->fetch()) {
+        session_destroy();             // Destroy the session
+        header("Location: index.php"); // Reload the page as a guest
+        exit;
+    }
+}
+// --------------------------------------------
+
 // Calculate current cart count
 $cartCount = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
 
@@ -79,44 +93,53 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
         </div>
     <?php endif; ?>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>🛒 FreshCart Market</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4 pt-4">
+        <a href="index.php" class="text-decoration-none">
+            <h4 class="m-0" style="font-family: var(--font-serif); letter-spacing: -0.05em;">FreshCart<span style="color: var(--accent-color)">.</span></h4>
+        </a>
         
-        <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-4">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <div class="dropdown">
-                    <button class="btn btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        👤 Hi, <?= htmlspecialchars($_SESSION['user_name']) ?>
+                    <button class="btn btn-link text-decoration-none dropdown-toggle p-0" type="button" data-bs-toggle="dropdown">
+                        <?= htmlspecialchars($_SESSION['user_name']) ?>
                     </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="profile.php">👤 Edit Profile</a></li>
-                        <li><a class="dropdown-item" href="my_orders.php">📦 My Orders</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+                        <li><a class="dropdown-item" href="my_orders.php">Orders</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="user_logout.php">Logout</a></li>
                     </ul>
                 </div>
             <?php else: ?>
-                <div>
-                    <a href="user_login.php" class="btn btn-outline-primary btn-sm">Login</a>
-                    <a href="user_register.php" class="btn btn-primary btn-sm">Register</a>
+                <div class="d-flex gap-3">
+                    <a href="user_login.php" class="btn btn-sm btn-outline-secondary">Login</a>
+                    <a href="user_register.php" class="btn btn-sm btn-primary">Register</a>
                 </div>
             <?php endif; ?>
 
-            <a href="cart.php" class="btn btn-success position-relative">
-                <i class="bi bi-cart-fill"></i> Cart
-                <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            <a href="cart.php" class="position-relative text-decoration-none">
+                <i class="bi bi-bag" style="font-size: 1.2rem;"></i>
+                <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
                     <?= $cartCount ?>
                 </span>
             </a>
         </div>
     </div>
+
+    <!-- Hero Section -->
+    <div class="hero-section animate-fade-in">
+        <h1 class="hero-title">Organic.<br>Fresh.<br>Delivered.</h1>
+        <p class="hero-subtitle">Curated essentials for the modern kitchen. Quality you can taste, aesthetics you can feel.</p>
+        <a href="#shop" class="btn btn-primary">Explore Collection</a>
+    </div>
     
-    <div class="card p-3 mb-4 shadow-sm bg-light">
-        <form method="GET" class="row g-2 align-items-center">
-            <div class="col-md-4">
+    <div id="shop" class="mb-5">
+        <form method="GET" class="row g-4 align-items-end">
+            <div class="col-md-6">
                 <div class="input-group">
-                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control" placeholder="Search..." value="<?= htmlspecialchars($search) ?>">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="Search products..." value="<?= htmlspecialchars($search) ?>">
                 </div>
             </div>
             <div class="col-md-3">
@@ -135,23 +158,20 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                     <option value="alpha" <?= $sort === 'alpha' ? 'selected' : '' ?>>Name: A-Z</option>
                 </select>
             </div>
-            <div class="col-md-2 d-grid">
-                <a href="index.php" class="btn btn-outline-secondary">Reset</a>
-            </div>
         </form>
     </div>
     
-    <div class="row">
+    <div class="row g-4">
         <?php if (count($products) > 0): ?>
             <?php foreach ($products as $product): ?>
-                <div class="col-md-3 mb-4">
-                    <div class="card h-100 shadow-sm">
+                <div class="col-md-3">
+                    <div class="card h-100">
                         
                         <?php $imgName = $product['image'] ?? 'default.jpg'; ?>
-                        <a href="product.php?id=<?= $product['id'] ?>" class="text-decoration-none text-dark">
+                        <a href="product.php?id=<?= $product['id'] ?>" class="text-decoration-none">
                             <div class="position-relative">
-                                <img src="assets/images/<?php echo $imgName; ?>" class="card-img-top" alt="img" style="height: 200px; object-fit: cover;">
-                                <span class="position-absolute top-0 start-0 badge bg-info text-dark m-2"><?= $product['category'] ?></span>
+                                <img src="assets/images/<?php echo $imgName; ?>" class="card-img-top" alt="img" style="height: 250px; object-fit: cover;">
+                                <span class="position-absolute top-0 start-0 badge bg-info m-2"><?= $product['category'] ?></span>
                             </div>
                             
                             <div class="card-body d-flex flex-column">
@@ -162,7 +182,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                                     $stmtRating->execute([$product['id']]);
                                     $avgRating = round($stmtRating->fetchColumn(), 1);
                                 ?>
-                                <div class="mb-2">
+                                <div class="mb-3">
                                     <?php if($avgRating > 0): ?>
                                         <span class="text-warning">
                                             <?php 
@@ -173,31 +193,32 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                                             } 
                                             ?>
                                         </span>
-                                        <span class="text-muted small">(<?= $avgRating ?>)</span>
+                                        <span class="text-muted small ms-1">(<?= $avgRating ?>)</span>
                                     <?php else: ?>
                                         <span class="text-muted small">No reviews yet</span>
                                     <?php endif; ?>
                                 </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <span class="fw-bold fs-5">$<?php echo number_format($product['price'], 2); ?></span>
+                                    <?php 
+                                    $stock = $product['stock_qty'];
+                                    if ($stock == 0) echo '<span class="badge bg-danger">Out of Stock</span>';
+                                    elseif ($stock < 5) echo '<span class="text-danger fw-bold small">Only ' . $stock . ' left!</span>';
+                                    ?>
+                                </div>
+                            </div>
                         </a>
-                        <div class="d-flex justify-content-between align-items-center mb-3 mt-auto">
-                            <span class="fw-bold fs-5">$<?php echo number_format($product['price'], 2); ?></span>
-                            <?php 
-                            $stock = $product['stock_qty'];
-                            if ($stock == 0) echo '<span class="badge bg-danger">Out of Stock</span>';
-                            elseif ($stock < 5) echo '<span class="text-danger fw-bold small">Only ' . $stock . ' left!</span>';
-                            else echo '<span class="text-muted small">Stock: ' . $stock . '</span>';
-                            ?>
-                        </div>
                         
-                        <?php if ($stock > 0): ?>
-                            <form action="add_to_cart.php" method="POST">
-                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                <button type="submit" class="btn btn-outline-primary w-100">Add to Cart</button>
-                            </form>
-                        <?php else: ?>
-                            <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
-                        <?php endif; ?>
-
+                        <div class="card-footer bg-transparent border-top-0 p-3 pt-0">
+                            <?php if ($stock > 0): ?>
+                                <form action="add_to_cart.php" method="POST">
+                                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                    <button type="submit" class="btn btn-outline-primary w-100">Add to Cart</button>
+                                </form>
+                            <?php else: ?>
+                                <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -208,7 +229,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
     </div>
 
     <?php if ($totalPages > 1): ?>
-    <nav>
+    <nav class="mt-5">
         <ul class="pagination justify-content-center">
             <?php 
                 $queryParams = $_GET; 

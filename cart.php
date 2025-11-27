@@ -80,56 +80,6 @@ if (isset($_SESSION['discount'])) {
     <a href="index.php" class="btn btn-secondary mb-3">&larr; Continue Shopping</a>
 
     <?php if (empty($cartItems)): ?>
-        <div class="alert alert-warning text-center py-5">
-            <h4>Your cart is empty!</h4>
-            <a href="index.php" class="btn btn-primary">Start Shopping</a>
-        </div>
-    <?php else: ?>
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card shadow-sm mb-3">
-                    <div class="card-body">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Price</th>
-                                    <th>Qty</th>
-                                    <th>Subtotal</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($cartItems as $item): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($item['name']) ?></td>
-                                    <td>$<?= number_format($item['price'], 2) ?></td>
-                                    <td><span class="badge bg-primary rounded-pill"><?= $item['qty'] ?></span></td>
-                                    <td class="fw-bold">$<?= number_format($item['subtotal'], 2) ?></td>
-                                    <td>
-                                        <form action="remove_from_cart.php" method="POST">
-                                            <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">Order Summary</h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" class="mb-3">
-                            <label class="form-label">Have a coupon?</label>
-                            <div class="input-group">
-                                <input type="text" name="coupon_code" class="form-control" placeholder="Enter code" required>
                                 <button type="submit" name="apply_coupon" class="btn btn-outline-dark">Apply</button>
                             </div>
                             <?php if ($coupon_msg): ?>

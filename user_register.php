@@ -33,52 +33,64 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <title>Sign Up</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - FreshCart Market</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow">
-                <div class="card-body p-4">
-                    <h3 class="text-center mb-4">📝 Create Account</h3>
-                    
-                    <?php if ($error): ?>
-                        <div class="alert alert-danger"><?= $error ?></div>
-                    <?php endif; ?>
-                    <?php if ($success): ?>
-                        <div class="alert alert-success"><?= $success ?></div>
-                    <?php endif; ?>
 
-                    <form method="POST">
-                        <div class="mb-3">
-                            <label>Full Name</label>
-                            <input type="text" name="full_name" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label>Email Address</label>
-                            <input type="email" name="email" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label>Password</label>
-                            <input type="password" name="password" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label>Delivery Address (Optional)</label>
-                            <textarea name="address" class="form-control" rows="2"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">Register</button>
-                    </form>
-                    
-                    <div class="text-center mt-3">
-                        <small>Already have an account? <a href="user_login.php">Login</a></small><br>
-                        <small><a href="index.php">Back to Shop</a></small>
-                    </div>
+<body class="login-body">
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="bi bi-person-plus-fill login-icon"></i>
+                <h2>Create Account</h2>
+            </div>
+
+            <?php if ($error): ?>
+                <div class="alert alert-danger text-center border-0 bg-transparent text-danger mb-4">
+                    <?= $error ?>
                 </div>
+            <?php endif; ?>
+            <?php if ($success): ?>
+                <div class="alert alert-success text-center border-0 bg-transparent text-success mb-4">
+                    <?= $success ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST">
+                <div class="form-group mb-4">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="full_name" class="form-control" required>
+                </div>
+                <div class="form-group mb-4">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="form-group mb-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="form-group mb-5">
+                    <label class="form-label">Delivery Address (Optional)</label>
+                    <textarea name="address" class="form-control" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-login w-100">Register</button>
+            </form>
+
+            <div class="login-footer mt-4">
+                <p>Already have an account? <a href="user_login.php">Login</a></p>
+                <p><a href="index.php">Back to Shop</a></p>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

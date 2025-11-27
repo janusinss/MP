@@ -45,22 +45,6 @@ if (isset($_SESSION['discount'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Checkout</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3>Finalize Order</h3>
-                </div>
-                <div class="card-body">
-                    <h4 class="mb-4">Total to Pay: <span class="text-success">$<?= number_format($finalTotal, 2) ?></span></h4>
-                    
-                    <form action="place_order.php" method="POST">
-                        <div class="mb-3">
                             <label>Full Name</label>
                             <input type="text" name="customer_name" class="form-control" required 
                                    value="<?= htmlspecialchars($pre_name) ?>" placeholder="John Doe">
