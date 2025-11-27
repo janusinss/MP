@@ -61,10 +61,9 @@ if ($sort === 'price_asc') {
 } elseif ($sort === 'alpha') {
     $sql .= " ORDER BY name ASC";
 } else {
-    $sql .= " ORDER BY id DESC"; // Default new items first
+    $sql .= " ORDER BY id DESC";
 }
 
-// Add Limit/Offset
 $sql .= " LIMIT $limit OFFSET $offset";
 
 $stmt = $pdo->prepare($sql);
@@ -74,6 +73,30 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Fetch unique categories for dropdown
 $catStmt = $pdo->query("SELECT DISTINCT category FROM products ORDER BY category");
 $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
+
+// Pagination Links
+$paginationHtml = '';
+if ($totalPages > 1) {
+    $paginationHtml .= '<nav aria-label="Page navigation" class="mt-5">';
+    $paginationHtml .= '<ul class="pagination justify-content-center">';
+    
+    // Previous button
+    $prevDisabled = ($page <= 1) ? 'disabled' : '';
+    $paginationHtml .= '<li class="page-item ' . $prevDisabled . '"><a class="page-link" href="index.php?page=' . ($page - 1) . '&search=' . urlencode($search) . '&category=' . urlencode($category) . '&sort=' . urlencode($sort) . '">Previous</a></li>';
+    
+    // Page numbers
+    for ($i = 1; $i <= $totalPages; $i++) {
+        $active = ($i == $page) ? 'active' : '';
+        $paginationHtml .= '<li class="page-item ' . $active . '"><a class="page-link" href="index.php?page=' . $i . '&search=' . urlencode($search) . '&category=' . urlencode($category) . '&sort=' . urlencode($sort) . '">' . $i . '</a></li>';
+    }
+    
+    // Next button
+    $nextDisabled = ($page >= $totalPages) ? 'disabled' : '';
+    $paginationHtml .= '<li class="page-item ' . $nextDisabled . '"><a class="page-link" href="index.php?page=' . ($page + 1) . '&search=' . urlencode($search) . '&category=' . urlencode($category) . '&sort=' . urlencode($sort) . '">Next</a></li>';
+    
+    $paginationHtml .= '</ul>';
+    $paginationHtml .= '</nav>';
+}
 ?>
 
 <!DOCTYPE html>
@@ -82,7 +105,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
     <title>FreshCart Market</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
 </head>
 <body class="container mt-5 mb-5">
     <?php if (isset($_SESSION['user_id'])): ?>
@@ -228,38 +251,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
         <?php endif; ?>
     </div>
 
-    <?php if ($totalPages > 1): ?>
-    <nav class="mt-5">
-        <ul class="pagination justify-content-center">
-            <?php 
-                $queryParams = $_GET; 
-                $queryParams['page'] = $page - 1;
-                $prevLink = '?' . http_build_query($queryParams);
-                
-                $queryParams['page'] = $page + 1;
-                $nextLink = '?' . http_build_query($queryParams);
-            ?>
-
-            <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                <a class="page-link" href="<?= $prevLink ?>">Previous</a>
-            </li>
-
-            <?php for($i = 1; $i <= $totalPages; $i++): ?>
-                <?php 
-                    $queryParams['page'] = $i;
-                    $link = '?' . http_build_query($queryParams);
-                ?>
-                <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
-                    <a class="page-link" href="<?= $link ?>"><?= $i ?></a>
-                </li>
-            <?php endfor; ?>
-
-            <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : '' ?>">
-                <a class="page-link" href="<?= $nextLink ?>">Next</a>
-            </li>
-        </ul>
-    </nav>
-    <?php endif; ?>
+    <?php echo $paginationHtml; ?>
 
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="liveToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">

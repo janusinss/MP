@@ -58,53 +58,64 @@ if (count($reviews) > 0) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <title><?= htmlspecialchars($product['name']) ?> - Details</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="container mt-5">
-
-    <div class="mb-4">
-        <a href="index.php" class="btn btn-outline-secondary">&larr; Back to Shop</a>
-    </div>
-
-    <div class="card shadow-sm mb-5">
+    <!-- Product Showcase -->
+    <div class="product-showcase mb-5 animate-fade-in">
         <div class="row g-0">
-            <div class="col-md-6">
-                <?php $img = $product['image'] ?? 'default.jpg'; ?>
-                <img src="assets/images/<?= $img ?>" class="img-fluid rounded-start w-100" style="height: 400px; object-fit: cover;" alt="Product">
+            <div class="col-lg-6">
+                <div class="product-image-stage">
+                    <?php $img = $product['image'] ?? 'default.jpg'; ?>
+                    <img src="assets/images/<?= $img ?>" class="img-fluid" alt="<?= htmlspecialchars($product['name']) ?>">
+                </div>
             </div>
-            <div class="col-md-6">
-                <div class="card-body p-4">
-                    <h6 class="text-muted text-uppercase"><?= $product['category'] ?></h6>
-                    <h1 class="display-5 fw-bold"><?= htmlspecialchars($product['name']) ?></h1>
+            <div class="col-lg-6">
+                <div class="product-details-panel">
+                    <span class="product-category-badge"><?= $product['category'] ?></span>
+                    <h1 class="product-title-large"><?= htmlspecialchars($product['name']) ?></h1>
                     
-                    <div class="mb-3">
-                        <span class="fs-4 fw-bold text-success">$<?= number_format($product['price'], 2) ?></span>
-                        
-                        <span class="ms-3 text-warning">
+                    <div class="product-price-large">
+                        $<?= number_format($product['price'], 2) ?>
+                        <div class="d-flex align-items-center fs-6 text-warning">
                             <?php for($i=1; $i<=5; $i++): ?>
                                 <i class="bi bi-star<?= $i <= $avgRating ? '-fill' : '' ?>"></i>
                             <?php endfor; ?>
-                        </span>
-                        <small class="text-muted">(<?= count($reviews) ?> reviews)</small>
+                            <span class="text-muted ms-2 fw-normal">(<?= count($reviews) ?> reviews)</span>
+                        </div>
                     </div>
 
-                    <p class="lead">Fresh, high-quality <?= strtolower($product['category']) ?> sourced directly from local farmers. Guaranteed freshness or your money back.</p>
+                    <p class="lead text-muted mb-4">Fresh, high-quality <?= strtolower($product['category']) ?> sourced directly from local farmers. Guaranteed freshness or your money back.</p>
+
+                    <div class="product-meta">
+                        <?php if ($product['stock_qty'] > 0): ?>
+                            <div class="d-flex align-items-center text-success">
+                                <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                                <div>
+                                    <span class="d-block fw-bold">In Stock</span>
+                                    <small><?= $product['stock_qty'] ?> available</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center text-muted">
+                                <i class="bi bi-truck me-2 fs-5"></i>
+                                <div>
+                                    <span class="d-block fw-bold">Fast Delivery</span>
+                                    <small>Get it by tomorrow</small>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-danger fw-bold">
+                                <i class="bi bi-x-circle-fill me-2"></i> Out of Stock
+                            </div>
+                        <?php endif; ?>
+                    </div>
 
                     <?php if ($product['stock_qty'] > 0): ?>
-                        <p class="text-success"><i class="bi bi-check-circle-fill"></i> In Stock (<?= $product['stock_qty'] ?> available)</p>
-                        
-                        <form action="add_to_cart.php" method="POST" class="d-grid">
+                        <form action="add_to_cart.php" method="POST">
                             <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                            <button type="submit" class="btn btn-primary btn-lg">Add to Cart</button>
+                            <button type="submit" class="btn-add-cart-lg">
+                                <i class="bi bi-cart-plus me-2"></i> Add to Cart
+                            </button>
                         </form>
                     <?php else: ?>
-                        <p class="text-danger"><i class="bi bi-x-circle-fill"></i> Out of Stock</p>
-                        <button class="btn btn-secondary btn-lg w-100" disabled>Unavailable</button>
+                        <button class="btn btn-secondary btn-lg w-100 rounded-4" disabled>Unavailable</button>
                     <?php endif; ?>
                     
                 </div>
@@ -150,26 +161,29 @@ if (count($reviews) > 0) {
 
             <?php if (count($reviews) > 0): ?>
                 <?php foreach ($reviews as $r): ?>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <h6 class="fw-bold"><?= htmlspecialchars($r['full_name']) ?></h6>
-                                <small class="text-muted"><?= date('M d, Y', strtotime($r['created_at'])) ?></small>
+                    <div class="testimonial-card mb-4 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <div class="testimonial-user"><?= htmlspecialchars($r['full_name']) ?></div>
+                                <div class="testimonial-date"><?= date('M d, Y', strtotime($r['created_at'])) ?></div>
                             </div>
-                            <div class="text-warning mb-2">
-                                <?php for($i=0; $i<$r['rating']; $i++) echo '★'; ?>
+                            <div class="text-warning small">
+                                <?php for($i=0; $i<$r['rating']; $i++) echo '<i class="bi bi-star-fill"></i>'; ?>
                             </div>
-                            <p class="card-text"><?= htmlspecialchars($r['comment']) ?></p>
                         </div>
+                        <p class="testimonial-text mb-0"><?= htmlspecialchars($r['comment']) ?></p>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+                <div class="text-center py-5 bg-white rounded-4 border border-light">
+                    <i class="bi bi-chat-square-quote fs-1 text-muted opacity-25 mb-3 d-block"></i>
+                    <p class="text-muted">No reviews yet. Be the first to share your thoughts!</p>
+                </div>
             <?php endif; ?>
         </div>
     </div>
 
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="liveToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body">
@@ -184,29 +198,19 @@ if (count($reviews) > 0) {
         document.querySelectorAll('form[action="add_to_cart.php"]').forEach(form => {
             form.addEventListener('submit', function(e) {
                 e.preventDefault(); 
-
                 const formData = new FormData(this);
-
-                fetch('add_to_cart.php', {
-                    method: 'POST',
-                    body: formData
-                })
+                fetch('add_to_cart.php', { method: 'POST', body: formData })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        // Success Logic (Update Badge + Toast)
-                        // Note: product.php might not have the badge ID if headers differ, 
-                        // but if you use the same header include, it works.
                         const badge = document.getElementById('cart-badge');
                         if(badge) badge.innerText = data.cart_count;
-                        
                         const toastEl = document.getElementById('liveToast');
                         if(toastEl) {
                             const toast = new bootstrap.Toast(toastEl);
                             toast.show();
                         }
                     } 
-                    // *** NEW: ALERT BEFORE REDIRECT ***
                     else if (data.status === 'login_required') {
                         alert("Log in to add to cart"); 
                         window.location.href = 'user_login.php';
@@ -217,40 +221,37 @@ if (count($reviews) > 0) {
         });
     </script>
 
-<?php if (count($relatedProducts) > 0): ?>
-    <div class="mt-5 mb-5">
+    <?php if (count($relatedProducts) > 0): ?>
+    <div class="mt-5 mb-5 pt-5 border-top">
         <h3 class="mb-4">You Might Also Like</h3>
         <div class="row">
             <?php foreach ($relatedProducts as $rp): ?>
                 <div class="col-md-3 mb-4">
-                    <div class="card h-100 shadow-sm">
+                    <div class="mini-showcase h-100">
                         <a href="product.php?id=<?= $rp['id'] ?>" class="text-decoration-none text-dark">
                             <?php $rImg = $rp['image'] ?? 'default.jpg'; ?>
-                            <div class="position-relative">
-                                <img src="assets/images/<?= $rImg ?>" class="card-img-top" style="height: 150px; object-fit: cover;">
-                                <span class="position-absolute top-0 start-0 badge bg-light text-dark m-2 border">
+                            <div class="position-relative overflow-hidden">
+                                <img src="assets/images/<?= $rImg ?>" class="card-img-top" style="height: 200px; object-fit: cover;">
+                                <span class="position-absolute top-0 start-0 badge bg-white text-dark m-3 shadow-sm border rounded-pill">
                                     <?= $rp['category'] ?>
                                 </span>
                             </div>
-                            <div class="card-body">
-                                <h6 class="card-title text-truncate"><?= htmlspecialchars($rp['name']) ?></h6>
-                                <p class="text-success fw-bold mb-0">$<?= number_format($rp['price'], 2) ?></p>
+                            <div class="card-body p-3">
+                                <h6 class="card-title text-truncate fw-bold mb-1" style="font-family: var(--font-serif); font-size: 1.1rem;"><?= htmlspecialchars($rp['name']) ?></h6>
+                                <p class="text-success fw-bold mb-3">$<?= number_format($rp['price'], 2) ?></p>
+                                
+                                <form action="add_to_cart.php" method="POST">
+                                    <input type="hidden" name="product_id" value="<?= $rp['id'] ?>">
+                                    <button type="submit" class="btn-add-mini w-100">Add to Cart</button>
+                                </form>
                             </div>
                         </a>
-                        <div class="card-footer bg-white border-0">
-                            <form action="add_to_cart.php" method="POST">
-                                <input type="hidden" name="product_id" value="<?= $rp['id'] ?>">
-                                <button type="submit" class="btn btn-sm btn-outline-primary w-100">Add</button>
-                            </form>
-                        </div>
                     </div>
                 </div>
             <?php endforeach; ?>
         </div>
     </div>
     <?php endif; ?>
-
-
     
 </body>
 </html>

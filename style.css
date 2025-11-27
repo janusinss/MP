@@ -146,20 +146,6 @@ label {
         pointer-events: none;
 }
 
-.hero-title {
-        font-size: 4.5rem;
-        font-family: var(--font-serif);
-        font-weight: 700;
-        background: linear-gradient(135deg, #3b3b3b 0%, #5D866C 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 1.5rem;
-        letter-spacing: -0.03em;
-        position: relative;
-        z-index: 1;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
-}
-
 .hero-subtitle {
         font-size: 1.2rem;
         color: var(--text-muted);
@@ -505,6 +491,201 @@ label {
 .login-footer a {
         color: var(--text-main);
         text-decoration: none;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1rem;
+}
+
+.table td {
+        padding: 1.5rem 0.5rem;
+        vertical-align: middle;
+}
+
+/* 7. Utilities & Badges */
+.badge {
+        font-family: var(--font-mono);
+        font-weight: 500;
+        border-radius: 4px;
+        padding: 0.4em 0.8em;
+        letter-spacing: 0.05em;
+}
+
+.bg-info {
+        background-color: rgba(230, 216, 195, 0.4) !important;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted) !important;
+}
+
+.bg-primary {
+        background-color: var(--border-color) !important;
+        color: #fff !important;
+}
+
+.bg-danger {
+        background-color: var(--accent-color) !important;
+}
+
+.text-success {
+        color: #5D866C !important;
+}
+
+.text-danger {
+        color: #C2A68C !important;
+}
+
+.text-warning {
+        color: #d4a373 !important;
+}
+
+/* 8. Navbar & Dropdowns */
+.dropdown-menu {
+        background-color: #F5F5F0;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(93, 134, 108, 0.1);
+}
+
+.dropdown-item {
+        color: var(--text-main);
+        font-family: var(--font-mono);
+        padding: 0.8rem 1.5rem;
+}
+
+.dropdown-item:hover {
+        background-color: rgba(93, 134, 108, 0.1);
+        color: var(--accent-color);
+}
+
+.dropdown-divider {
+        border-top-color: var(--border-color);
+}
+
+/* 9. Alerts & Toasts */
+.alert {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        border-left: 3px solid var(--accent-color);
+        color: var(--text-main);
+        border-radius: 0;
+}
+
+.toast {
+        background-color: #F5F5F0;
+        border: 1px solid var(--accent-color);
+        color: var(--text-main);
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(93, 134, 108, 0.15);
+}
+
+.btn-close {
+        /* Default is fine for light mode */
+}
+
+/* 10. Login Page Styling */
+.login-body {
+        background-color: var(--bg-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+}
+
+.login-container {
+        width: 100%;
+        max-width: 450px;
+        padding: 20px;
+}
+
+.login-card {
+        background-color: #E6D8C3;
+        /* Soft Beige from palette */
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.login-header {
+        margin-bottom: 2.5rem;
+}
+
+.login-icon {
+        font-size: 2.5rem;
+        color: #d4a373;
+        /* Gold/Orange tone for lock */
+        margin-bottom: 1rem;
+        display: block;
+        text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+.login-header h2 {
+        font-family: var(--font-serif);
+        font-size: 2rem;
+        color: var(--text-main);
+        font-weight: 700;
+        margin: 0;
+}
+
+.login-card .form-label {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.5rem;
+        text-align: left;
+        display: block;
+}
+
+.login-card .form-control {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        border-radius: 0;
+        padding: 0.5rem 0;
+        color: var(--text-main);
+        font-family: var(--font-sans);
+        font-size: 1rem;
+}
+
+.login-card .form-control:focus {
+        box-shadow: none;
+        border-color: var(--accent-color);
+}
+
+.btn-login {
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(93, 134, 108, 0.3);
+}
+
+.btn-login:hover {
+        background-color: #4a6b56;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(93, 134, 108, 0.4);
+        color: white;
+}
+
+.login-footer p {
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-main);
+}
+
+.login-footer a {
+        color: var(--text-main);
+        text-decoration: none;
         font-weight: 500;
         border-bottom: 1px solid transparent;
         transition: border-color 0.3s ease;
@@ -513,4 +694,172 @@ label {
 .login-footer a:hover {
         border-color: var(--text-main);
         color: var(--text-main);
+}
+
+/* 11. Product Page Redesign */
+
+/* Product Showcase Container */
+.product-showcase {
+        background-color: #fff;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.03);
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+/* Left Column: Image Stage */
+.product-image-stage {
+        background-color: #f8f9fa;
+        height: 100%;
+        min-height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        position: relative;
+}
+
+.product-image-stage img {
+        max-height: 400px;
+        filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.15));
+        transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.product-image-stage:hover img {
+        transform: scale(1.05) translateY(-10px);
+}
+
+/* Right Column: Details Panel */
+.product-details-panel {
+        padding: 4rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+}
+
+.product-category-badge {
+        display: inline-block;
+        background-color: rgba(93, 134, 108, 0.1);
+        color: var(--accent-color);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+        align-self: flex-start;
+}
+
+.product-title-large {
+        font-size: 3.5rem;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+        color: var(--text-main);
+}
+
+.product-price-large {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--accent-color);
+        margin-bottom: 2rem;
+        font-family: var(--font-mono);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+}
+
+.product-meta {
+        margin-bottom: 2.5rem;
+        padding: 1.5rem 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        gap: 3rem;
+}
+
+/* Add to Cart Button (Large) */
+.btn-add-cart-lg {
+        background-color: var(--text-main);
+        color: #fff;
+        border: none;
+        padding: 1.2rem 2.5rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        width: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-add-cart-lg:hover {
+        background-color: var(--accent-color);
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(93, 134, 108, 0.3);
+}
+
+/* Testimonials / Reviews */
+.testimonial-card {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 16px;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        transition: transform 0.3s ease;
+}
+
+.testimonial-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.testimonial-user {
+        font-weight: 700;
+        font-family: var(--font-serif);
+        font-size: 1.1rem;
+}
+
+.testimonial-date {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+}
+
+.testimonial-text {
+        font-style: italic;
+        color: #555;
+        line-height: 1.8;
+}
+
+/* Mini Showcase (Related Products) */
+.mini-showcase {
+        background: #fff;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.mini-showcase:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05);
+}
+
+.btn-add-mini {
+        background: transparent;
+        border: 1px solid var(--text-main);
+        color: var(--text-main);
+        padding: 0.5rem;
+        width: 100%;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        transition: all 0.3s ease;
+}
+
+.btn-add-mini:hover {
+        background: var(--text-main);
+        color: #fff;
 }
