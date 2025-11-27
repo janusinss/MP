@@ -8,7 +8,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-// 1. Fetch All Orders (Existing Logic)
+// 1. Fetch Orders
 try {
     $stmt = $pdo->query("SELECT * FROM orders ORDER BY id DESC");
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -17,175 +17,227 @@ try {
     $error = $e->getMessage();
 }
 
-// 2. ADVANCED: Fetch Daily Sales Data for the Chart
-// We use SQL 'GROUP BY' to sum up the totals for each day
+// 2. Fetch Daily Sales Data for Chart
 try {
     $sqlChart = "SELECT DATE(created_at) as order_date, SUM(total_amount) as daily_total 
                  FROM orders 
                  WHERE status != 'Cancelled' 
                  GROUP BY DATE(created_at) 
                  ORDER BY order_date ASC 
-                 LIMIT 7"; // Last 7 days
+                 LIMIT 7";
     $stmtChart = $pdo->query($sqlChart);
     $chartData = $stmtChart->fetchAll(PDO::FETCH_ASSOC);
-
-    // Prepare data for JavaScript
+    
     $dates = [];
     $totals = [];
     foreach ($chartData as $data) {
-        $dates[] = date('M d', strtotime($data['order_date'])); // Format: Nov 21
+        $dates[] = date('M d', strtotime($data['order_date']));
         $totals[] = $data['daily_total'];
     }
-
 } catch (Exception $e) {
-    $dates = [];
-    $totals = [];
+    $dates = []; $totals = [];
 }
+
+// 3. Low Stock Check
+$stmtLow = $pdo->query("SELECT * FROM products WHERE stock_qty <= 5");
+$lowStockItems = $stmtLow->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard | FreshCart</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
 </head>
-<body class="container mt-5">
+<body class="container-fluid py-4" style="background-color: var(--bg-color);">
     
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>👮‍♂️ Admin Dashboard</h2>
-        <div>
-            <a href="export_orders.php" class="btn btn-success me-2">⬇ Export CSV</a>
-            <a href="admin_reviews.php" class="btn btn-warning text-dark me-2">⭐ Reviews</a>
-            <a href="admin_products.php" class="btn btn-primary me-2">📦 Products</a>
-            <a href="admin_users.php" class="btn btn-info text-white me-2">👥 Users</a>
-            <a href="admin_reviews.php" class="btn btn-warning text-dark me-2">⭐ Reviews</a>
-            
-            <a href="index.php" class="btn btn-outline-secondary me-2">Go to Shop</a>
-            <a href="logout.php" class="btn btn-danger">Logout</a>
-        </div>
-    </div>
-
-    <?php if (isset($error)): ?>
-        <div class="alert alert-danger">Error: <?= $error ?></div>
-    <?php endif; ?>
-    <?php
-    // Fetch items with less than 5 stock
-    $stmtLow = $pdo->query("SELECT * FROM products WHERE stock_qty <= 5");
-    $lowStockItems = $stmtLow->fetchAll(PDO::FETCH_ASSOC);
-    ?>
-
-    <?php if (count($lowStockItems) > 0): ?>
-        <div class="alert alert-warning shadow-sm border-warning">
-            <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Low Stock Alert</h5>
-            <p class="mb-0">The following items are running low and need restocking:</p>
-            <ul class="mb-2 mt-2">
-                <?php foreach ($lowStockItems as $item): ?>
-                    <li>
-                        <strong><?= htmlspecialchars($item['name']) ?></strong> 
-                        (Only <?= $item['stock_qty'] ?> left)
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-            <a href="admin_products.php" class="btn btn-sm btn-warning text-dark">Manage Inventory</a>
-        </div>
-    <?php endif; ?>
-
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">📈 Sales Overview (Last 7 Active Days)</h5>
+    <div class="row g-4">
+        <div class="col-lg-2 d-none d-lg-block">
+            <div class="dashboard-card admin-sidebar d-flex flex-column">
+                <div class="text-center mb-5 mt-2">
+                    <h4 class="m-0" style="font-family: var(--font-serif); letter-spacing: -0.05em;">FreshCart<span style="color: var(--accent-color)">.</span></h4>
+                    <small class="text-muted">Admin Panel</small>
                 </div>
-                <div class="card-body">
-                    <canvas id="salesChart" style="max-height: 300px;"></canvas>
+                
+                <div class="nav flex-column nav-pills flex-grow-1">
+                    <a href="admin.php" class="nav-link active mb-3"><i class="bi bi-grid-fill me-3"></i> Dashboard</a>
+                    <a href="admin_products.php" class="nav-link mb-2"><i class="bi bi-box-seam me-3"></i> Inventory</a>
+                    <a href="admin_users.php" class="nav-link mb-2"><i class="bi bi-people me-3"></i> Customers</a>
+                    <a href="admin_reviews.php" class="nav-link mb-2"><i class="bi bi-star me-3"></i> Reviews</a>
+                </div>
+
+                <div class="mt-auto pt-4 border-top">
+                    <a href="index.php" class="nav-link mb-2"><i class="bi bi-shop me-3"></i> View Shop</a>
+                    <a href="logout.php" class="nav-link text-danger"><i class="bi bi-box-arrow-left me-3"></i> Logout</a>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Recent Orders</h5>
-        </div>
-        <div class="card-body">
-            <?php if (count($orders) > 0): ?>
-                <table class="table table-striped table-hover align-middle">
+        <div class="col-lg-10">
+            
+            <div class="d-lg-none d-flex justify-content-between align-items-center mb-4">
+                <h4 class="m-0">FreshCart Admin</h4>
+                <a href="logout.php" class="btn btn-sm btn-danger">Logout</a>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="m-0">Dashboard Overview</h2>
+                    <p class="text-muted">Welcome back, Admin.</p>
+                </div>
+                <a href="export_orders.php" class="btn btn-success"><i class="bi bi-file-earmark-spreadsheet me-2"></i> Export Report</a>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-3">
+                    <div class="dashboard-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stat-title">Total Orders</div>
+                                <div class="stat-value"><?= count($orders) ?></div>
+                            </div>
+                            <div class="bg-light p-2 rounded-circle text-primary">
+                                <i class="bi bi-receipt fs-4"></i>
+                            </div>
+                        </div>
+                        <small class="text-muted mt-3 d-block">Lifetime volume</small>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="dashboard-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stat-title">Revenue (7d)</div>
+                                <div class="stat-value">$<?= number_format(array_sum($totals), 0) ?></div>
+                            </div>
+                            <div class="bg-light p-2 rounded-circle text-success">
+                                <i class="bi bi-currency-dollar fs-4"></i>
+                            </div>
+                        </div>
+                        <small class="text-success mt-3 d-block"><i class="bi bi-graph-up"></i> Active period</small>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <?php if (count($lowStockItems) > 0): ?>
+                        <div class="dashboard-card border-warning" style="background: rgba(255, 243, 205, 0.6);">
+                            <div class="d-flex align-items-center mb-3 text-warning">
+                                <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
+                                <h6 class="m-0 fw-bold">Low Stock Alert</h6>
+                            </div>
+                            <div style="max-height: 80px; overflow-y: auto;">
+                                <ul class="mb-0 small ps-3">
+                                    <?php foreach ($lowStockItems as $item): ?>
+                                        <li class="mb-1">
+                                            <strong><?= htmlspecialchars($item['name']) ?></strong> 
+                                            <span class="badge bg-warning text-dark rounded-pill ms-2"><?= $item['stock_qty'] ?> left</span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                            <a href="admin_products.php" class="btn btn-sm btn-outline-dark mt-2" style="font-size: 0.7rem;">Manage Inventory</a>
+                        </div>
+                    <?php else: ?>
+                        <div class="dashboard-card d-flex align-items-center justify-content-center text-muted">
+                            <div class="text-center">
+                                <i class="bi bi-check-circle fs-3 text-success mb-2"></i>
+                                <p class="m-0">Inventory levels are healthy.</p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="dashboard-card">
+                        <h5 class="mb-4" style="font-family: var(--font-serif);">Sales Analytics</h5>
+                        <canvas id="salesChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="mb-3" style="font-family: var(--font-serif);">Recent Orders</h5>
+            <div class="table-responsive table-glass shadow-sm">
+                <table class="table mb-0 align-middle">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Order ID</th>
                             <th>Customer</th>
-                            <th>Date</th> <th>Total</th>
+                            <th>Date</th>
+                            <th>Total</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($orders as $order): ?>
+                        <?php if (count($orders) > 0): ?>
+                            <?php foreach (array_slice($orders, 0, 10) as $order): ?>
                             <tr>
-                                <td>#<?= $order['id'] ?></td>
+                                <td><span class="badge bg-light text-dark border">#<?= $order['id'] ?></span></td>
                                 <td>
                                     <div class="fw-bold"><?= htmlspecialchars($order['customer_name']) ?></div>
-                                    <small class="text-muted"><?= htmlspecialchars($order['address']) ?></small>
+                                    <small class="text-muted text-truncate d-block" style="max-width: 150px;"><?= htmlspecialchars($order['address']) ?></small>
                                 </td>
                                 <td><?= date('M d, Y', strtotime($order['created_at'])) ?></td>
                                 <td class="fw-bold text-success">$<?= number_format($order['total_amount'], 2) ?></td>
-                                
                                 <td>
                                     <?php 
-                                        $status = $order['status'];
-                                        $badgeClass = 'bg-secondary';
-                                        if ($status == 'Pending') $badgeClass = 'bg-warning text-dark';
-                                        if ($status == 'Shipped') $badgeClass = 'bg-info text-dark';
-                                        if ($status == 'Delivered') $badgeClass = 'bg-success';
-                                        if ($status == 'Cancelled') $badgeClass = 'bg-danger';
+                                        $s = $order['status'];
+                                        $cls = 'bg-secondary';
+                                        if ($s == 'Pending') $cls = 'bg-warning text-dark';
+                                        if ($s == 'Shipped') $cls = 'bg-info text-dark';
+                                        if ($s == 'Delivered') $cls = 'bg-success';
+                                        if ($s == 'Cancelled') $cls = 'bg-danger';
                                     ?>
-                                    <span class="badge <?= $badgeClass ?>"><?= $status ?></span>
+                                    <span class="badge <?= $cls ?>"><?= $s ?></span>
                                 </td>
-                                
                                 <td>
-                                    <a href="order_details.php?order_id=<?= $order['id'] ?>" class="btn btn-sm btn-primary">
-                                        View Items
-                                    </a>
+                                    <a href="order_details.php?order_id=<?= $order['id'] ?>" class="btn btn-sm btn-outline-primary">Details</a>
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr><td colspan="6" class="text-center py-4 text-muted">No orders found.</td></tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
-            <?php else: ?>
-                <div class="alert alert-info text-center m-0">No orders found yet.</div>
-            <?php endif; ?>
+            </div>
+            
         </div>
     </div>
-
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const ctx = document.getElementById('salesChart').getContext('2d');
         const salesChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: <?= json_encode($dates) ?>, // PHP Arrays to JS
+                labels: <?= json_encode($dates) ?>,
                 datasets: [{
-                    label: 'Daily Revenue ($)',
+                    label: 'Revenue ($)',
                     data: <?= json_encode($totals) ?>,
-                    borderColor: '#28a745',
-                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    borderColor: '#5D866C', // Using your accent color
+                    backgroundColor: 'rgba(93, 134, 108, 0.1)',
                     borderWidth: 2,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#5D866C',
                     fill: true,
-                    tension: 0.4 // Makes the line curved
+                    tension: 0.4
                 }]
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: { display: true }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
-                    y: { beginAtZero: true }
+                    y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                    x: { grid: { display: false } }
                 }
             }
         });
     </script>
-
 </body>
 </html>

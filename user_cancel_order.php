@@ -10,14 +10,15 @@ if (!isset($_SESSION['user_id'])) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['order_id'])) {
     $order_id = $_POST['order_id'];
+    $user_id = $_SESSION['user_id']; // Get the logged-in user ID
 
     try {
         $pdo->beginTransaction();
 
-        // 2. Get current status
-        // (We removed the user_id check here so you can cancel your old orders too)
-        $stmt = $pdo->prepare("SELECT status FROM orders WHERE id = ?");
-        $stmt->execute([$order_id]);
+        // 2. Get current status AND verify ownership (The Fix)
+        // We added "AND user_id = ?" to ensure you own this order
+        $stmt = $pdo->prepare("SELECT status FROM orders WHERE id = ? AND user_id = ?");
+        $stmt->execute([$order_id, $user_id]);
         $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($order && $order['status'] != 'Cancelled') {
@@ -32,20 +33,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['order_id'])) {
                 $stmtRestock->execute([$item['quantity'], $item['product_id']]);
             }
 
-            // 4. Update Status
-            $stmtUpdate = $pdo->prepare("UPDATE orders SET status = 'Cancelled' WHERE id = ?");
-            $stmtUpdate->execute([$order_id]);
+            // 4. Update Status (Verify ownership again for safety)
+            $stmtUpdate = $pdo->prepare("UPDATE orders SET status = 'Cancelled' WHERE id = ? AND user_id = ?");
+            $stmtUpdate->execute([$order_id, $user_id]);
 
             $pdo->commit();
             
-            // Redirect back to My Orders
             header("Location: my_orders.php?msg=cancelled");
             exit;
 
         } else {
-            // Already cancelled or invalid
+            // Order not found, not yours, or already cancelled
             $pdo->rollBack();
-            header("Location: my_orders.php");
+            header("Location: my_orders.php?error=invalid_request");
             exit;
         }
 
