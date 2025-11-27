@@ -93,19 +93,13 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
             <div class="collapse navbar-collapse" id="navContent">
                 <ul class="navbar-nav ms-auto align-items-center gap-3">
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link-custom dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
+                        <li class="nav-item">
+                            <a class="nav-link-custom d-flex align-items-center gap-2" href="profile.php">
                                 <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
                                     <?= strtoupper(substr($_SESSION['user_name'], 0, 1)) ?>
                                 </div>
                                 <span><?= htmlspecialchars($_SESSION['user_name']) ?></span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 animate-fade-in">
-                                <li><a class="dropdown-item" href="profile.php"><i class="bi bi-person me-2"></i> Profile</a></li>
-                                <li><a class="dropdown-item" href="my_orders.php"><i class="bi bi-box-seam me-2"></i> Orders</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="user_logout.php"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
-                            </ul>
                         </li>
                     <?php else: ?>
                         <li class="nav-item"><a href="user_login.php" class="nav-link-custom">Login</a></li>
@@ -228,37 +222,47 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="product-card">
                             
-                            <?php $imgName = $product['image'] ? $product['image'] : 'default.jpg'; ?>
-                            <a href="product.php?id=<?= $product['id'] ?>" class="text-decoration-none">
-                                <div class="position-relative">
-                                    <img src="assets/images/<?php echo $imgName; ?>" class="card-img-top" alt="<?= htmlspecialchars($product['name']) ?>">
+                            <div class="product-thumb">
+                                
+                                <div class="card-badge-container">
                                     <?php if($product['stock_qty'] < 5 && $product['stock_qty'] > 0): ?>
-                                        <span class="position-absolute top-0 start-0 m-2 badge bg-warning text-dark border shadow-sm">Low Stock</span>
+                                        <span class="badge-pill badge-stock">Low Stock</span>
                                     <?php endif; ?>
+                                    <span class="badge-pill badge-cat"><?= $product['category'] ?></span>
                                 </div>
-                            </a>
 
-                            <div class="card-body d-flex flex-column">
-                                <span class="category-badge"><?= $product['category'] ?></span>
-                                <a href="product.php?id=<?= $product['id'] ?>" class="text-decoration-none text-dark">
-                                    <h6 class="fw-bold mb-2 text-truncate"><?= htmlspecialchars($product['name']) ?></h6>
+                                <a href="product.php?id=<?= $product['id'] ?>">
+                                    <?php $imgName = $product['image'] ? $product['image'] : 'default.jpg'; ?>
+                                    <img src="assets/images/<?php echo $imgName; ?>" class="card-img-front" alt="<?= htmlspecialchars($product['name']) ?>">
                                 </a>
 
-                                <div class="price-tag mb-3">$<?= number_format($product['price'], 2) ?></div>
-
-                                <div class="mt-auto">
+                                <div class="card-action-overlay">
                                     <?php if ($product['stock_qty'] > 0): ?>
                                         <form action="add_to_cart.php" method="POST" class="add-cart-form">
                                             <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                                            <button type="submit" class="btn btn-outline-dark w-100 rounded-pill btn-sm hover-fill">
-                                                Add to Cart
+                                            <button type="submit" class="btn-quick-add" title="Add to Cart">
+                                                <i class="bi bi-plus-lg fs-5"></i>
+                                                <span>Add</span>
                                             </button>
                                         </form>
                                     <?php else: ?>
-                                        <button class="btn btn-light w-100 rounded-pill btn-sm text-muted" disabled>Out of Stock</button>
+                                        <button class="btn-quick-add" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
                                     <?php endif; ?>
                                 </div>
                             </div>
+
+                            <div class="product-details">
+                                <a href="product.php?id=<?= $product['id'] ?>" class="product-title-link text-truncate">
+                                    <?= htmlspecialchars($product['name']) ?>
+                                </a>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="product-price">$<?= number_format($product['price'], 2) ?></span>
+                                    <span class="product-unit">per unit</span>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -301,31 +305,74 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
 
     </div>
 
-    <footer class="site-footer">
+<footer class="site-footer">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 style="font-family: var(--font-serif);">FreshCart<span style="color: var(--accent-color)">.</span></h5>
-                    <p class="small text-muted mt-3">Delivering nature's best to your doorstep. Organic, sustainable, and fresh from local farmers.</p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="text-uppercase fw-bold small mb-3">Quick Links</h6>
-                    <ul class="list-unstyled small d-flex flex-column gap-2">
-                        <li><a href="index.php" class="text-decoration-none text-muted">Shop All</a></li>
-                        <li><a href="my_orders.php" class="text-decoration-none text-muted">Order History</a></li>
-                        <li><a href="profile.php" class="text-decoration-none text-muted">Account Settings</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="text-uppercase fw-bold small mb-3">Stay Updated</h6>
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control border-0 bg-white" placeholder="Email address" style="border-radius: 50px 0 0 50px; padding-left: 20px;">
-                        <button class="btn btn-dark" type="button" style="border-radius: 0 50px 50px 0; padding-right: 20px;">Join</button>
+            <div class="row g-5">
+                
+                <div class="col-lg-4 col-md-6">
+                    <a href="index.php" class="text-decoration-none">
+                        <span class="footer-brand">FreshCart<span style="color: var(--accent-color)">.</span></span>
+                    </a>
+                    <p class="text-muted small lh-lg mb-4">
+                        Delivering nature's best to your doorstep. We partner directly with local organic farmers to ensure freshness, sustainability, and fair trade practices.
+                    </p>
+                    <div class="d-flex">
+                        <a href="#" class="social-icon-link"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-icon-link"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="social-icon-link"><i class="bi bi-twitter"></i></a>
                     </div>
                 </div>
+
+                <div class="col-lg-2 col-md-3 col-6">
+                    <h6 class="footer-heading">Shop</h6>
+                    <ul class="list-unstyled footer-link-list">
+                        <li><a href="index.php" class="footer-link">All Products</a></li>
+                        <li><a href="#categories" class="footer-link">Fresh Produce</a></li>
+                        <li><a href="#categories" class="footer-link">Dairy & Eggs</a></li>
+                        <li><a href="#categories" class="footer-link">Bakery</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-3 col-6">
+                    <h6 class="footer-heading">Company</h6>
+                    <ul class="list-unstyled footer-link-list">
+                        <li><a href="#" class="footer-link">About Us</a></li>
+                        <li><a href="#" class="footer-link">Sustainability</a></li>
+                        <li><a href="#" class="footer-link">Farmers</a></li>
+                        <li><a href="#" class="footer-link">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-12">
+                    <h6 class="footer-heading">Stay Fresh</h6>
+                    <p class="small text-muted mb-3">Join our newsletter for exclusive organic deals and recipes.</p>
+                    
+                    <form action="#">
+                        <div class="footer-newsletter-group">
+                            <input type="email" class="footer-email-input" placeholder="Your email address">
+                            <button class="footer-subscribe-btn" type="button">Join</button>
+                        </div>
+                    </form>
+
+                    <div class="mt-4">
+                        <p class="small text-muted mb-2">Secure Payment</p>
+                        <div class="d-flex flex-wrap">
+                            <span class="payment-badge">VISA</span>
+                            <span class="payment-badge">MasterCard</span>
+                            <span class="payment-badge">PayPal</span>
+                            <span class="payment-badge">GCash</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-            <div class="text-center pt-4 border-top border-secondary-subtle mt-4">
-                <small class="text-muted">&copy; 2025 FreshCart Market. Student Project.</small>
+
+            <div class="border-top mt-5 pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <small class="text-muted mb-2 mb-md-0">&copy; 2025 FreshCart Market. Student Project by Janus Dominic.</small>
+                <div class="small text-muted">
+                    <a href="#" class="text-muted text-decoration-none me-3">Privacy Policy</a>
+                    <a href="#" class="text-muted text-decoration-none">Terms of Service</a>
+                </div>
             </div>
         </div>
     </footer>

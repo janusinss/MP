@@ -188,6 +188,61 @@ h1, h2, h3, h4, h5 {
     position: relative;
 }
 
+.product-card {
+    background: transparent; /* Remove white box background to focus on image */
+    border: none;
+    border-radius: 24px;
+    position: relative;
+    transition: all 0.4s ease;
+    margin-bottom: 30px;
+}
+
+/* The Product Image - UPDATED TO FIT */
+.card-img-front {
+    width: 100%;           /* Force width to fill container */
+    height: 100%;          /* Force height to fill container */
+    object-fit: contain;   /* Ensures the whole product is visible without cropping */
+    padding: 30px;         /* Adds breathing room so it doesn't hit the edges */
+    
+    /* MAGIC TRICK: This makes white backgrounds transparent on the beige card */
+    mix-blend-mode: multiply; 
+    
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.05));
+    transition: transform 0.5s ease;
+}
+
+/* Badges (Low Stock / Category) */
+.card-badge-container {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.product-card:hover .card-img-front {
+    transform: scale(1.36); /* Gentle zoom */
+}
+
+.product-card:hover .product-thumb {
+    box-shadow: 0 20px 40px -10px rgba(93, 134, 108, 0.2);
+    transform: translateY(-5px);
+}
+
+.product-thumb {
+    background-color: #f7f7f5; /* Soft organic beige */
+    border-radius: 24px;
+    height: 280px;             /* Fixed height for uniformity */
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
 .card:hover, .product-card:hover, .dashboard-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 15px 30px rgba(0,0,0,0.08);
@@ -546,7 +601,7 @@ h1, h2, h3, h4, h5 {
     font-family: var(--font-serif);
     font-size: 4.5rem; /* Larger, bolder */
     font-weight: 700;
-    line-height: 1.05;
+    /* line-height: 1.05; */
     color: var(--text-main);
     margin-bottom: 1.5rem;
     letter-spacing: -0.03em;
@@ -855,4 +910,546 @@ h1, h2, h3, h4, h5 {
 @keyframes float-card {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
+}
+
+/* --- FOOTER REDESIGN --- */
+.site-footer {
+    background-color: #fff;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    padding-top: 5rem;
+    padding-bottom: 2rem;
+    margin-top: 6rem;
+    position: relative;
+    font-size: 0.9rem;
+}
+
+/* Brand Section */
+.footer-brand {
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-main);
+    display: inline-block;
+    margin-bottom: 1rem;
+    letter-spacing: -0.03em;
+}
+
+/* Links with Hover Slide Effect */
+.footer-heading {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 1.5rem;
+}
+
+.footer-link-list li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.footer-link:hover {
+    color: var(--accent-color);
+    transform: translateX(5px); /* Slide right effect */
+}
+
+/* Newsletter Input */
+.footer-newsletter-group {
+    background: #f8f9fa;
+    border: 1px solid #eee;
+    border-radius: 50px;
+    padding: 5px;
+    display: flex;
+    transition: all 0.3s ease;
+}
+
+.footer-newsletter-group:focus-within {
+    border-color: var(--accent-color);
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(93, 134, 108, 0.1);
+}
+
+.footer-email-input {
+    border: none;
+    background: transparent;
+    padding: 10px 20px;
+    width: 100%;
+    outline: none;
+    color: var(--text-main);
+}
+
+.footer-subscribe-btn {
+    background: var(--text-main);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 8px 25px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.footer-subscribe-btn:hover {
+    background: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+/* Social & Payment */
+.social-icon-link {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f8f9fa;
+    color: var(--text-main);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-icon-link:hover {
+    background: var(--accent-color);
+    color: #fff;
+    transform: translateY(-3px);
+}
+
+/* Payment Badges (Pure CSS) */
+.payment-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #555;
+    margin-right: 5px;
+    font-family: var(--font-sans);
+}
+
+.badge-pill {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 6px 12px;
+    border-radius: 50px;
+    backdrop-filter: blur(4px);
+}
+
+.badge-stock {
+    background: rgba(255, 193, 7, 0.9);
+    color: #333;
+    box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+}
+
+.badge-cat {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--text-muted);
+}
+
+.card-action-overlay {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    z-index: 10;
+}
+
+.btn-quick-add {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.btn-quick-add span {
+    display: none; /* Hide text initially */
+    margin-left: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Expand button on hover */
+.btn-quick-add:hover {
+    width: 140px; /* Expand width */
+    border-radius: 50px;
+    background: var(--text-main);
+    color: #fff;
+}
+
+.btn-quick-add:hover span {
+    display: block; /* Show text */
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* Product Info Area */
+.product-details {
+    padding: 15px 5px 0;
+}
+
+.product-title-link {
+    text-decoration: none;
+    color: var(--text-main);
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 5px;
+    transition: color 0.2s;
+}
+
+.product-title-link:hover {
+    color: var(--accent-color);
+}
+
+.product-price {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--accent-color);
+}
+
+.product-unit {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* --- PRODUCT PAGE REDESIGN --- */
+
+.product-showcase {
+    background: transparent; /* Remove old card background */
+    box-shadow: none;        /* Remove old shadow */
+    margin-bottom: 5rem;
+}
+
+/* Left: The Image Stage */
+.product-image-stage {
+    background-color: #f7f7f5; /* Soft beige pedestal */
+    border-radius: 30px;
+    height: 550px; /* Taller stage */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.product-image-stage img {
+    max-width: 85%;
+    max-height: 400px;
+    object-fit: contain;
+    filter: drop-shadow(0 30px 60px rgba(0,0,0,0.15));
+    transition: transform 0.5s ease;
+    /* Blend mode trick again */
+    mix-blend-mode: multiply; 
+}
+
+.product-image-stage:hover img {
+    transform: scale(1.7);
+}
+
+/* Right: Details Panel */
+.product-details-panel {
+    padding: 2rem 0 2rem 4rem; /* Add padding to separate from image */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.product-breadcrumb {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+.product-title-large {
+    font-family: var(--font-serif);
+    font-size: 3.5rem;
+    line-height: 1.1;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+}
+
+.product-price-large {
+    font-family: var(--font-mono);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stock-badge {
+    font-size: 0.9rem;
+    background: rgba(93, 134, 108, 0.1);
+    color: var(--accent-color);
+    padding: 5px 15px;
+    border-radius: 50px;
+    vertical-align: middle;
+}
+
+/* Feature List */
+.product-features {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+    color: var(--text-muted);
+}
+
+.product-features li {
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.product-features i {
+    color: var(--accent-color);
+    background: rgba(93, 134, 108, 0.1);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+/* Add Button */
+.btn-add-large {
+    background: var(--text-main);
+    color: #fff;
+    width: 100%;
+    padding: 1.2rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.btn-add-large:hover {
+    background: var(--accent-color);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(93, 134, 108, 0.3);
+}
+
+/* Review Section Clean up */
+.review-section {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 24px;
+    padding: 3rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 991px) {
+    .product-details-panel {
+        padding: 2rem 0;
+    }
+    .product-image-stage {
+        height: 350px;
+    }
+    .product-title-large {
+        font-size: 2.5rem;
+    }
+}
+
+/* --- PRODUCT PAGE: REVIEWS & SIDEBAR (REFINED) --- */
+
+/* Split Container */
+.product-lower-section {
+    display: flex;
+    gap: 2rem; /* Reduced from 4rem to bring them closer */
+    align-items: flex-start;
+}
+
+/* Left: Reviews Area */
+.reviews-wrapper {
+    flex: 1.6; /* Approx 60% width */
+}
+
+.review-form-card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 20px;
+    padding: 2.5rem; /* Increased padding for luxurious feel */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    margin-bottom: 2rem;
+}
+
+/* Empty State Styling */
+.empty-reviews-state {
+    background: #fdfdfd;
+    border: 2px dashed rgba(0,0,0,0.05);
+    border-radius: 16px;
+    padding: 3rem;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+/* Modern Review Item */
+.review-item {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    transition: transform 0.2s ease;
+}
+
+.review-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-color);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+    align-items: center;
+}
+
+.reviewer-name {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.review-date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    background: #f4f4f4;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.review-body {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Right: Sidebar Recommendations */
+.sidebar-wrapper {
+    flex: 1; /* Approx 40% width - increased from previous to fill gap */
+    background: #fff; /* Changed to white to match left side */
+    border-radius: 24px;
+    padding: 2rem;
+    border: 1px solid rgba(0,0,0,0.05); /* Clean border instead of dash */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03); /* Matching shadow */
+    position: sticky;
+    top: 100px;
+}
+
+.sidebar-title {
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    color: var(--text-main);
+}
+
+/* Mini Product Card for Sidebar */
+.mini-product-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #fff;
+    padding: 12px;
+    border-radius: 16px;
+    margin-bottom: 0.8rem;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.mini-product-card:hover {
+    background: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.mini-img-box {
+    width: 60px;
+    height: 60px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.mini-img-box img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+}
+
+.mini-details {
+    flex-grow: 1;
+    min-width: 0; /* Prevents text overflow issues */
+}
+
+.mini-details h6 {
+    font-size: 0.9rem;
+    margin: 0 0 2px 0;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mini-price {
+    color: var(--accent-color);
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 991px) {
+    .product-lower-section {
+        flex-direction: column;
+        gap: 3rem;
+    }
+    .sidebar-wrapper {
+        width: 100%;
+        margin-top: 0;
+    }
 }
