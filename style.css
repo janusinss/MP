@@ -37,11 +37,15 @@ a:hover {
     color: var(--accent-color);
 }
 
-h1, h2, h3, h4, h5 {
+h1, h2, h3, h4 {
     color: var(--text-main);
     font-family: var(--font-serif);
     font-weight: 700;
     letter-spacing: -0.02em;
+}
+
+h5{
+    color: #fff;
 }
 
 /* Custom Scrollbar */
@@ -2489,4 +2493,267 @@ h1, h2, h3, h4, h5 {
     .receipt-card { box-shadow: none; border: 1px solid #000; max-width: 100%; }
     .success-header-bg { color: black; background: white; border-bottom: 1px solid #000; padding: 20px; }
     .success-icon-box { display: none; }
+}
+
+/* --- LEGAL PAGE STYLES (Privacy & Terms) --- */
+.legal-page-wrapper {
+    padding: 5rem 0;
+    background: var(--bg-color); /* Uses the soft background color */
+}
+
+.legal-content-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 4rem;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+}
+
+.legal-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color); /* Subtle divider */
+}
+
+.legal-title {
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}
+
+.legal-date {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* Section Headings with Accent Color */
+.legal-section h3 {
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    color: var(--accent-color);
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--accent-color); /* Green marker on the left */
+    padding-left: 15px;
+}
+
+.legal-section p, .legal-section ul {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+
+/* Custom List Bullets */
+.legal-section ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+.legal-section ul li {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.legal-section ul li::before {
+    content: "•";
+    color: var(--accent-color);
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .legal-content-card {
+        padding: 2rem;
+    }
+    .legal-title {
+        font-size: 2.5rem;
+    }
+}
+
+/* --- ENHANCED LEGAL PAGE (Trust Center) --- */
+
+.legal-hero-modern {
+    background: radial-gradient(circle at top right, #f1f0eb, #F5F5F0);
+    padding: 5rem 0 3rem;
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+
+.legal-hero-modern::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 300px; height: 300px;
+    background: url('https://cdn-icons-png.flaticon.com/512/2438/2438078.png'); /* Shield Icon placeholder */
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.03;
+    transform: rotate(15deg);
+    z-index: 0;
+}
+
+.last-updated-badge {
+    display: inline-block;
+    background: rgba(93, 134, 108, 0.1);
+    color: var(--accent-color);
+    padding: 6px 15px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+}
+
+.legal-grid-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 4rem;
+    margin-top: 4rem;
+    position: relative;
+}
+
+/* Sticky Sidebar Navigation */
+.legal-toc-wrapper {
+    position: sticky;
+    top: 120px; /* Below the sticky navbar */
+}
+
+.legal-toc-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.legal-nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: var(--text-main);
+    text-decoration: none;
+    border-radius: 12px;
+    margin-bottom: 5px;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.legal-nav-link i {
+    margin-right: 12px;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+
+.legal-nav-link:hover {
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+    color: var(--accent-color);
+}
+
+.legal-nav-link:hover i {
+    color: var(--accent-color);
+}
+
+/* Main Content Card */
+.policy-card-enhanced {
+    background: #fff;
+    border-radius: 24px;
+    padding: 4rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.policy-section {
+    margin-bottom: 4rem;
+    scroll-margin-top: 140px; /* Keeps heading visible under sticky nav */
+}
+
+.policy-heading {
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    color: var(--text-main);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.policy-heading i {
+    color: var(--accent-color);
+    background: rgba(93, 134, 108, 0.1);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.policy-text {
+    color: #555;
+    line-height: 1.8;
+    font-size: 1.05rem;
+}
+
+.data-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 1.5rem;
+}
+
+.data-list li {
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.data-list i {
+    color: var(--accent-color);
+    margin-top: 4px;
+}
+
+/* Contact Box at bottom */
+.contact-highlight-box {
+    background: var(--accent-color);
+    color: #fff;
+    padding: 2rem;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    border-radius: 16px;
+    margin-top: 2rem;
+}
+
+.contact-highlight-box a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* Mobile Responsive */
+@media (max-width: 991px) {
+    .legal-grid-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    .legal-toc-wrapper {
+        display: none; /* Hide sidebar on mobile for cleaner view */
+    }
+    .policy-card-enhanced {
+        padding: 2rem;
+    }
 }

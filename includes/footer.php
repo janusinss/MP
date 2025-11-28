@@ -10,9 +10,10 @@
                         Delivering nature's best to your doorstep. We partner directly with local organic farmers to ensure freshness, sustainability, and fair trade practices.
                     </p>
                     <div class="d-flex">
-                        <a href="#" class="social-icon-link"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="social-icon-link"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="social-icon-link"><i class="bi bi-twitter"></i></a>
+                        <a href="https://www.facebook.com/notagirlgamer69" target="_blank" class="social-icon-link"><i class="bi bi-facebook"></i></a>
+                        <a href="https://www.instagram.com/janusinss/" target="_blank" class="social-icon-link"><i class="bi bi-instagram"></i></a>
+                        <a href="https://x.com/Syrupynut" target="_blank" class="social-icon-link"><i class="bi bi-twitter"></i></a>
+                        <a href="https://www.linkedin.com/in/janusdominic/" target="_blank" class="social-icon-link"><i class="bi bi-linkedin"></i></a>
                     </div>
                 </div>
 
@@ -63,8 +64,8 @@
             <div class="border-top mt-5 pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
                 <small class="text-muted mb-2 mb-md-0">&copy; 2025 FreshCart Market. Student Project by Janus Dominic.</small>
                 <div class="small text-muted">
-                    <a href="#" class="text-muted text-decoration-none me-3">Privacy Policy</a>
-                    <a href="#" class="text-muted text-decoration-none">Terms of Service</a>
+                    <a href="privacy_policy.php" class="text-decoration-none text-muted fw-bold me-3">Privacy Policy</a>
+                    <a href="terms_of_service.php" class="text-decoration-none text-muted fw-bold">Terms of Service</a>
                 </div>
             </div>
         </div>

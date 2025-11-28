@@ -42,10 +42,10 @@ include 'includes/header.php';
                 <div class="mt-auto">
                     <p class="small text-uppercase fw-bold opacity-75 mb-3">Follow our journey</p>
                     <div class="contact-socials">
-                        <a href="#" class="social-btn-glass"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="social-btn-glass"><i class="bi bi-twitter"></i></a>
-                        <a href="#" class="social-btn-glass"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="social-btn-glass"><i class="bi bi-linkedin"></i></a>
+                        <a href="https://www.facebook.com/notagirlgamer69" target="_blank" class="social-btn-glass"><i class="bi bi-facebook"></i></a>
+                        <a href="https://www.instagram.com/janusinss/" target="_blank" class="social-btn-glass"><i class="bi bi-instagram"></i></a>
+                        <a href="https://x.com/Syrupynut" target="_blank" class="social-btn-glass"><i class="bi bi-twitter"></i></a>
+                        <a href="https://www.linkedin.com/in/janusdominic/" target="_blank" class="social-btn-glass"><i class="bi bi-linkedin"></i></a>
                     </div>
                 </div>
             </div>
