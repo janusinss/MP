@@ -630,17 +630,6 @@ h5{
     justify-content: center;
 }
 
-/* Abstract blob behind image */
-.hero-image-blob {
-    position: absolute;
-    width: 450px;
-    height: 450px;
-    background-color: #dce7e0; /* Sage tint */
-    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-    animation: morph 8s ease-in-out infinite;
-    z-index: 0;
-}
-
 @keyframes morph {
     0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
     34% { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; }
@@ -819,6 +808,8 @@ h5{
     margin-right: 10px;
     transition: all 0.2s ease;
     white-space: nowrap;
+    cursor: pointer;
+    background: #fff;
 }
 
 .cat-chip:hover {
