@@ -263,7 +263,9 @@ h5{
 
 /* Left Side: Image/Brand */
 .auth-banner-side {
-    background-color: var(--accent-color);
+    /* Use a high-quality Unsplash image */
+    background: url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000') no-repeat center center;
+    background-size: cover;
     position: relative;
     display: flex;
     align-items: center;
@@ -272,16 +274,19 @@ h5{
     overflow: hidden;
 }
 
-/* CSS Pattern Fallback if image missing */
-.auth-banner-side::after {
+/* Stylish Gradient Overlay */
+.auth-banner-side::before {
     content: '';
     position: absolute;
-    width: 200%;
-    height: 200%;
-    background-image: radial-gradient(#ffffff 1px, transparent 1px);
-    background-size: 40px 40px;
-    opacity: 0.1;
-    transform: rotate(45deg);
+    top: 0; left: 0; right: 0; bottom: 0; 
+    opacity: 0.5;   
+    background-color: rgb(0, 0, 0); /* Adjust opacity as needed */
+    z-index: 1;
+}
+
+/* Remove the old pattern overlay (optional, or keep it if you like the dots) */
+.auth-banner-side::after {
+    display: none; 
 }
 
 .auth-banner-content {
