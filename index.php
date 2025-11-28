@@ -1,7 +1,10 @@
 <?php
 include 'db.php';
-session_start();
 
+// Check if a session is already active before starting one
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 // --- FORCE LOGOUT CHECK ---
 if (isset($_SESSION['user_id'])) {
     $stmtCheck = $pdo->prepare("SELECT id FROM users WHERE id = ?");
@@ -278,34 +281,34 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
             <?php endif; ?>
         </div>
 
-        <?php if ($totalPages > 1): ?>
-        <nav class="mt-5 mb-5">
-            <ul class="pagination justify-content-center">
-                <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                    <a class="page-link border-0 text-dark" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>&category=<?= urlencode($category) ?>&sort=<?= urlencode($sort) ?>">
-                        <i class="bi bi-chevron-left"></i>
-                    </a>
-                </li>
+    <?php if ($totalPages > 1): ?>
+        <div class="pagination-wrapper">
+            <div class="pagination-glass">
+                
+                <a class="page-btn page-arrow <?= ($page <= 1) ? 'disabled' : '' ?>" 
+                   href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>&category=<?= urlencode($category) ?>&sort=<?= urlencode($sort) ?>">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+
                 <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <li class="page-item">
-                        <a class="page-link border-0 <?= ($i == $page) ? 'fw-bold text-decoration-underline text-dark' : 'text-muted' ?>" 
-                           href="?page=<?= $i ?>&search=<?= urlencode($search) ?>&category=<?= urlencode($category) ?>&sort=<?= urlencode($sort) ?>">
-                           <?= $i ?>
-                        </a>
-                    </li>
-                <?php endfor; ?>
-                <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : '' ?>">
-                    <a class="page-link border-0 text-dark" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>&category=<?= urlencode($category) ?>&sort=<?= urlencode($sort) ?>">
-                        <i class="bi bi-chevron-right"></i>
+                    <a class="page-btn <?= ($i == $page) ? 'active' : '' ?>" 
+                       href="?page=<?= $i ?>&search=<?= urlencode($search) ?>&category=<?= urlencode($category) ?>&sort=<?= urlencode($sort) ?>">
+                       <?= $i ?>
                     </a>
-                </li>
-            </ul>
-        </nav>
-        <?php endif; ?>
+                <?php endfor; ?>
+
+                <a class="page-btn page-arrow <?= ($page >= $totalPages) ? 'disabled' : '' ?>" 
+                   href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>&category=<?= urlencode($category) ?>&sort=<?= urlencode($sort) ?>">
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            </div>
+        </div>
+    <?php endif; ?>
 
     </div>
 
-<footer class="site-footer">
+    <footer class="site-footer">
         <div class="container">
             <div class="row g-5">
                 
@@ -336,10 +339,10 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                 <div class="col-lg-2 col-md-3 col-6">
                     <h6 class="footer-heading">Company</h6>
                     <ul class="list-unstyled footer-link-list">
-                        <li><a href="#" class="footer-link">About Us</a></li>
-                        <li><a href="#" class="footer-link">Sustainability</a></li>
-                        <li><a href="#" class="footer-link">Farmers</a></li>
-                        <li><a href="#" class="footer-link">Contact</a></li>
+                        <li><a href="about.php" class="footer-link">About Us</a></li>
+                        <li><a href="sustainability.php" class="footer-link">Sustainability</a></li>
+                        <li><a href="farmers.php" class="footer-link">Farmers</a></li>
+                        <li><a href="contact.php" class="footer-link">Contact</a></li>
                     </ul>
                 </div>
 
