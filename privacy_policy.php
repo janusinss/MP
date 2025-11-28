@@ -105,8 +105,8 @@ include 'includes/header.php';
                 
                 <div class="contact-highlight-box">
                     <h5 class="mb-3">FreshCart Privacy Team</h5>
-                    <p class="mb-1"><i class="bi bi-envelope me-2"></i> hello@freshcart.com</p>
-                    <p class="mb-0"><i class="bi bi-geo-alt me-2"></i> 123 Market Street, San Francisco, CA 94103</p>
+                    <p class="mb-1"><i class="bi bi-envelope me-2"></i> janusdominic0@gmail.com</p>
+                    <p class="mb-0"><i class="bi bi-geo-alt me-2"></i> Maasin Zone 1-B, Zamboanga City</p>
                 </div>
             </div>
 

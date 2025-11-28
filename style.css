@@ -793,6 +793,8 @@ h5{
 /* --- CATEGORY CHIPS --- */
 .category-rail-wrapper {
     overflow-x: auto;
+    /* ADDED: Top padding to prevent hover clipping */
+    padding-top: 5px; 
     padding-bottom: 10px;
     margin-bottom: 2rem;
     scrollbar-width: none;

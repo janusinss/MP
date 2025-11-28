@@ -72,7 +72,7 @@ include 'includes/header.php';
                         We use electric vans for 90% of our city deliveries. We aren't just offsetting carbon; we are actively reducing it. 
                         By 2026, FreshCart aims to be the first grocery delivery service to be completely carbon neutral.
                     </p>
-                    <button class="btn btn-light rounded-pill px-4 mt-4 text-success fw-bold">Read our 2025 Report</button>
+                    <a href="https://www.repsol.com/en/sustainability/sustainability-pillars/climate-change/reducing-carbon-footprint/index.cshtml" target="_blank" class="btn btn-light rounded-pill px-4 mt-4 text-success fw-bold">Read about Carbon Footprint</a>
                 </div>
             </div>
             <div class="col-lg-6">
