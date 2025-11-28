@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="row g-0 h-100">
             
             <div class="col-lg-6 d-none d-lg-block">
-                <div class="auth-banner-side">
+                <div class="auth-banner-side login-bg">
                     <div class="auth-banner-content">
                         <h1 style="font-family: var(--font-serif);font-size: 3rem;margin-bottom: 1.5rem;line-height: 1.1; color: #fff; opacity: 0.9;" >Quality you can taste, aesthetics you can feel.</h1>
                         <p class="fs-5 opacity-75">Welcome back to your curated grocery experience.</p>

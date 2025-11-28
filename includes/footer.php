@@ -21,9 +21,9 @@
                     <h6 class="footer-heading">Shop</h6>
                     <ul class="list-unstyled footer-link-list">
                         <li><a href="index.php" class="footer-link">All Products</a></li>
-                        <li><a href="#categories" class="footer-link">Fresh Produce</a></li>
-                        <li><a href="#categories" class="footer-link">Dairy & Eggs</a></li>
-                        <li><a href="#categories" class="footer-link">Bakery</a></li>
+                        <li><a href="index.php" class="footer-link">Fresh Produce</a></li>
+                        <li><a href="index.php" class="footer-link">Dairy & Eggs</a></li>
+                        <li><a href="index.php" class="footer-link">Bakery</a></li>
                     </ul>
                 </div>
 

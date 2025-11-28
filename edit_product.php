@@ -2,6 +2,7 @@
 include 'db.php';
 session_start();
 
+// Security Check
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header("Location: login.php");
     exit;
@@ -22,22 +23,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $file_extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
         $new_filename = uniqid() . "." . $file_extension;
         $target_file = $target_dir . $new_filename;
-        
         $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
         if (in_array(strtolower($file_extension), $allowed_types)) {
             if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-                // Update Database WITH new image
                 $sql = "UPDATE products SET stock_qty = ?, price = ?, category = ?, image = ? WHERE id = ?";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([$newStock, $newPrice, $newCat, $new_filename, $id]);
-                
                 header("Location: admin_products.php");
                 exit;
             }
         }
     }
 
-    // 2. If NO image uploaded, just update the text fields (Keep old image)
+    // 2. If NO image uploaded
     $sql = "UPDATE products SET stock_qty = ?, price = ?, category = ? WHERE id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$newStock, $newPrice, $newCat, $id]);
@@ -54,61 +52,67 @@ $product = $stmt->fetch(PDO::FETCH_ASSOC);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Edit Product</title>
+    <title>Edit Product | Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Edit: <?= htmlspecialchars($product['name']) ?></h4>
+<body style="background-color: var(--bg-color);">
+
+    <div class="edit-product-wrapper">
+        <div class="edit-card animate-fade-in">
+            
+            <h2 class="edit-title">Edit Product</h2>
+
+            <form method="POST" enctype="multipart/form-data">
+                
+                <div class="edit-img-preview-box">
+                    <img src="assets/images/<?= $product['image'] ?>" alt="Current Image">
+                    <div class="edit-img-overlay">Current</div>
                 </div>
-                <div class="card-body">
-                    <form method="POST" enctype="multipart/form-data">
-                        
-                        <div class="mb-3 text-center">
-                            <label class="form-label d-block">Current Image</label>
-                            <img src="assets/images/<?= $product['image'] ?>" alt="Current Image" 
-                                 style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px;">
-                        </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Change Image (Optional)</label>
-                            <input type="file" name="image" class="form-control" accept="image/*">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Category</label>
-                            <select name="category" class="form-select">
-                                <option value="Fruits" <?= $product['category'] == 'Fruits' ? 'selected' : '' ?>>Fruits</option>
-                                <option value="Dairy" <?= $product['category'] == 'Dairy' ? 'selected' : '' ?>>Dairy</option>
-                                <option value="Bakery" <?= $product['category'] == 'Bakery' ? 'selected' : '' ?>>Bakery</option>
-                                <option value="Beverages" <?= $product['category'] == 'Beverages' ? 'selected' : '' ?>>Beverages</option>
-                                <option value="General" <?= $product['category'] == 'General' ? 'selected' : '' ?>>General</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Price ($)</label>
-                            <input type="number" step="0.01" name="price" class="form-control" value="<?= $product['price'] ?>" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Stock Quantity</label>
-                            <input type="number" name="stock_qty" class="form-control" value="<?= $product['stock_qty'] ?>" required>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success">Save Changes</button>
-                            <a href="admin_products.php" class="btn btn-outline-secondary">Cancel</a>
-                        </div>
-
-                    </form>
+                <div class="mb-4">
+                    <label class="form-label-edit">Product Name (Read-only)</label>
+                    <input type="text" class="form-control form-control-edit text-muted" value="<?= htmlspecialchars($product['name']) ?>" readonly style="background: #f0f0f0;">
                 </div>
-            </div>
+
+                <div class="mb-4">
+                    <label class="form-label-edit">Update Image</label>
+                    <input type="file" name="image" class="form-control form-control-edit" accept="image/*">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label-edit">Category</label>
+                        <select name="category" class="form-select form-control-edit">
+                            <option value="Fruits" <?= $product['category'] == 'Fruits' ? 'selected' : '' ?>>Fruits</option>
+                            <option value="Dairy" <?= $product['category'] == 'Dairy' ? 'selected' : '' ?>>Dairy</option>
+                            <option value="Bakery" <?= $product['category'] == 'Bakery' ? 'selected' : '' ?>>Bakery</option>
+                            <option value="Beverages" <?= $product['category'] == 'Beverages' ? 'selected' : '' ?>>Beverages</option>
+                            <option value="General" <?= $product['category'] == 'General' ? 'selected' : '' ?>>General</option>
+                            <option value="Pantry" <?= $product['category'] == 'Pantry' ? 'selected' : '' ?>>Pantry</option>
+                            <option value="Meat" <?= $product['category'] == 'Meat' ? 'selected' : '' ?>>Meat</option>
+                            <option value="Snacks" <?= $product['category'] == 'Snacks' ? 'selected' : '' ?>>Snacks</option>
+                            <option value="Vegetables" <?= $product['category'] == 'Vegetables' ? 'selected' : '' ?>>Vegetables</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label-edit">Price ($)</label>
+                        <input type="number" step="0.01" name="price" class="form-control form-control-edit" value="<?= $product['price'] ?>" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label-edit">Stock Quantity</label>
+                    <input type="number" name="stock_qty" class="form-control form-control-edit" value="<?= $product['stock_qty'] ?>" required>
+                </div>
+
+                <button type="submit" class="btn-save">Save Changes</button>
+                <a href="admin.php" class="btn-cancel-link">Cancel</a>
+
+            </form>
         </div>
     </div>
+
 </body>
 </html>

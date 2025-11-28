@@ -45,10 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="row g-0 h-100">
             
             <div class="col-lg-6 d-none d-lg-block">
-                <div class="auth-banner-side">
+                <div class="auth-banner-side register-bg">
                     <div class="auth-banner-content">
-                        <h1 style="font-family: var(--font-serif);font-size: 3rem;margin-bottom: 1.5rem;line-height: 1.1; color: #fff; opacity: 0.9;" >Join the community of fresh food lovers.</h1>
-                        <p class="fs-5 opacity-75">Track orders, save favorites, and get exclusive organic deals.</p>
+                        <h1 style="font-family: var(--font-serif);font-size: 3rem;margin-bottom: 1.5rem;line-height: 1.1; color: #fff; opacity: 0.9;" >Join the community of clean, fresh food lovers.</h1>
+                        <p class="fs-5 opacity-75">Track orders, save favorites, and get many exclusive organic deals.</p>
                     </div>
                 </div>
             </div>
