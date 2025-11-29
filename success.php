@@ -2,6 +2,7 @@
 include 'db.php';
 session_start();
 
+// 1. Validate Order ID existence
 if (!isset($_GET['orderid'])) {
     header("Location: index.php");
     exit;
@@ -9,16 +10,29 @@ if (!isset($_GET['orderid'])) {
 
 $order_id = $_GET['orderid'];
 
-// Fetch Order Details
-$stmt = $pdo->prepare("SELECT * FROM orders WHERE id = ?");
-$stmt->execute([$order_id]);
-$order = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$order) {
-    die("Invalid Order ID");
+// 2. SECURE FETCH: Ensure the order belongs to the user OR the admin
+if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
+    // Admin can view any order
+    $stmt = $pdo->prepare("SELECT * FROM orders WHERE id = ?");
+    $stmt->execute([$order_id]);
+} else {
+    // Customers can ONLY view their own orders
+    // If user is not logged in, user_id is 0, which won't match any order
+    $user_id = $_SESSION['user_id'] ?? 0; 
+    
+    $stmt = $pdo->prepare("SELECT * FROM orders WHERE id = ? AND user_id = ?");
+    $stmt->execute([$order_id, $user_id]);
 }
 
-// Fetch Order Items
+$order = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// 3. CRITICAL CHECK: If no order found (or doesn't belong to user), KICK THEM OUT
+if (!$order) {
+    header("Location: index.php");
+    exit; // Stop script execution immediately
+}
+
+// Fetch items only after security check passes
 $stmtItems = $pdo->prepare("SELECT order_items.*, products.name, products.price 
                             FROM order_items 
                             JOIN products ON order_items.product_id = products.id 

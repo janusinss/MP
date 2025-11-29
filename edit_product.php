@@ -60,7 +60,7 @@ $product = $stmt->fetch(PDO::FETCH_ASSOC);
     <title>Edit Product | Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
 </head>
 <body style="background-color: var(--bg-color);">
 
@@ -71,19 +71,22 @@ $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
             <form method="POST" enctype="multipart/form-data">
                 
-                <div class="edit-img-preview-box">
-                    <img src="assets/images/<?= $product['image'] ?>" alt="Current Image">
-                    <div class="edit-img-overlay">Current</div>
+                <div class="edit-img-preview-box mb-0">
+                    <img src="assets/images/<?= $product['image'] ?>" id="currentPreviewImage" alt="Current Image">
+                    <div class="edit-img-overlay" id="previewOverlay">Current</div>
                 </div>
+                <p id="changeImageHelper" class="text-center text-muted small fw-bold text-uppercase mt-2 mb-4" style="display: none; letter-spacing: 0.05em;">
+                    Click "Update Image" below to change selection
+                </p>
 
-                <div class="mb-4">
+                <div class="mb-4 mt-4">
                     <label class="form-label-edit">Product Name (Read-only)</label>
                     <input type="text" class="form-control form-control-edit text-muted" value="<?= htmlspecialchars($product['name']) ?>" readonly style="background: #f0f0f0;">
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label-edit">Update Image</label>
-                    <input type="file" name="image" class="form-control form-control-edit" accept="image/*">
+                    <input type="file" name="image" id="editImageInput" class="form-control form-control-edit" accept="image/*">
                 </div>
 
                 <div class="row">
@@ -119,6 +122,33 @@ $product = $stmt->fetch(PDO::FETCH_ASSOC);
             </form>
         </div>
     </div>
+
+    <script>
+        // Image Preview Logic for Edit Product
+        const editInput = document.getElementById('editImageInput');
+        const previewImg = document.getElementById('currentPreviewImage');
+        const helperText = document.getElementById('changeImageHelper');
+        const overlayText = document.getElementById('previewOverlay');
+
+        editInput.addEventListener('change', function() {
+            const file = this.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // Update the src of the top image instantly
+                    previewImg.src = e.target.result;
+                    // Show the helper text
+                    helperText.style.display = 'block';
+                    // Change overlay label
+                    overlayText.innerText = 'New Selection';
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 
 </body>
 </html>

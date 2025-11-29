@@ -19,11 +19,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $image = "default.jpg"; // Default
     
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+        // 1. Check MIME Type (Real Check)
+        $check = getimagesize($_FILES["image"]["tmp_name"]);
+        if($check === false) {
+            die("File is not an image.");
+        }
+
+        // 2. Check Extension (Secondary Check)
+        $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
+        if (!in_array(strtolower($file_extension), $allowed_types)) {
+            die("Sorry, only JPG, JPEG, PNG & GIF files are allowed.");
+        }
+
         $target_dir = "assets/images/";
         $file_extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
         $new_filename = uniqid() . "." . $file_extension;
         $target_file = $target_dir . $new_filename;
-        $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
         
         if (in_array(strtolower($file_extension), $allowed_types)) {
             if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
@@ -63,13 +74,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 
                 <div class="form-group-modern">
                     <label class="label-modern">Product Image</label>
-                    <div class="upload-area-modern">
-                        <div class="upload-icon-circle">
-                            <i class="bi bi-cloud-arrow-up"></i>
+                    
+                    <div class="upload-area-modern" id="uploadPreview">
+                        
+                        <div id="uploadPlaceholder">
+                            <div class="upload-icon-circle">
+                                <i class="bi bi-cloud-arrow-up"></i>
+                            </div>
+                            <h6 class="mb-1 text-dark">Click to upload image</h6>
+                            <p class="text-muted small mb-0">SVG, PNG, JPG or GIF (Max 2MB)</p>
                         </div>
-                        <h6 class="mb-1 text-dark">Click to upload image</h6>
-                        <p class="text-muted small mb-0">SVG, PNG, JPG or GIF (Max 2MB)</p>
-                        <input type="file" name="image" class="file-input-hidden" accept="image/*" required>
+
+                        <input type="file" name="image" id="imageInput" class="file-input-hidden" accept="image/*" required>
                     </div>
                 </div>
 
@@ -97,6 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
 
                 <div class="row">
+
                     <div class="col-md-6 form-group-modern">
                         <label class="label-modern">Price ($)</label>
                         <input type="number" step="0.01" name="price" class="input-modern" placeholder="0.00" required>
@@ -113,6 +130,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </form>
         </div>
     </div>
+
+
+<script>
+    // Image Preview Logic for Add Product
+    const imageInput = document.getElementById('imageInput');
+    const uploadPreview = document.getElementById('uploadPreview');
+    const placeholder = document.getElementById('uploadPlaceholder');
+
+    imageInput.addEventListener('change', function() {
+        const file = this.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                // 1. Create the image element
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                // Styling to make it look good inside the box
+                img.style.width = '100%';
+                img.style.height = '220px'; // Slightly shorter to make room for text
+                img.style.objectFit = 'contain';
+                img.style.borderRadius = '12px';
+                img.style.mixBlendMode = 'multiply'; // Blends white backgrounds
+
+                // 2. Create the "Change Image" label
+                const changeLabel = document.createElement('p');
+                changeLabel.innerText = "Click here to change image";
+                changeLabel.className = "text-muted small mt-3 mb-0 fw-bold text-uppercase";
+                changeLabel.style.letterSpacing = "0.05em";
+
+                // 3. Clear the original placeholder text/icon
+                uploadPreview.innerHTML = ''; 
+
+                // 4. Rebuild the container content
+                uploadPreview.appendChild(imageInput); // IMPORTANT: Keep the hidden input!
+                uploadPreview.appendChild(img);        // Add the preview image
+                uploadPreview.appendChild(changeLabel);// Add the text below it
+            }
+            
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 
 </body>
 </html>

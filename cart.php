@@ -130,14 +130,20 @@ if (isset($_SESSION['discount'])) {
                                 </form>
                             </div>
 
-                            <div class="d-flex justify-content-between align-items-end mt-3 border-top pt-3">
-                                <div>
-                                    <span class="text-muted small me-2">Quantity:</span>
-                                    <span class="cart-qty-badge"><?= $item['qty'] ?></span>
-                                </div>
-                                <div class="fw-bold fs-5">
-                                    $<?= number_format($item['subtotal'], 2) ?>
-                                </div>
+                            <div class="d-flex align-items-center border rounded-pill px-2" style="width: fit-content;">
+                                <form action="update_cart.php" method="POST" class="d-flex align-items-center">
+                                    <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
+                                    <input type="hidden" name="action" value="decrease">
+                                    <button type="submit" class="btn btn-sm text-muted p-0 border-0"><i class="bi bi-dash"></i></button>
+                                </form>
+                                
+                                <span class="mx-3 fw-bold small"><?= $item['qty'] ?></span>
+                                
+                                <form action="update_cart.php" method="POST" class="d-flex align-items-center">
+                                    <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
+                                    <input type="hidden" name="action" value="increase">
+                                    <button type="submit" class="btn btn-sm text-muted p-0 border-0"><i class="bi bi-plus"></i></button>
+                                </form>
                             </div>
                         </div>
                     </div>
