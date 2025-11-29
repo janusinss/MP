@@ -2784,7 +2784,6 @@ body {
     display: flex;
     flex-direction: column;
     padding: 2rem 1.5rem;
-    transition: all 0.3s ease;
 }
 
 /* 2. Main Content Area (Offset by sidebar width) */
@@ -2794,7 +2793,6 @@ body {
     padding: 2rem 3rem;
     width: calc(100% - 260px);
     opacity: 1;
-    transition: opacity 0.3s ease;
 }
 
 /* Navigation Links */
@@ -4116,4 +4114,181 @@ body {
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(93, 134, 108, 0.2);
     color: #fff;
+}
+
+/* --- NEW: NO STOCK BADGE STYLE --- */
+.stock-badge-out {
+    background: #f1f3f5;
+    color: #adb5bd;
+    padding: 8px 5px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    min-width: 50px;
+    border: 1px dashed #dee2e6;
+}
+
+.stock-badge-out span {
+    font-size: 0.5rem;
+    text-transform: uppercase;
+    margin-top: 3px;
+    letter-spacing: 0.05em;
+}
+
+/* --- CLICKABLE STAT CARDS --- */
+.dash-stat-card.interactive {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dash-stat-card.interactive:active {
+    transform: scale(0.98);
+}
+
+/* --- ORDER MANAGEMENT REDESIGN --- */
+
+/* 1. Glass Filter Rail */
+.filter-glass-container {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0,0,0,0.05);
+    padding: 6px;
+    border-radius: 50px;
+    display: inline-flex;
+    gap: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+}
+
+.filter-tab-btn {
+    border: none;
+    background: transparent;
+    padding: 8px 24px;
+    border-radius: 40px;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.filter-tab-btn:hover {
+    color: var(--accent-color);
+    background: rgba(255,255,255,0.5);
+}
+
+.filter-tab-btn.active {
+    background: #fff;
+    color: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(93, 134, 108, 0.15);
+    transform: scale(1.05);
+}
+
+/* 2. Order Table Rows */
+.order-row-strip {
+    transition: all 0.2s ease;
+}
+
+.order-row-strip:hover {
+    background-color: #fdfbf7 !important; /* Warm hover state */
+    transform: scale(1.005);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+    z-index: 10;
+    position: relative;
+}
+
+.order-id-badge {
+    font-family: var(--font-mono);
+    background: #fff;
+    border: 1px solid #eee;
+    padding: 5px 10px;
+    border-radius: 8px;
+    color: var(--text-main);
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.order-customer-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.order-customer-name {
+    font-weight: 700;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.order-customer-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.order-total-display {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+/* 3. Status Indicators */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+}
+
+/* Specific Status Colors */
+.st-pending { background: #fff8e1; color: #b45309; }
+.st-pending .status-dot { background: #b45309; }
+
+.st-shipped { background: #e0f2fe; color: #0369a1; }
+.st-shipped .status-dot { background: #0369a1; }
+
+.st-delivered { background: #dcfce7; color: #15803d; }
+.st-delivered .status-dot { background: #15803d; }
+
+.st-cancelled { background: #fee2e2; color: #b91c1c; }
+.st-cancelled .status-dot { background: #b91c1c; }
+
+/* Action Button */
+.btn-manage-pill {
+    border: 1px solid rgba(0,0,0,0.1);
+    background: #fff;
+    color: var(--text-main);
+    border-radius: 20px;
+    padding: 5px 15px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.btn-manage-pill:hover {
+    background: var(--text-main);
+    color: #fff;
+    border-color: var(--text-main);
+    transform: translateY(-2px);
 }

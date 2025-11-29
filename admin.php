@@ -17,6 +17,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'updated'): ?>
     <div class="success-overlay" id="successModal">
         <div class="success-modal">
@@ -25,36 +26,34 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
             </div>
             <h2 class="success-title">Perfect!</h2>
             <p class="success-desc">The product has been updated successfully.</p>
-            
             <button onclick="closeModal()" class="btn-success-action">Awesome</button>
         </div>
     </div>
-
     <script>
-        // Function to remove query params and close modal
         function closeModal() {
-            const modal = document.getElementById('successModal');
-            modal.style.opacity = '0'; // Fade out effect
-            setTimeout(() => {
-                modal.style.display = 'none';
-                // Clean the URL so refreshing doesn't show popup again
-                window.history.replaceState({}, document.title, 'admin.php?view=products');
-            }, 300);
+            document.getElementById('successModal').style.display = 'none';
+            // Clean URL while keeping the current view
+            const urlParams = new URLSearchParams(window.location.search);
+            const view = urlParams.get('view') || 'dashboard';
+            window.history.replaceState({}, document.title, 'admin.php?view=' + view);
         }
     </script>
     <?php endif; ?>
-    
+
     <div class="admin-wrapper">
         
         <div class="admin-sidebar">
-            <div class="mb-5">
+            <div class="mb-4">
                 <div class="admin-brand">FreshCart<span>.</span></div>
                 <span class="admin-badge">Admin Panel</span>
             </div>
             
-            <nav class="nav flex-column gap-2 flex-grow-1">
+            <nav class="nav flex-column gap-3 flex-grow-1">
                 <a href="#" id="nav-dashboard" onclick="loadView('dashboard')" class="admin-nav-link active">
                     <i class="bi bi-grid-1x2-fill"></i> Overview
+                </a>
+                <a href="#" id="nav-orders" onclick="loadView('orders')" class="admin-nav-link">
+                    <i class="bi bi-receipt-cutoff"></i> Orders
                 </a>
                 <a href="#" id="nav-products" onclick="loadView('products')" class="admin-nav-link">
                     <i class="bi bi-box-seam"></i> Inventory
@@ -89,24 +88,20 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
         });
 
         function loadView(viewName) {
-            // 1. Sidebar Logic: Remove 'active' from all, add to current
+            // 1. Sidebar Logic: Update Active State
             document.querySelectorAll('.admin-nav-link').forEach(el => el.classList.remove('active'));
-            
-            // Find the sidebar link by ID and highlight it
             const activeLink = document.getElementById('nav-' + viewName);
-            if (activeLink) {
-                activeLink.classList.add('active');
-            }
+            if (activeLink) activeLink.classList.add('active');
 
             const main = document.getElementById('mainContent');
 
-            // 2. Fetch Content INSTANTLY
+            // 2. Fetch Content INSTANTLY (No Timeout)
             fetch('admin_router.php?view=' + viewName)
                 .then(response => response.text())
                 .then(html => {
                     main.innerHTML = html;
                     
-                    // Execute scripts inside the fetched HTML (like Charts)
+                    // Re-initialize Charts if any
                     const scripts = main.querySelectorAll("script");
                     scripts.forEach(oldScript => {
                         const newScript = document.createElement("script");

@@ -19,7 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
     $new_status = $_POST['status'];
     $stmtUpdate = $pdo->prepare("UPDATE orders SET status = ? WHERE id = ?");
     $stmtUpdate->execute([$new_status, $order_id]);
-    header("Location: order_details.php?order_id=" . $order_id);
+    
+    // CHANGED: Redirect to main admin router with the "Orders" view active and a success message
+    header("Location: admin.php?view=orders&msg=updated");
     exit;
 }
 
