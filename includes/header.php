@@ -17,9 +17,26 @@ $cartCount = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
 </head>
 <body>
 
-    <div class="bg-dark text-white text-center py-2 small fw-bold" style="letter-spacing: 0.05em;">
+    <div id="flash-promo" class="bg-dark text-white text-center py-2 small fw-bold" 
+         style="letter-spacing: 0.05em; transition: opacity 1s ease-out, height 1s ease-out; overflow: hidden;">
         ⚡ FLASH SALE: Use code <span class="text-warning border-bottom border-warning" style="cursor:pointer;" onclick="navigator.clipboard.writeText('FRESH50'); alert('Code FRESH50 copied!');">FRESH50</span> for 50% OFF your first order!
     </div>
+
+    <script>
+        // Auto-hide promo bar after 6 seconds
+        setTimeout(() => {
+            const promo = document.getElementById('flash-promo');
+            if (promo) {
+                promo.style.opacity = '0'; // Fade out
+                
+                // After fade completes, shrink height to 0 to slide up content
+                setTimeout(() => {
+                    promo.style.height = '0';
+                    promo.style.padding = '0';
+                }, 1000); 
+            }
+        }, 1000); // 6000ms = 6 seconds
+    </script>
 
     <nav class="navbar navbar-expand-lg navbar-glass sticky-top">
         <div class="container">
