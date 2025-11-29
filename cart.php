@@ -154,12 +154,52 @@ if (isset($_SESSION['discount'])) {
                 <div class="cart-summary-card shadow-sm">
                     <h5 class="mb-4" style="font-family: var(--font-serif);">Order Summary</h5>
 
-                    <form method="POST" class="mb-4">
+                    <form method="POST" class="mb-4" id="couponForm">
                         <label class="small text-muted mb-2 text-uppercase fw-bold">Discount Code</label>
                         <div class="coupon-input-group">
-                            <input type="text" name="coupon_code" class="coupon-input" placeholder="WELCOME20">
+                            <input type="text" name="coupon_code" id="couponField" class="coupon-input" placeholder="Enter code">
                             <button type="submit" name="apply_coupon" class="coupon-btn">Apply</button>
                         </div>
+                        
+                        <div class="mt-3">
+                            <small class="text-muted fw-bold" style="font-size: 0.7rem;">AVAILABLE OFFERS:</small>
+                            
+                            <div class="d-flex align-items-center justify-content-between p-2 mt-2 border border-dashed rounded bg-light" style="border-style: dashed !important; border-color: #ccc;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-tag-fill text-success"></i>
+                                    <div>
+                                        <span class="d-block fw-bold text-dark small">WELCOME20</span>
+                                        <span class="d-block text-muted" style="font-size: 0.65rem;">20% off your first order</span>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="applyCode('WELCOME20')" class="btn btn-sm btn-link text-decoration-none p-0 text-success fw-bold" style="font-size: 0.75rem;">APPLY</button>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between p-2 mt-2 border border-dashed rounded bg-light" style="border-style: dashed !important; border-color: #ccc;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-lightning-fill text-warning"></i>
+                                    <div>
+                                        <span class="d-block fw-bold text-dark small">FRESH50</span>
+                                        <span class="d-block text-muted" style="font-size: 0.65rem;">50% off huge savings</span>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="applyCode('FRESH50')" class="btn btn-sm btn-link text-decoration-none p-0 text-success fw-bold" style="font-size: 0.75rem;">APPLY</button>
+                            </div>
+                        </div>
+
+                        <?php if ($coupon_msg): ?>
+                            <div class="text-success small mt-3"><i class="bi bi-check-circle-fill"></i> <?= $coupon_msg ?></div>
+                        <?php endif; ?>
+                        <?php if ($coupon_error): ?>
+                            <div class="text-danger small mt-3"><i class="bi bi-exclamation-circle-fill"></i> <?= $coupon_error ?></div>
+                        <?php endif; ?>
+                    </form>
+
+                    <script>
+                        function applyCode(code) {
+                            document.getElementById('couponField').value = code;
+                        }
+                    </script>
                         
                         <?php if ($coupon_msg): ?>
                             <div class="text-success small"><i class="bi bi-check-circle-fill"></i> <?= $coupon_msg ?></div>

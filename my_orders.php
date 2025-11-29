@@ -91,21 +91,21 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     </div>
                                 </div>
 
-                                <div class="col-md-4 text-md-end">
+                                <div class="col-md-4 text-md-end d-flex flex-column align-items-end gap-2">
+                                    
+                                    <a href="user_order_details.php?order_id=<?= $order['id'] ?>" class="btn btn-light rounded-circle border" title="View Details">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+
                                     <?php if ($status == 'Pending'): ?>
-                                        <form action="user_cancel_order.php" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');" class="d-inline-block">
+                                        <form action="user_cancel_order.php" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
                                             <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
-                                            <button type="submit" class="btn btn-outline-danger rounded-pill px-4 btn-sm me-2">
-                                                Cancel
+                                            <button type="submit" class="btn btn-outline-danger rounded-pill px-4 btn-sm">
+                                                Cancel Order
                                             </button>
                                         </form>
                                     <?php endif; ?>
-                                    
-                                    <button class="btn btn-light rounded-circle border" title="View Details" disabled>
-                                        <i class="bi bi-chevron-right"></i>
-                                    </button>
                                 </div>
-
                             </div>
                         </div>
                     </div>

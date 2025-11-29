@@ -81,7 +81,10 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
     <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
 </head>
 <body>
-
+    <div class="bg-dark text-white text-center py-2 small fw-bold" style="letter-spacing: 0.05em;">
+        ⚡ FLASH SALE: Use code <span class="text-warning border-bottom border-warning" style="cursor:pointer;" onclick="navigator.clipboard.writeText('FRESH50'); alert('Code FRESH50 copied!');">FRESH50</span> for 50% OFF your first order!
+    </div>
+    
     <nav class="navbar navbar-expand-lg navbar-glass sticky-top">
         <div class="container">
             <a class="navbar-brand" href="index.php">
