@@ -9,7 +9,8 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 }
 
 $id = $_GET['id'] ?? null;
-if (!$id) { header("Location: admin_products.php"); exit; }
+// FIX: Redirect to the main admin router if no ID
+if (!$id) { header("Location: admin.php?view=products"); exit; }
 
 // Handle Update
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -24,12 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $new_filename = uniqid() . "." . $file_extension;
         $target_file = $target_dir . $new_filename;
         $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
+        
         if (in_array(strtolower($file_extension), $allowed_types)) {
             if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
                 $sql = "UPDATE products SET stock_qty = ?, price = ?, category = ?, image = ? WHERE id = ?";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([$newStock, $newPrice, $newCat, $new_filename, $id]);
-                header("Location: admin_products.php");
+                
+                // FIX: Redirect to admin.php with success message
+                header("Location: admin.php?view=products&msg=updated");
                 exit;
             }
         }
@@ -40,7 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$newStock, $newPrice, $newCat, $id]);
 
-    header("Location: admin_products.php");
+    // FIX: Redirect to admin.php with success message
+    header("Location: admin.php?view=products&msg=updated");
     exit;
 }
 
@@ -108,7 +113,8 @@ $product = $stmt->fetch(PDO::FETCH_ASSOC);
                 </div>
 
                 <button type="submit" class="btn-save">Save Changes</button>
-                <a href="admin.php" class="btn-cancel-link">Cancel</a>
+                
+                <a href="admin.php?view=products" class="btn-cancel-link">Cancel</a>
 
             </form>
         </div>

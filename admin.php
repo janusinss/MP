@@ -17,6 +17,32 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <?php if (isset($_GET['msg']) && $_GET['msg'] == 'updated'): ?>
+    <div class="success-overlay" id="successModal">
+        <div class="success-modal">
+            <div class="success-icon-animated">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <h2 class="success-title">Perfect!</h2>
+            <p class="success-desc">The product has been updated successfully.</p>
+            
+            <button onclick="closeModal()" class="btn-success-action">Awesome</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to remove query params and close modal
+        function closeModal() {
+            const modal = document.getElementById('successModal');
+            modal.style.opacity = '0'; // Fade out effect
+            setTimeout(() => {
+                modal.style.display = 'none';
+                // Clean the URL so refreshing doesn't show popup again
+                window.history.replaceState({}, document.title, 'admin.php?view=products');
+            }, 300);
+        }
+    </script>
+    <?php endif; ?>
     
     <div class="admin-wrapper">
         
