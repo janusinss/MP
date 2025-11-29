@@ -81,21 +81,30 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
     </div>
 
-    <script>
-        // Default Load
+<script>
+        // Default Load - Check URL for 'view' parameter
         document.addEventListener("DOMContentLoaded", () => {
-            loadView('dashboard');
+            const urlParams = new URLSearchParams(window.location.search);
+            // If ?view=products exists, load that. Otherwise load 'dashboard'
+            const currentView = urlParams.get('view') || 'dashboard';
+            loadView(currentView);
         });
 
         function loadView(viewName) {
-            // 1. Sidebar Logic: Update Active State
+            // 1. Handle Sidebar Highlighting (Strip extra params like '&status=Pending')
+            const baseView = viewName.split('&')[0]; 
+            
             document.querySelectorAll('.admin-nav-link').forEach(el => el.classList.remove('active'));
-            const activeLink = document.getElementById('nav-' + viewName);
-            if (activeLink) activeLink.classList.add('active');
+            
+            // Find the sidebar link by ID (nav-dashboard, nav-products, etc.)
+            const activeLink = document.getElementById('nav-' + baseView);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
 
             const main = document.getElementById('mainContent');
 
-            // 2. Fetch Content INSTANTLY (No Timeout)
+            // 2. Fetch Content INSTANTLY
             fetch('admin_router.php?view=' + viewName)
                 .then(response => response.text())
                 .then(html => {

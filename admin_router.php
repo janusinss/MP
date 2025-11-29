@@ -220,35 +220,95 @@ elseif ($view == 'users') {
 
 // --- VIEW 4: REVIEWS ---
 elseif ($view == 'reviews') {
-    $stmt = $pdo->query("SELECT r.*, u.full_name, p.name as product_name, p.image as product_image FROM reviews r JOIN users u ON r.user_id = u.id JOIN products p ON r.product_id = p.id ORDER BY r.created_at DESC");
+    $stmt = $pdo->query("SELECT r.*, u.full_name, p.name as product_name, p.image as product_image 
+                         FROM reviews r 
+                         JOIN users u ON r.user_id = u.id 
+                         JOIN products p ON r.product_id = p.id 
+                         ORDER BY r.created_at DESC");
     $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Calculate Stats
+    $totalReviews = count($reviews);
+    $avgRating = 0;
+    if ($totalReviews > 0) {
+        $sum = array_sum(array_column($reviews, 'rating'));
+        $avgRating = number_format($sum / $totalReviews, 1);
+    }
     ?>
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div><h2 class="admin-header-title">Customer Feedback</h2><p class="text-muted m-0">See what people are saying.</p></div>
-        <div class="bg-white px-4 py-2 rounded-pill shadow-sm border"><span class="fw-bold text-dark"><?= count($reviews) ?></span> <span class="text-muted small text-uppercase">Reviews</span></div>
+    
+    <div class="d-flex justify-content-between align-items-end mb-5">
+        <div>
+            <h2 class="admin-header-title">Review Gallery</h2>
+            <p class="text-muted m-0">Insights directly from your customers.</p>
+        </div>
     </div>
-    <div class="row g-4 reviews-grid-container">
-        <?php foreach ($reviews as $r): ?>
-            <div class="col-xl-4 col-md-6">
-                <div class="review-gallery-card">
-                    <div class="review-product-badge">
-                        <img src="assets/images/<?= $r['product_image'] ?: 'default.jpg' ?>" class="review-prod-img">
-                        <div class="review-prod-name text-truncate"><?= htmlspecialchars($r['product_name']) ?></div>
-                    </div>
-                    <div class="review-user-row">
-                        <div class="review-avatar"><?= strtoupper(substr($r['full_name'], 0, 1)) ?></div>
-                        <div class="review-meta"><span class="review-username"><?= htmlspecialchars($r['full_name']) ?></span><span class="review-time"><?= date('M d, Y', strtotime($r['created_at'])) ?></span></div>
-                    </div>
-                    <div class="review-stars">
-                        <?php for($i=0; $i<$r['rating']; $i++) echo '<i class="bi bi-star-fill"></i>'; ?>
-                    </div>
-                    <p class="review-text">"<?= htmlspecialchars($r['comment']) ?>"</p>
-                    <div class="review-actions">
-                        <a href="delete_review.php?id=<?= $r['id'] ?>" class="btn-del-icon" onclick="return confirm('Delete review?');"><i class="bi bi-trash"></i></a>
+
+    <div class="review-stats-bar">
+        <div class="r-stat-box">
+            <div class="r-icon"><i class="bi bi-chat-quote-fill"></i></div>
+            <div class="r-info">
+                <h3><?= $totalReviews ?></h3>
+                <span>Total Reviews</span>
+            </div>
+        </div>
+        <div class="r-stat-box">
+            <div class="r-icon" style="background: #e0f2fe; color: #0369a1;"><i class="bi bi-star-half"></i></div>
+            <div class="r-info">
+                <h3><?= $avgRating ?></h3>
+                <span>Average Rating</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <?php if ($totalReviews > 0): ?>
+            <?php foreach ($reviews as $r): ?>
+                <div class="col-xl-4 col-md-6">
+                    <div class="review-card-modern">
+                        <div class="rc-quote-icon">”</div>
+                        
+                        <div class="rc-header">
+                            <div class="rc-user">
+                                <div class="rc-avatar"><?= strtoupper(substr($r['full_name'], 0, 1)) ?></div>
+                                <div class="rc-meta">
+                                    <h6><?= htmlspecialchars($r['full_name']) ?></h6>
+                                    <span><?= date('M d, Y', strtotime($r['created_at'])) ?></span>
+                                </div>
+                            </div>
+                            <div class="rc-product-badge">
+                                <img src="assets/images/<?= $r['product_image'] ?: 'default.jpg' ?>">
+                                <span class="text-truncate"><?= htmlspecialchars($r['product_name']) ?></span>
+                            </div>
+                        </div>
+
+                        <div class="rc-rating">
+                            <?php for($i=0; $i<$r['rating']; $i++) echo '<i class="bi bi-star-fill"></i>'; ?>
+                            <?php for($i=$r['rating']; $i<5; $i++) echo '<i class="bi bi-star text-muted opacity-25"></i>'; ?>
+                        </div>
+
+                        <p class="rc-comment">
+                            <?= htmlspecialchars($r['comment']) ?>
+                        </p>
+
+                        <div class="rc-actions">
+                            <a href="delete_review.php?id=<?= $r['id'] ?>" class="btn-delete-review text-decoration-none" onclick="return confirm('Delete this review?');">
+                                <i class="bi bi-trash me-1"></i> Remove
+                            </a>
+                        </div>
                     </div>
                 </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="col-12">
+                <div class="text-center py-5 bg-white rounded-4 border border-light">
+                    <div class="mb-3">
+                        <span style="font-size: 4rem;">💬</span>
+                    </div>
+                    <h4 class="text-muted font-serif">Quiet around here...</h4>
+                    <p class="text-muted">No customer reviews have been posted yet.</p>
+                </div>
             </div>
-        <?php endforeach; ?>
+        <?php endif; ?>
     </div>
     <?php
 }

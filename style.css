@@ -4292,3 +4292,195 @@ body {
     border-color: var(--text-main);
     transform: translateY(-2px);
 }
+
+/* --- REVIEW GALLERY REDESIGN --- */
+
+.review-stats-bar {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 3rem;
+}
+
+.r-stat-box {
+    background: #fff;
+    padding: 1.5rem 2rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+    border: 1px solid rgba(0,0,0,0.02);
+    flex: 1;
+}
+
+.r-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: #fff8e1;
+    color: #f59e0b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.r-info h3 {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--text-main);
+}
+
+.r-info span {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+}
+
+/* Modern Card */
+.review-card-modern {
+    background: #fff;
+    border-radius: 24px;
+    padding: 2rem;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.03);
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.review-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(93, 134, 108, 0.15);
+    border-color: var(--accent-color);
+}
+
+/* Header inside card */
+.rc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.rc-user {
+    display: flex;
+    gap: 12px;
+}
+
+.rc-avatar {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, var(--accent-color), #4a6b56);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.rc-meta h6 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.rc-meta span {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Product Pill Badge */
+.rc-product-badge {
+    background: #f8f9fa;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    max-width: 140px;
+}
+
+.rc-product-badge img {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+}
+
+/* Content */
+.rc-rating {
+    color: #ffc107;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.rc-comment {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #555;
+    font-style: italic;
+    flex-grow: 1;
+    position: relative;
+    z-index: 1;
+}
+
+/* Background Decoration */
+.rc-quote-icon {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    font-size: 6rem;
+    color: rgba(0,0,0,0.03);
+    font-family: serif;
+    line-height: 1;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Delete Button */
+.rc-actions {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #eee;
+    text-align: right;
+}
+
+.btn-delete-review {
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.05);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-delete-review:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .review-stats-bar {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
