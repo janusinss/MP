@@ -1,12 +1,15 @@
 <?php
-$host = 'localhost';
-$dbname = 'grocery_db';
-$username = 'root';  // Default for XAMPP
-$password = '';      // Default is empty for XAMPP
+// Use environment variables if available (Railway), otherwise use local defaults (XAMPP)
+$host = getenv('MYSQLHOST') ? getenv('MYSQLHOST') : 'localhost';
+$dbname = getenv('MYSQLDATABASE') ? getenv('MYSQLDATABASE') : 'grocery_db';
+$username = getenv('MYSQLUSER') ? getenv('MYSQLUSER') : 'root';
+$password = getenv('MYSQLPASSWORD') ? getenv('MYSQLPASSWORD') : '';
+// specific port is sometimes needed for cloud dbs (Railway usually provides MYSQLPORT)
+$port = getenv('MYSQLPORT') ? getenv('MYSQLPORT') : 3306;
 
 try {
-    // We use PDO because it is more secure and professional than old MySQLi
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    // We use PDO and include the port in the DSN
+    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Connection failed: " . $e->getMessage());
