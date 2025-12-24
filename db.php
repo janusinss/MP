@@ -1,10 +1,18 @@
 <?php
-// Use environment variables if available (Railway), otherwise use local defaults (XAMPP)
+// Use environment variables if available (Railway/Render)
 $host = getenv('MYSQLHOST') ? getenv('MYSQLHOST') : 'localhost';
 $dbname = getenv('MYSQLDATABASE') ? getenv('MYSQLDATABASE') : 'grocery_db';
 $username = getenv('MYSQLUSER') ? getenv('MYSQLUSER') : 'root';
 $password = getenv('MYSQLPASSWORD') ? getenv('MYSQLPASSWORD') : '';
-// specific port is sometimes needed for cloud dbs (Railway usually provides MYSQLPORT)
+
+// Check if we are on InfinityFree (Host matches specific pattern)
+if ($_SERVER['HTTP_HOST'] == 'janus-grocery.ct.ws' || $_SERVER['HTTP_HOST'] == 'janus-grocery.infinityfreeapp.com' || strpos($host, 'infinityfree') !== false) {
+    $host = 'sql309.infinityfree.com';
+    $dbname = 'if0_40753726_grocery_db';
+    $username = 'if0_40753726';
+    $password = '092633449090';
+}
+
 $port = getenv('MYSQLPORT') ? getenv('MYSQLPORT') : 3306;
 
 try {
@@ -14,4 +22,3 @@ try {
 } catch (PDOException $e) {
     die("Connection failed: " . $e->getMessage());
 }
-?>
