@@ -20,21 +20,21 @@ include 'includes/header.php';
                         <div class="contact-icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
                         <div>
                             <span class="d-block fw-bold mb-1">Visit Us</span>
-                            <span class="opacity-75 small">123 Market Street<br>San Francisco, CA 94103</span>
+                            <span class="opacity-75 small">Maasin Z.C<br>Zamboanga City, 7000</span>
                         </div>
                     </li>
                     <li>
                         <div class="contact-icon-circle"><i class="bi bi-envelope-fill"></i></div>
                         <div>
                             <span class="d-block fw-bold mb-1">Email Us</span>
-                            <span class="opacity-75 small">hello@freshcart.com</span>
+                            <span class="opacity-75 small">janusdominic0@gmail.com</span>
                         </div>
                     </li>
                     <li>
                         <div class="contact-icon-circle"><i class="bi bi-telephone-fill"></i></div>
                         <div>
                             <span class="d-block fw-bold mb-1">Call Us</span>
-                            <span class="opacity-75 small">+1 (555) 123-4567</span>
+                            <span class="opacity-75 small">+63 994 873 9200</span>
                         </div>
                     </li>
                 </ul>

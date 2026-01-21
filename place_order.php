@@ -3,10 +3,10 @@ session_start();
 include 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SESSION['cart'])) {
-    
+
     $name = $_POST['customer_name'];
     $address = $_POST['address'];
-    
+
     // 1. Calculate Total (With Discount Logic)
     $ids = implode(',', array_keys($_SESSION['cart']));
     $stmt = $pdo->query("SELECT * FROM products WHERE id IN ($ids)");
@@ -34,11 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SESSION['cart'])) {
 
         $sql = "INSERT INTO orders (customer_name, address, total_amount, status, user_id) VALUES (?, ?, ?, 'Pending', ?)";
         $stmt = $pdo->prepare($sql);
-        
+
         // FIXED: We now use $finalTotal here instead of $total
         $stmt->execute([$name, $address, $finalTotal, $userId]);
-        
-        $orderId = $pdo->lastInsertId(); 
+
+        $orderId = $pdo->lastInsertId();
 
         // 3. Insert into ORDER_ITEMS table
         $sqlItem = "INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)";
@@ -53,9 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SESSION['cart'])) {
 
             // Save item
             $stmtItem->execute([$orderId, $p['id'], $qty]);
-            
-            // Decrease stock
-            $stmtStock->execute([$qty, $p['id']]);
+
+            // Stock Reduction is now handled by Trigger `trg_reduce_stock_after_order`
         }
 
         // Commit the transaction
@@ -64,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SESSION['cart'])) {
         // 5. Clear Cart & Coupon
         unset($_SESSION['cart']);
         unset($_SESSION['discount']); // Clear the coupon so it doesn't apply to the next order automatically
-        
+
         header("Location: success.php?orderid=$orderId");
         exit;
 

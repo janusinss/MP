@@ -1,7 +1,0 @@
-{
-  "name": "user/grocery-app",
-  "description": "Grocery Application",
-  "require": {
-    "php": ">=8.2"
-  }
-}
