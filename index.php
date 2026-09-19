@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+require_once __DIR__ . '/config/db.php';
 
 // Check if a session is already active before starting one
 if (session_status() === PHP_SESSION_NONE) {
@@ -78,7 +78,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
     <title>FreshCart Market | Organic & Fresh</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
 </head>
 <body>
 
@@ -119,7 +119,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                 <ul class="navbar-nav ms-auto align-items-center gap-3">
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <li class="nav-item">
-                            <a class="nav-link-custom d-flex align-items-center gap-2" href="profile.php">
+                            <a class="nav-link-custom d-flex align-items-center gap-2" href="account/profile.php">
                                 <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
                                     <?= strtoupper(substr($_SESSION['user_name'], 0, 1)) ?>
                                 </div>
@@ -127,12 +127,12 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                             </a>
                         </li>
                     <?php else: ?>
-                        <li class="nav-item"><a href="user_login.php" class="nav-link-custom">Login</a></li>
-                        <li class="nav-item"><a href="user_register.php" class="btn btn-primary rounded-pill px-4 shadow-sm">Sign Up</a></li>
+                        <li class="nav-item"><a href="auth/login.php" class="nav-link-custom">Login</a></li>
+                        <li class="nav-item"><a href="auth/register.php" class="btn btn-primary rounded-pill px-4 shadow-sm">Sign Up</a></li>
                     <?php endif; ?>
 
                     <li class="nav-item position-relative">
-                        <a href="cart.php" class="btn btn-outline-secondary border-0 position-relative">
+                        <a href="cart/index.php" class="btn btn-outline-secondary border-0 position-relative">
                             <i class="bi bi-bag" style="font-size: 1.3rem;"></i>
                             <?php if($cartCount > 0): ?>
                                 <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.65rem;">
@@ -150,18 +150,18 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
         <div class="container hero-content">
             <div class="row align-items-center">
                 
-                <div class="col-lg-6 mb-5 mb-lg-0">
+                <div class="col-lg-6 mb-4 mb-lg-0">
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <div class="welcome-badge">
                             <i class="bi bi-basket-fill"></i> 
-                            <span>Welcome back, <strong><?= htmlspecialchars($_SESSION['user_name']) ?></strong>!</span>
+                            <span>Welcome back, <strong><?= htmlspecialchars($_SESSION['user_name']) ?></strong></span>
                         </div>
-                        <h1 class="hero-display-text animate-fade-in">Restock your<br>kitchen favorites.</h1>
-                        <p class="hero-lead">Your pantry looks a little empty. Let's fill it up with fresh, organic goodness delivered by tomorrow.</p>
+                        <h1 class="hero-display-text animate-fade-in">Restock your<br>kitchen staples.</h1>
+                        <p class="hero-lead">Seasonal organic vegetables, fresh dairy, and pantry essentials ready for packing.</p>
                     <?php else: ?>
                         <span class="text-uppercase text-success fw-bold small mb-2 d-block tracking-wider"><i class="bi bi-patch-check-fill me-1"></i> Certified Organic</span>
-                        <h1 class="hero-display-text animate-fade-in">Groceries made,<br> much more easier</h1>
-                        <p class="hero-lead">Skip the line and get farm-fresh produce delivered to your door. Quality you can taste, convenience you'll love.</p>
+                        <h1 class="hero-display-text animate-fade-in">Farm-fresh food,<br> harvested for you.</h1>
+                        <p class="hero-lead">Direct from local certified growers to your kitchen table. Hand-picked vegetables, organic dairy, and artisan baked goods.</p>
                     <?php endif; ?>
                     
                     <div class="d-flex gap-3">
@@ -213,7 +213,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
         </div>
     </div>
 
-    <div class="container mt-5 pt-2" id="categories">
+    <div class="container mt-3" id="categories">
         
         <div class="category-rail-wrapper text-center text-md-start" id="categoryRail">
             <button class="cat-chip active" data-category="All">All Items</button>
@@ -232,14 +232,14 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                        echo '<div class="col-6 col-md-4 col-lg-3"><div class="product-card"><div class="product-thumb"><div class="card-badge-container">';
                        if($product['stock_qty'] < 5 && $product['stock_qty'] > 0) echo '<span class="badge-pill badge-stock">Low Stock</span>';
                        echo '<span class="badge-pill badge-cat">'.htmlspecialchars($product['category']).'</span></div>';
-                       echo '<a href="product.php?id='.$product['id'].'"><img src="assets/images/'.$imgName.'" class="card-img-front" alt="'.htmlspecialchars($product['name']).'"></a>';
+                       echo '<a href="products/view.php?id='.$product['id'].'"><img src="assets/images/'.$imgName.'" class="card-img-front" alt="'.htmlspecialchars($product['name']).'"></a>';
                        echo '<div class="card-action-overlay">';
                        if ($product['stock_qty'] > 0) {
-                           echo '<form action="add_to_cart.php" method="POST" class="add-cart-form"><input type="hidden" name="product_id" value="'.$product['id'].'"><button type="submit" class="btn-quick-add"><i class="bi bi-plus-lg fs-5"></i><span>Add</span></button></form>';
+                           echo '<form action="cart/add.php" method="POST" class="add-cart-form"><input type="hidden" name="product_id" value="'.$product['id'].'"><button type="submit" class="btn-quick-add"><i class="bi bi-plus-lg fs-5"></i><span>Add</span></button></form>';
                        } else {
                            echo '<button class="btn-quick-add" disabled style="opacity:0.5"><i class="bi bi-x-lg"></i></button>';
                        }
-                       echo '</div></div><div class="product-details"><a href="product.php?id='.$product['id'].'" class="product-title-link text-truncate">'.htmlspecialchars($product['name']).'</a><div class="d-flex align-items-center justify-content-between"><span class="product-price">$'.number_format($product['price'], 2).'</span><span class="product-unit">per unit</span></div></div></div></div>';
+                       echo '</div></div><div class="product-details"><a href="products/view.php?id='.$product['id'].'" class="product-title-link text-truncate">'.htmlspecialchars($product['name']).'</a><div class="d-flex align-items-center justify-content-between"><span class="product-price">$'.number_format($product['price'], 2).'</span><span class="product-unit">per unit</span></div></div></div></div>';
                    }
                } else {
                    echo '<div class="col-12 text-center py-5"><h3 class="text-muted">No products found.</h3></div>';
@@ -295,10 +295,10 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                 <div class="col-lg-2 col-md-3 col-6">
                     <h6 class="footer-heading">Company</h6>
                     <ul class="list-unstyled footer-link-list">
-                        <li><a href="about.php" class="footer-link">About Us</a></li>
-                        <li><a href="sustainability.php" class="footer-link">Sustainability</a></li>
-                        <li><a href="farmers.php" class="footer-link">Farmers</a></li>
-                        <li><a href="contact.php" class="footer-link">Contact</a></li>
+                        <li><a href="pages/about.php" class="footer-link">About Us</a></li>
+                        <li><a href="pages/sustainability.php" class="footer-link">Sustainability</a></li>
+                        <li><a href="pages/farmers.php" class="footer-link">Farmers</a></li>
+                        <li><a href="pages/contact.php" class="footer-link">Contact</a></li>
                     </ul>
                 </div>
 
@@ -329,8 +329,8 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
             <div class="border-top mt-5 pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
                 <small class="text-muted mb-2 mb-md-0">&copy; 2025 FreshCart Market. Student Project by <span style="color: var(--accent-color); text-transform: uppercase; font-weight: bold">Janus Dominic</span>.</small>
                 <div class="small text-muted">
-                    <a href="privacy_policy.php" class="text-decoration-none text-muted fw-bold me-3">Privacy Policy</a>
-                    <a href="terms_of_service.php" class="text-decoration-none text-muted fw-bold">Terms of Service</a>
+                    <a href="pages/privacy_policy.php" class="text-decoration-none text-muted fw-bold me-3">Privacy Policy</a>
+                    <a href="pages/terms_of_service.php" class="text-decoration-none text-muted fw-bold">Terms of Service</a>
                 </div>
             </div>
         </div>
@@ -429,7 +429,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                 page: currentPage
             });
 
-            fetch('fetch_products.php?' + params.toString())
+            fetch('products/fetch.php?' + params.toString())
                 .then(response => response.json())
                 .then(data => {
                     grid.innerHTML = data.grid;
@@ -473,7 +473,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
             if (e.target && e.target.classList.contains('add-cart-form')) {
                 e.preventDefault();
                 const formData = new FormData(e.target);
-                fetch('add_to_cart.php', { method: 'POST', body: formData })
+                fetch('cart/add.php', { method: 'POST', body: formData })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -483,7 +483,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                         const toast = new bootstrap.Toast(document.getElementById('liveToast'));
                         toast.show();
                     } else if (data.status === 'login_required') {
-                        window.location.href = 'user_login.php';
+                        window.location.href = 'auth/login.php';
                     } else {
                         alert(data.message);
                     }

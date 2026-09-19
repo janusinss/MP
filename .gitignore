@@ -95,6 +95,7 @@ playwright/.cache/
 .playwright/
 cypress/videos/
 cypress/screenshots/
+tests/screenshots/
 
 # Temporary, Cache & Scratch Directories
 .cache/

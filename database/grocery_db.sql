@@ -14175,7 +14175,8 @@ ALTER TABLE `coupons`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_orders_status` (`status`);
+  ADD KEY `idx_orders_status` (`status`),
+  ADD KEY `idx_orders_user_id` (`user_id`);
 
 --
 -- Indexes for table `order_items`
@@ -14250,6 +14251,12 @@ ALTER TABLE `users`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `fk_orders_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `order_items`

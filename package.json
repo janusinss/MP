@@ -1,0 +1,21 @@
+{
+  "name": "grocery_app",
+  "version": "1.0.0",
+  "description": "> **Year 3 Mini Project: Advanced Database Systems (ADS)**   > Full-stack PHP/MySQL web application featuring an e-commerce storefront, administrative back-office, RESTful API, and advanced database routines (Views, Stored Procedures, Stored Functions, Triggers, and Transactions).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janusinss/MP.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/janusinss/MP/issues"
+  },
+  "homepage": "https://github.com/janusinss/MP#readme"
+}

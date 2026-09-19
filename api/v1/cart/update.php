@@ -14,13 +14,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $data = json_decode(file_get_contents("php://input"));
 $pid = isset($data->product_id) ? (int) $data->product_id : 0;
 $action = $data->action ?? ''; // 'increase', 'decrease', 'remove'
+$hasQuantity = isset($data->quantity);
 
-if (!$pid || !$action) {
-    Response::error("Product ID and Action required.");
+if (!$pid || (!$action && !$hasQuantity)) {
+    Response::error("Product ID and either Action or Quantity required.");
 }
 
 try {
-    if ($action === 'remove') {
+    if ($action === 'remove' || ($hasQuantity && (int)$data->quantity <= 0)) {
         $stmt = $pdo->prepare("DELETE FROM api_cart WHERE user_id = ? AND product_id = ?");
         $stmt->execute([$user['id'], $pid]);
         Response::success([], "Item removed.");
@@ -35,12 +36,15 @@ try {
         Response::error("Item not in cart.", 404);
     }
 
-    $newQty = $current['quantity'];
-
-    if ($action === 'increase') {
-        $newQty++;
-    } elseif ($action === 'decrease') {
-        $newQty--;
+    if ($hasQuantity) {
+        $newQty = (int) $data->quantity;
+    } else {
+        $newQty = $current['quantity'];
+        if ($action === 'increase') {
+            $newQty++;
+        } elseif ($action === 'decrease') {
+            $newQty--;
+        }
     }
 
     if ($newQty < 1) {

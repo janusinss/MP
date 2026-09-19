@@ -1,9 +1,12 @@
+<?php
+$rootPath = (basename(dirname($_SERVER['SCRIPT_FILENAME'])) === 'grocery_app') ? '' : '../';
+?>
     <footer class="site-footer">
         <div class="container">
             <div class="row g-5">
                 
                 <div class="col-lg-4 col-md-6">
-                    <a href="index.php" class="text-decoration-none">
+                    <a href="<?= $rootPath ?>index.php" class="text-decoration-none">
                         <span class="footer-brand">FreshCart<span style="color: var(--accent-color)">.</span></span>
                     </a>
                     <p class="text-muted small lh-lg mb-4">
@@ -20,20 +23,20 @@
                 <div class="col-lg-2 col-md-3 col-6">
                     <h6 class="footer-heading">Shop</h6>
                     <ul class="list-unstyled footer-link-list">
-                        <li><a href="index.php" class="footer-link">All Products</a></li>
-                        <li><a href="index.php" class="footer-link">Fresh Produce</a></li>
-                        <li><a href="index.php" class="footer-link">Dairy & Eggs</a></li>
-                        <li><a href="index.php" class="footer-link">Bakery</a></li>
+                        <li><a href="<?= $rootPath ?>index.php" class="footer-link">All Products</a></li>
+                        <li><a href="<?= $rootPath ?>index.php" class="footer-link">Fresh Produce</a></li>
+                        <li><a href="<?= $rootPath ?>index.php" class="footer-link">Dairy & Eggs</a></li>
+                        <li><a href="<?= $rootPath ?>index.php" class="footer-link">Bakery</a></li>
                     </ul>
                 </div>
 
                 <div class="col-lg-2 col-md-3 col-6">
                     <h6 class="footer-heading">Company</h6>
                     <ul class="list-unstyled footer-link-list">
-                        <li><a href="about.php" class="footer-link">About Us</a></li>
-                        <li><a href="sustainability.php" class="footer-link">Sustainability</a></li>
-                        <li><a href="farmers.php" class="footer-link">Farmers</a></li>
-                        <li><a href="contact.php" class="footer-link">Contact</a></li>
+                        <li><a href="<?= $rootPath ?>pages/about.php" class="footer-link">About Us</a></li>
+                        <li><a href="<?= $rootPath ?>pages/sustainability.php" class="footer-link">Sustainability</a></li>
+                        <li><a href="<?= $rootPath ?>pages/farmers.php" class="footer-link">Farmers</a></li>
+                        <li><a href="<?= $rootPath ?>pages/contact.php" class="footer-link">Contact</a></li>
                     </ul>
                 </div>
 
@@ -64,8 +67,8 @@
             <div class="border-top mt-5 pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
                 <small class="text-muted mb-2 mb-md-0">&copy; 2025 FreshCart Market. Student Project by Janus Dominic.</small>
                 <div class="small text-muted">
-                    <a href="privacy_policy.php" class="text-decoration-none text-muted fw-bold me-3">Privacy Policy</a>
-                    <a href="terms_of_service.php" class="text-decoration-none text-muted fw-bold">Terms of Service</a>
+                    <a href="<?= $rootPath ?>pages/privacy_policy.php" class="text-decoration-none text-muted fw-bold me-3">Privacy Policy</a>
+                    <a href="<?= $rootPath ?>pages/terms_of_service.php" class="text-decoration-none text-muted fw-bold">Terms of Service</a>
                 </div>
             </div>
         </div>
@@ -90,7 +93,7 @@
             if (e.target && e.target.classList.contains('add-cart-form')) {
                 e.preventDefault();
                 const formData = new FormData(e.target);
-                fetch('add_to_cart.php', { method: 'POST', body: formData })
+                fetch('<?= $rootPath ?>cart/add.php', { method: 'POST', body: formData })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -100,7 +103,7 @@
                         const toast = new bootstrap.Toast(document.getElementById('liveToast'));
                         toast.show();
                     } else if (data.status === 'login_required') {
-                        window.location.href = 'user_login.php';
+                        window.location.href = '<?= $rootPath ?>auth/login.php';
                     } else {
                         alert(data.message);
                     }

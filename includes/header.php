@@ -6,14 +6,17 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Calculate Cart Count safely
 $cartCount = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
+$rootPath = (basename(dirname($_SERVER['SCRIPT_FILENAME'])) === 'grocery_app') ? '' : '../';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshCart Market</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?= $rootPath ?>assets/css/style.css?v=<?php echo time(); ?>">
 </head>
 <body>
 
@@ -28,19 +31,17 @@ $cartCount = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
             const promo = document.getElementById('flash-promo');
             if (promo) {
                 promo.style.opacity = '0'; // Fade out
-                
-                // After fade completes, shrink height to 0 to slide up content
                 setTimeout(() => {
                     promo.style.height = '0';
                     promo.style.padding = '0';
                 }, 1000); 
             }
-        }, 1000); // 6000ms = 6 seconds
+        }, 1000);
     </script>
 
     <nav class="navbar navbar-expand-lg navbar-glass sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="index.php">
+            <a class="navbar-brand" href="<?= $rootPath ?>index.php">
                 <h3 class="m-0" style="font-family: var(--font-serif); letter-spacing: -0.05em; font-weight: 800;">
                     FreshCart<span style="color: var(--accent-color)">.</span>
                 </h3>
@@ -54,7 +55,7 @@ $cartCount = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
                 <ul class="navbar-nav ms-auto align-items-center gap-3">
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <li class="nav-item">
-                            <a class="nav-link-custom d-flex align-items-center gap-2" href="profile.php">
+                            <a class="nav-link-custom d-flex align-items-center gap-2" href="<?= $rootPath ?>account/profile.php">
                                 <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
                                     <?= strtoupper(substr($_SESSION['user_name'], 0, 1)) ?>
                                 </div>
@@ -62,12 +63,12 @@ $cartCount = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
                             </a>
                         </li>
                     <?php else: ?>
-                        <li class="nav-item"><a href="user_login.php" class="nav-link-custom">Login</a></li>
-                        <li class="nav-item"><a href="user_register.php" class="btn btn-primary rounded-pill px-4 shadow-sm">Sign Up</a></li>
+                        <li class="nav-item"><a href="<?= $rootPath ?>auth/login.php" class="nav-link-custom">Login</a></li>
+                        <li class="nav-item"><a href="<?= $rootPath ?>auth/register.php" class="btn btn-primary rounded-pill px-4 shadow-sm">Sign Up</a></li>
                     <?php endif; ?>
 
                     <li class="nav-item position-relative">
-                        <a href="cart.php" class="btn btn-outline-secondary border-0 position-relative">
+                        <a href="<?= $rootPath ?>cart/index.php" class="btn btn-outline-secondary border-0 position-relative">
                             <i class="bi bi-bag" style="font-size: 1.3rem;"></i>
                             <?php if($cartCount > 0): ?>
                                 <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.65rem;">
