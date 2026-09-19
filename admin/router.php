@@ -17,9 +17,15 @@ if ($view == 'dashboard') {
     $stmt = $pdo->query("SELECT * FROM orders ORDER BY id DESC");
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $sqlChart = "SELECT * FROM view_daily_sales ORDER BY order_date ASC LIMIT 7";
-    $stmtChart = $pdo->query($sqlChart);
-    $chartData = $stmtChart->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        $sqlChart = "SELECT * FROM view_daily_sales ORDER BY order_date ASC LIMIT 7";
+        $stmtChart = $pdo->query($sqlChart);
+        $chartData = $stmtChart->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        $sqlChart = "SELECT cast(created_at as date) AS order_date, sum(total_amount) AS daily_total, count(id) AS order_count FROM orders WHERE status <> 'Cancelled' GROUP BY cast(created_at as date) ORDER BY order_date ASC LIMIT 7";
+        $stmtChart = $pdo->query($sqlChart);
+        $chartData = $stmtChart->fetchAll(PDO::FETCH_ASSOC);
+    }
     $dates = [];
     $totals = [];
     foreach ($chartData as $data) {
@@ -242,7 +248,7 @@ elseif ($view == 'products') {
                             <td class="text-end" style="padding-right: 2rem;">
                                 <a href="product_edit.php?id=<?= $p['id'] ?>" class="btn-icon-action" title="Edit"><i
                                         class="bi bi-pencil-fill" style="font-size: 0.9rem;"></i></a>
-                                <a href="actions/product_delete.php?id=<?= $p['id'] ?>" class="btn-icon-action btn-icon-delete"
+                                <a href="actions/product_delete.php?id=<?= $p['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn-icon-action btn-icon-delete"
                                     title="Delete" onclick="return confirm('Delete product?');"><i class="bi bi-trash-fill"
                                         style="font-size: 0.9rem;"></i></a>
                             </td>
@@ -274,7 +280,7 @@ elseif ($view == 'users') {
             <div class="col-md-6 col-lg-4 col-xl-3">
                 <div class="customer-card-grid">
                     <span class="cust-id-badge">ID: <?= str_pad($u['id'], 3, '0', STR_PAD_LEFT) ?></span>
-                    <a href="actions/user_delete.php?id=<?= $u['id'] ?>" class="btn-delete-user"
+                    <a href="actions/user_delete.php?id=<?= $u['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn-delete-user"
                         onclick="return confirm('Delete this user?');" title="Delete User"><i class="bi bi-trash-fill"></i></a>
                     <div class="cust-avatar-lg"><?= strtoupper(substr($u['full_name'], 0, 1)) ?></div>
                     <h5 class="cust-name text-truncate"><?= htmlspecialchars($u['full_name']) ?></h5>
@@ -364,7 +370,7 @@ elseif ($view == 'reviews') {
                         </p>
 
                         <div class="rc-actions">
-                            <a href="actions/review_delete.php?id=<?= $r['id'] ?>" class="btn-delete-review text-decoration-none"
+                            <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn-delete-review text-decoration-none"
                                 onclick="return confirm('Delete this review?');">
                                 <i class="bi bi-trash me-1"></i> Remove
                             </a>
@@ -398,10 +404,16 @@ elseif ($view == 'customer_details') {
     $stmtOrders->execute([$userId]);
     $userOrders = $stmtOrders->fetchAll(PDO::FETCH_ASSOC);
 
-    // Stored Function for Total Spend
-    $stmtAlloc = $pdo->prepare("SELECT fn_get_total_spent(?)");
-    $stmtAlloc->execute([$userId]);
-    $lifetimeSpend = $stmtAlloc->fetchColumn() ?: 0.00;
+    // Stored Function for Total Spend (with graceful SQL fallback)
+    try {
+        $stmtAlloc = $pdo->prepare("SELECT fn_get_total_spent(?)");
+        $stmtAlloc->execute([$userId]);
+        $lifetimeSpend = $stmtAlloc->fetchColumn() ?: 0.00;
+    } catch (PDOException $e) {
+        $stmtAlloc = $pdo->prepare("SELECT SUM(total_amount) FROM orders WHERE user_id = ? AND status != 'Cancelled'");
+        $stmtAlloc->execute([$userId]);
+        $lifetimeSpend = $stmtAlloc->fetchColumn() ?: 0.00;
+    }
 
     $totalOrders = count($userOrders);
     $avgOrder = $totalOrders > 0 ? $lifetimeSpend / $totalOrders : 0;

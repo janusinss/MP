@@ -12,11 +12,17 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch orders for THIS user only using Stored Procedure
-$stmt = $pdo->prepare("CALL sp_get_user_order_history(?)");
-$stmt->execute([$user_id]);
-$orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$stmt->closeCursor();
+// Fetch orders for THIS user only (Stored Procedure with graceful SELECT fallback)
+try {
+    $stmt = $pdo->prepare("CALL sp_get_user_order_history(?)");
+    $stmt->execute([$user_id]);
+    $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+} catch (PDOException $e) {
+    $stmt = $pdo->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
+    $stmt->execute([$user_id]);
+    $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
 
 <!DOCTYPE html>
@@ -38,7 +44,7 @@ $stmt->closeCursor();
             <h2 class="m-0" style="font-family: var(--font-serif); font-weight: 700;">My Orders</h2>
             <p class="text-muted m-0">Track your past purchases and returns.</p>
         </div>
-        <a href="../index.php" class="btn btn-outline-secondary rounded-pill px-4">
+        <a href="../" class="btn btn-outline-secondary rounded-pill px-4">
             <i class="bi bi-arrow-left me-2"></i> Back to Shop
         </a>
     </div>
@@ -120,6 +126,7 @@ $stmt->closeCursor();
                                     <?php if ($status == 'Pending'): ?>
                                         <form action="cancel.php" method="POST"
                                             onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                            <?= csrf_input() ?>
                                             <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
                                             <button type="submit" class="btn btn-outline-danger rounded-pill px-4 btn-sm">
                                                 Cancel Order
@@ -141,7 +148,7 @@ $stmt->closeCursor();
             <i class="bi bi-cart-x empty-orders-icon"></i>
             <h3 style="font-family: var(--font-serif);">No orders yet</h3>
             <p class="text-muted mb-4">You haven't placed any orders yet. Fill your pantry with fresh goodness!</p>
-            <a href="../index.php" class="btn btn-primary rounded-pill px-5 py-3 shadow-sm">Start Shopping</a>
+            <a href="../" class="btn btn-primary rounded-pill px-5 py-3 shadow-sm">Start Shopping</a>
         </div>
 
     <?php endif; ?>

@@ -11,6 +11,11 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'])) {
+    if (!verify_csrf_token()) {
+        http_response_code(403);
+        die("Security validation failed. Please refresh and try again.");
+    }
+    
     $order_id = (int)$_POST['order_id'];
     $user_id = $_SESSION['user_id'];
 

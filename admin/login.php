@@ -1,6 +1,6 @@
 <?php
 // admin/login.php
-session_start();
+require_once __DIR__ . '/../config/security.php';
 
 // If already logged in, redirect to dashboard
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
@@ -14,13 +14,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    // Default administrative credentials
-    if ($username === 'admin' && $password === 'admin123') {
-        $_SESSION['admin_logged_in'] = true;
-        header("Location: index.php");
-        exit;
+    if (!check_rate_limit('admin_auth', 5, 60)) {
+        $error = "Too many login attempts. Please wait 1 minute.";
+    } elseif (!verify_csrf_token()) {
+        $error = "Security validation failed. Please refresh.";
     } else {
-        $error = "Invalid username or password!";
+        $adminUser = getenv('ADMIN_USERNAME') ?: 'admin';
+        $adminPass = getenv('ADMIN_PASSWORD') ?: 'admin123';
+
+        if ($username === $adminUser && $password === $adminPass) {
+            session_regenerate_id(true);
+            $_SESSION['admin_logged_in'] = true;
+            header("Location: index.php");
+            exit;
+        } else {
+            $error = "Invalid username or password!";
+        }
     }
 }
 ?>
@@ -47,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php endif; ?>
 
         <form method="POST">
+            <?= csrf_input() ?>
             <div class="mb-3">
                 <label class="form-label fw-bold">Username</label>
                 <input type="text" name="username" class="form-control" required autofocus placeholder="admin">
@@ -59,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
         
         <div class="text-center mt-3">
-            <a href="../index.php" class="text-decoration-none">← Back to Storefront</a>
+            <a href="../" class="text-decoration-none">← Back to Storefront</a>
         </div>
     </div>
 

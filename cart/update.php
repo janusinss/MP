@@ -33,6 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'], $_POST['
     }
 }
 
-header("Location: index.php");
+header("Location: ./");
 exit;
 ?>

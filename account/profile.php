@@ -11,8 +11,13 @@ $user_id = $_SESSION['user_id'];
 $msg = "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['full_name'];
-    $address = $_POST['address'];
+    if (!verify_csrf_token()) {
+        http_response_code(403);
+        die("Security validation failed. Please refresh and try again.");
+    }
+    
+    $name = trim($_POST['full_name'] ?? '');
+    $address = trim($_POST['address'] ?? '');
     
     if (!empty($_POST['password'])) {
         $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
@@ -44,7 +49,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 </head>
 <body class="container mt-5">
     
-    <a href="../index.php" class="btn btn-outline-secondary mb-4">&larr; Back to Shop</a>
+    <a href="../" class="btn btn-outline-secondary mb-4">&larr; Back to Shop</a>
 
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -69,6 +74,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                     <?php endif; ?>
 
                     <form method="POST">
+                        <?= csrf_input() ?>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label text-muted small fw-bold">FULL NAME</label>

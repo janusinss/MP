@@ -6,7 +6,7 @@ $rootPath = (basename(dirname($_SERVER['SCRIPT_FILENAME'])) === 'grocery_app') ?
             <div class="row g-5">
                 
                 <div class="col-lg-4 col-md-6">
-                    <a href="<?= $rootPath ?>index.php" class="text-decoration-none">
+                    <a href="<?= $rootPath ?: './' ?>" class="text-decoration-none">
                         <span class="footer-brand">FreshCart<span style="color: var(--accent-color)">.</span></span>
                     </a>
                     <p class="text-muted small lh-lg mb-4">
@@ -23,10 +23,10 @@ $rootPath = (basename(dirname($_SERVER['SCRIPT_FILENAME'])) === 'grocery_app') ?
                 <div class="col-lg-2 col-md-3 col-6">
                     <h6 class="footer-heading">Shop</h6>
                     <ul class="list-unstyled footer-link-list">
-                        <li><a href="<?= $rootPath ?>index.php" class="footer-link">All Products</a></li>
-                        <li><a href="<?= $rootPath ?>index.php" class="footer-link">Fresh Produce</a></li>
-                        <li><a href="<?= $rootPath ?>index.php" class="footer-link">Dairy & Eggs</a></li>
-                        <li><a href="<?= $rootPath ?>index.php" class="footer-link">Bakery</a></li>
+                        <li><a href="<?= $rootPath ?: './' ?>" class="footer-link">All Products</a></li>
+                        <li><a href="<?= $rootPath ?: './' ?>#categories" class="footer-link">Fresh Produce</a></li>
+                        <li><a href="<?= $rootPath ?: './' ?>#categories" class="footer-link">Dairy & Eggs</a></li>
+                        <li><a href="<?= $rootPath ?: './' ?>#categories" class="footer-link">Bakery</a></li>
                     </ul>
                 </div>
 

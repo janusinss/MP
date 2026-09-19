@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['apply_coupon'])) {
 // Remove Coupon
 if (isset($_GET['remove_coupon'])) {
     unset($_SESSION['discount']);
-    header("Location: index.php");
+    header("Location: ./");
     exit;
 }
 
@@ -40,9 +40,10 @@ $cartItems = [];
 $subTotal = 0;
 
 if (!empty($_SESSION['cart'])) {
-    $ids = implode(',', array_keys($_SESSION['cart']));
-    // Fetch products
-    $stmt = $pdo->query("SELECT * FROM products WHERE id IN ($ids)");
+    $cartKeys = array_map('intval', array_keys($_SESSION['cart']));
+    $placeholders = implode(',', array_fill(0, count($cartKeys), '?'));
+    $stmt = $pdo->prepare("SELECT * FROM products WHERE id IN ($placeholders)");
+    $stmt->execute($cartKeys);
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($products as $product) {
@@ -89,7 +90,7 @@ if (isset($_SESSION['discount'])) {
             <h2 class="m-0">Your Shopping Bag</h2>
             <p class="text-muted m-0"><?= array_sum($_SESSION['cart'] ?? []) ?> items in your cart</p>
         </div>
-        <a href="../index.php" class="btn btn-outline-secondary rounded-pill">
+        <a href="../" class="btn btn-outline-secondary rounded-pill">
             <i class="bi bi-arrow-left me-2"></i> Continue Shopping
         </a>
     </div>
@@ -100,7 +101,7 @@ if (isset($_SESSION['discount'])) {
             <i class="bi bi-basket3 empty-icon"></i>
             <h3 class="mb-3" style="font-family: var(--font-serif);">Your bag is empty</h3>
             <p class="text-muted mb-4">Looks like you haven't added any fresh goodies yet.</p>
-            <a href="../index.php" class="btn btn-primary btn-lg rounded-pill px-5">Start Shopping</a>
+            <a href="../" class="btn btn-primary btn-lg rounded-pill px-5">Start Shopping</a>
         </div>
 
     <?php else: ?>
@@ -216,7 +217,7 @@ if (isset($_SESSION['discount'])) {
                             <span>-$<?= number_format($discountAmount, 2) ?></span>
                         </div>
                         <div class="text-end mb-2">
-                            <a href="index.php?remove_coupon=true" class="text-danger small text-decoration-none" style="font-size: 0.8rem;">[Remove Coupon]</a>
+                            <a href="./?remove_coupon=true" class="text-danger small text-decoration-none" style="font-size: 0.8rem;">[Remove Coupon]</a>
                         </div>
                     <?php endif; ?>
 

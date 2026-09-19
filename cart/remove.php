@@ -11,6 +11,6 @@ if (isset($_POST['product_id'])) {
     }
 }
 
-header("Location: index.php");
+header("Location: ./");
 exit;
 ?>

@@ -41,7 +41,7 @@ $rootPath = (basename(dirname($_SERVER['SCRIPT_FILENAME'])) === 'grocery_app') ?
 
     <nav class="navbar navbar-expand-lg navbar-glass sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="<?= $rootPath ?>index.php">
+            <a class="navbar-brand" href="<?= $rootPath ?: './' ?>">
                 <h3 class="m-0" style="font-family: var(--font-serif); letter-spacing: -0.05em; font-weight: 800;">
                     FreshCart<span style="color: var(--accent-color)">.</span>
                 </h3>

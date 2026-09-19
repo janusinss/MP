@@ -1,11 +1,14 @@
 <?php
 // admin/export_orders.php
-require_once __DIR__ . '/../config/db.php';
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) { 
     exit("Access Denied"); 
 }
+
+require_once __DIR__ . '/../config/db.php';
 
 // Force CSV download
 header('Content-Type: text/csv; charset=utf-8');
@@ -21,4 +24,3 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
 fclose($output);
 exit;
-?>

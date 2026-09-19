@@ -1,0 +1,49 @@
+# FreshCart Security & URL Canonicalization Architecture
+# -------------------------------------------------------------
+
+# 1. Disable Directory Listing / Browsing
+Options -Indexes -MultiViews
+
+# 2. Block Direct HTTP Access to Sensitive Files
+<FilesMatch "(^\.env|\.sql$|\.md$|composer\.(json|lock)$|package\.(json|lock)$|skills-lock\.json$)">
+    Require all denied
+</FilesMatch>
+
+# 3. HTTP Security Headers (Defense in Depth)
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# 4. URL Rewriting & Information Masking
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Force HTTPS on live hosting (ignored on localhost)
+    RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$ [NC]
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+    # Block direct HTTP access to internal backend directories
+    RewriteRule ^(database|config|scripts|\.agents|\.git) - [F,L,NC]
+
+    # Canonical Redirect: Hide index.php from URL (NE prevents double-escaping spaces)
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/index\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^index\.php$ %1/ [R=301,L,NE]
+
+    # Route clean friendly URLs
+    RewriteRule ^login/?$ auth/login.php [L,QSA]
+    RewriteRule ^register/?$ auth/register.php [L,QSA]
+    RewriteRule ^logout/?$ auth/logout.php [L,QSA]
+    RewriteRule ^cart/?$ cart/index.php [L,QSA]
+    RewriteRule ^checkout/?$ orders/checkout.php [L,QSA]
+    RewriteRule ^orders/?$ orders/index.php [L,QSA]
+    RewriteRule ^profile/?$ account/profile.php [L,QSA]
+
+    # Support extensionless PHP files
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME}\.php -f
+    RewriteRule ^([^\.]+)$ $1.php [NC,L]
+</IfModule>

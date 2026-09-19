@@ -13,6 +13,11 @@ $error = '';
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (!verify_csrf_token()) {
+        http_response_code(403);
+        die("Security validation failed. Invalid CSRF token.");
+    }
+
     $name = trim($_POST['name'] ?? '');
     $category = trim($_POST['category'] ?? 'General');
     $price = (float)($_POST['price'] ?? 0);
@@ -73,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <?php endif; ?>
 
             <form method="POST" enctype="multipart/form-data">
+                <?= csrf_input() ?>
                 <div class="form-group-modern">
                     <label class="label-modern">Product Image</label>
                     <div class="upload-area-modern" id="uploadPreview">

@@ -6,7 +6,7 @@ require_once __DIR__ . '/../config/db.php';
 
 // If cart is empty, redirect back to shop
 if (empty($_SESSION['cart'])) {
-    header("Location: ../index.php");
+    header("Location: ../");
     exit;
 }
 
@@ -26,8 +26,10 @@ if (isset($_SESSION['user_id'])) {
 
 // 2. FETCH CART ITEMS & CALCULATE TOTAL
 $cartItems = [];
-$ids = implode(',', array_keys($_SESSION['cart']));
-$stmt = $pdo->query("SELECT * FROM products WHERE id IN ($ids)");
+$cartKeys = array_map('intval', array_keys($_SESSION['cart']));
+$placeholders = implode(',', array_fill(0, count($cartKeys), '?'));
+$stmt = $pdo->prepare("SELECT * FROM products WHERE id IN ($placeholders)");
+$stmt->execute($cartKeys);
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $subTotal = 0;
@@ -64,6 +66,7 @@ include __DIR__ . '/../includes/header.php';
         </div>
 
         <form action="place.php" method="POST">
+            <?= csrf_input() ?>
             <div class="row g-5">
                 
                 <div class="col-lg-7">

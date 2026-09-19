@@ -9,17 +9,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_name'] = $user['full_name'];
-        header("Location: ../index.php");
-        exit;
+    if (!check_rate_limit('login_' . ($email ?: 'anon'), 6, 60)) {
+        $error_message = "Too many login attempts. Please wait 1 minute.";
+    } elseif (!verify_csrf_token()) {
+        $error_message = "Security validation failed. Please refresh the page.";
     } else {
-        $error_message = "Invalid email or password!";
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && password_verify($password, $user['password'])) {
+            session_regenerate_id(true);
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['full_name'];
+            header("Location: ../");
+            exit;
+        } else {
+            $error_message = "Invalid email or password!";
+        }
     }
 }
 ?>
@@ -64,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <?php endif; ?>
 
                         <form action="login.php" method="POST">
+                            <?= csrf_input() ?>
                             <div class="mb-2">
                                 <label class="auth-label">Email Address</label>
                                 <div class="auth-input-group">

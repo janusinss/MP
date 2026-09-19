@@ -13,19 +13,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'] ?? '';
     $address = trim($_POST['address'] ?? '');
 
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    if ($stmt->fetch()) {
-        $error = "Email is already registered!";
+    if (!check_rate_limit('register_attempt', 5, 60)) {
+        $error = "Too many registration attempts. Please wait 1 minute.";
+    } elseif (!verify_csrf_token()) {
+        $error = "Security validation failed. Please refresh the page.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Please enter a valid email address.";
+    } elseif (strlen($password) < 6) {
+        $error = "Password must be at least 6 characters.";
     } else {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO users (full_name, email, password, address, role) VALUES (?, ?, ?, ?, 'customer')";
-        $stmt = $pdo->prepare($sql);
-        if ($stmt->execute([$name, $email, $hashed_password, $address])) {
-            $success = "Account created successfully! Redirecting to login...";
-            echo "<script>setTimeout(function(){ window.location.href = 'login.php'; }, 1500);</script>";
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        if ($stmt->fetch()) {
+            $error = "Email is already registered!";
         } else {
-            $error = "Registration failed. Please try again.";
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $sql = "INSERT INTO users (full_name, email, password, address, role) VALUES (?, ?, ?, ?, 'customer')";
+            $stmt = $pdo->prepare($sql);
+            if ($stmt->execute([$name, $email, $hashed_password, $address])) {
+                $success = "Account created successfully! Redirecting to login...";
+                echo "<script>setTimeout(function(){ window.location.href = 'login.php'; }, 1500);</script>";
+            } else {
+                $error = "Registration failed. Please try again.";
+            }
         }
     }
 }
@@ -76,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <?php endif; ?>
 
                         <form method="POST">
+                            <?= csrf_input() ?>
                             <div class="mb-2">
                                 <label class="auth-label">Full Name</label>
                                 <div class="auth-input-group">

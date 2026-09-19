@@ -6,7 +6,7 @@ require_once __DIR__ . '/../config/db.php';
 
 // 1. Validate Order ID existence
 if (!isset($_GET['orderid'])) {
-    header("Location: ../index.php");
+    header("Location: ../");
     exit;
 }
 
@@ -29,7 +29,7 @@ $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // 3. If no order found (or doesn't belong to user), redirect
 if (!$order) {
-    header("Location: ../index.php");
+    header("Location: ../");
     exit;
 }
 
@@ -106,7 +106,7 @@ include __DIR__ . '/../includes/header.php';
                 <button onclick="window.print()" class="btn-print">
                     <i class="bi bi-printer me-2"></i> Print Receipt
                 </button>
-                <a href="../index.php" class="btn-continue d-block text-center text-decoration-none">
+                <a href="../" class="btn-continue d-block text-center text-decoration-none">
                     Continue Shopping
                 </a>
             </div>

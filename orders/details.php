@@ -145,6 +145,7 @@ if ($s === 'Cancelled') {
         <?php if ($s === 'Pending'): ?>
             <div class="p-4 text-center bg-light border-top">
                 <form action="cancel.php" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                    <?= csrf_input() ?>
                     <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
                     <button type="submit" class="btn btn-outline-danger rounded-pill px-4 text-uppercase small fw-bold">
                         Cancel Order

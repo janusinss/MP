@@ -1,6 +1,6 @@
 <?php
 /**
- * End-to-end test for restructured storefront workflows
+ * End-to-end test for restructured storefront workflows with CSRF & canonical URL verification
  */
 $baseUrl = 'http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app';
 $cookieFile = __DIR__ . '/test_cookies.txt';
@@ -15,7 +15,7 @@ function makeReq($url, $postData = null) {
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
     if ($postData !== null) {
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, is_array($postData) ? http_build_query($postData) : $postData);
     }
     $body = curl_exec($ch);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -24,14 +24,33 @@ function makeReq($url, $postData = null) {
     return ['code' => $code, 'body' => $body, 'redirect' => $redirect];
 }
 
+function extractCsrfToken($html) {
+    if (preg_match('/name=["\']csrf_token["\']\s+value=["\']([^"\']+)["\']/', $html, $m)) {
+        return $m[1];
+    }
+    return '';
+}
+
 echo "=== E2E Storefront Web Verification ===\n";
 
-// 1. Home
-$res = makeReq("$baseUrl/index.php");
-echo "1. Home (index.php): HTTP {$res['code']}" . ($res['code'] === 200 ? " [PASS]\n" : " [FAIL]\n");
+// 1. Home (Clean URL)
+$res = makeReq("$baseUrl/");
+echo "1. Clean Home URL: HTTP {$res['code']}" . ($res['code'] === 200 ? " [PASS]\n" : " [FAIL]\n");
 
-// 2. Login
-$res = makeReq("$baseUrl/auth/login.php", ['email' => 'customer@example.com', 'password' => 'password']);
+// 1b. Canonical Redirect of index.php
+$res = makeReq("$baseUrl/index.php");
+echo "1b. Canonical Redirect of index.php: HTTP {$res['code']}" . (in_array($res['code'], [301, 302]) ? " [PASS]\n" : " [FAIL]\n");
+
+// 2. Fetch Login & CSRF
+$loginPage = makeReq("$baseUrl/auth/login.php");
+$token = extractCsrfToken($loginPage['body']);
+
+// 2b. Customer Login with CSRF Token
+$res = makeReq("$baseUrl/auth/login.php", [
+    'email' => 'customer@example.com',
+    'password' => 'password',
+    'csrf_token' => $token
+]);
 echo "2. Customer Login (auth/login.php): HTTP {$res['code']} -> Redirect: {$res['redirect']}" . ($res['code'] === 302 ? " [PASS]\n" : " [FAIL]\n");
 
 // 3. Profile
@@ -47,24 +66,26 @@ $res = makeReq("$baseUrl/products/fetch.php?search=Apple");
 $json = json_decode($res['body'], true);
 echo "5. Products Fetch (products/fetch.php): HTTP {$res['code']}" . ($res['code'] === 200 && isset($json['grid']) ? " [PASS]\n" : " [FAIL]\n");
 
-// 6. Add to Cart
+// 6. Add to Cart (authenticated)
 $res = makeReq("$baseUrl/cart/add.php", ['product_id' => 1]);
 $json = json_decode($res['body'], true);
-echo "6. Cart Add (cart/add.php): HTTP {$res['code']} (Status: " . ($json['status'] ?? 'unknown') . ")" . ($json['status'] === 'success' ? " [PASS]\n" : " [FAIL]\n");
+echo "6. Cart Add (cart/add.php): HTTP {$res['code']} (Status: " . ($json['status'] ?? 'unknown') . ")" . (($json['status'] ?? '') === 'success' ? " [PASS]\n" : " [FAIL]\n");
 
 // 7. Cart View
 $res = makeReq("$baseUrl/cart/index.php");
 echo "7. Cart Page (cart/index.php): HTTP {$res['code']}" . ($res['code'] === 200 && strpos($res['body'], 'Shopping Bag') !== false ? " [PASS]\n" : " [FAIL]\n");
 
-// 8. Orders Checkout View
-$res = makeReq("$baseUrl/orders/checkout.php");
-echo "8. Orders Checkout (orders/checkout.php): HTTP {$res['code']}" . ($res['code'] === 200 && strpos($res['body'], 'Secure Checkout') !== false ? " [PASS]\n" : " [FAIL]\n");
+// 8. Orders Checkout View & Extract CSRF
+$checkoutPage = makeReq("$baseUrl/orders/checkout.php");
+$checkoutCsrf = extractCsrfToken($checkoutPage['body']);
+echo "8. Orders Checkout (orders/checkout.php): HTTP {$checkoutPage['code']}" . ($checkoutPage['code'] === 200 && strpos($checkoutPage['body'], 'Secure Checkout') !== false ? " [PASS]\n" : " [FAIL]\n");
 
-// 9. Orders Place
+// 9. Orders Place with CSRF
 $res = makeReq("$baseUrl/orders/place.php", [
     'customer_name' => 'John Customer',
     'address' => '123 Main St, Test City',
-    'payment_method' => 'COD'
+    'payment_method' => 'COD',
+    'csrf_token' => $checkoutCsrf
 ]);
 echo "9. Orders Place (orders/place.php): HTTP {$res['code']} -> Redirect: {$res['redirect']}" . ($res['code'] === 302 && strpos($res['redirect'], 'success.php') !== false ? " [PASS]\n" : " [FAIL]\n");
 

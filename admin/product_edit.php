@@ -17,6 +17,11 @@ if (!$id) {
 
 // Handle Update
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (!verify_csrf_token()) {
+        http_response_code(403);
+        die("Security validation failed. Invalid CSRF token.");
+    }
+    
     $newStock = (int)($_POST['stock_qty'] ?? 0);
     $newPrice = (float)($_POST['price'] ?? 0);
     $newCat   = trim($_POST['category'] ?? 'General');
@@ -78,6 +83,7 @@ if (!$product) {
             <h2 class="edit-title">Edit Product</h2>
 
             <form method="POST" enctype="multipart/form-data">
+                <?= csrf_input() ?>
                 
                 <div class="edit-img-preview-box mb-0">
                     <img src="../assets/images/<?= htmlspecialchars($product['image'] ?: 'default.jpg') ?>" id="currentPreviewImage" alt="Current Image">

@@ -17,9 +17,16 @@ $order_id = (int)$_GET['order_id'];
 
 // Handle Status Update
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
-    $new_status = $_POST['status'];
-    $stmtUpdate = $pdo->prepare("UPDATE orders SET status = ? WHERE id = ?");
-    $stmtUpdate->execute([$new_status, $order_id]);
+    if (!verify_csrf_token()) {
+        http_response_code(403);
+        die("Security validation failed. Invalid CSRF token.");
+    }
+    $allowedStatuses = ['Pending', 'Shipped', 'Delivered', 'Cancelled'];
+    $new_status = $_POST['status'] ?? '';
+    if (in_array($new_status, $allowedStatuses, true)) {
+        $stmtUpdate = $pdo->prepare("UPDATE orders SET status = ? WHERE id = ?");
+        $stmtUpdate->execute([$new_status, $order_id]);
+    }
     
     header("Location: index.php?view=orders&msg=updated");
     exit;
@@ -102,6 +109,7 @@ try {
                     <span class="info-box-title">Manage Order Status</span>
                     <div class="status-update-container">
                         <form method="POST" class="d-flex gap-2">
+                            <?= csrf_input() ?>
                             <select name="status" class="form-select status-select-custom">
                                 <option value="Pending" <?= $s == 'Pending' ? 'selected' : '' ?>>Pending</option>
                                 <option value="Shipped" <?= $s == 'Shipped' ? 'selected' : '' ?>>Shipped</option>

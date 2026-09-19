@@ -4,7 +4,7 @@ session_start();
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
-    header("Location: ../index.php");
+    header("Location: ../");
     exit;
 }
 
@@ -16,16 +16,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_review'])) {
         exit;
     }
     
-    $user_id = $_SESSION['user_id'];
-    $rating = $_POST['rating'];
-    $comment = $_POST['comment'];
+    if (!verify_csrf_token()) {
+        $review_msg = "Security validation failed. Please refresh.";
+    } else {
+        $user_id = (int)$_SESSION['user_id'];
+        $rating = max(1, min(5, (int)($_POST['rating'] ?? 5)));
+        $comment = trim($_POST['comment'] ?? '');
 
-    try {
-        $stmtRev = $pdo->prepare("INSERT INTO reviews (product_id, user_id, rating, comment) VALUES (?, ?, ?, ?)");
-        $stmtRev->execute([$id, $user_id, $rating, $comment]);
-        $review_msg = "Review submitted successfully!";
-    } catch (Exception $e) {
-        $review_msg = "Error submitting review.";
+        try {
+            $stmtRev = $pdo->prepare("INSERT INTO reviews (product_id, user_id, rating, comment) VALUES (?, ?, ?, ?)");
+            $stmtRev->execute([$id, $user_id, $rating, $comment]);
+            $review_msg = "Review submitted successfully!";
+        } catch (Exception $e) {
+            $review_msg = "Error submitting review.";
+        }
     }
 }
 
@@ -68,7 +72,7 @@ if (count($reviews) > 0) {
     <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
 </head>
 <body class="container mt-5 mb-5">
-    <a href="../index.php" class="btn btn-outline-secondary rounded-pill mb-4 px-4">&larr; Back to Shop</a>
+    <a href="../" class="btn btn-outline-secondary rounded-pill mb-4 px-4">&larr; Back to Shop</a>
 
     <div class="product-showcase animate-fade-in">
         <div class="row align-items-center">
@@ -154,6 +158,7 @@ if (count($reviews) > 0) {
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <h5 class="mb-3">Share your experience</h5>
                     <form method="POST">
+                        <?= csrf_input() ?>
                         <div class="mb-3">
                             <label class="form-label small text-uppercase fw-bold text-muted">Your Rating</label>
                             <select name="rating" class="form-select border-0 bg-light rounded-pill w-auto px-4 fw-bold" required>

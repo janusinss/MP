@@ -12,7 +12,7 @@ if (isset($_SESSION['user_id'])) {
     $stmtCheck->execute([$_SESSION['user_id']]);
     if (!$stmtCheck->fetch()) {
         session_destroy();
-        header("Location: index.php");
+        header("Location: ./");
         exit;
     }
 }
@@ -105,7 +105,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
 
     <nav class="navbar navbar-expand-lg navbar-glass sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="index.php">
+            <a class="navbar-brand" href="./">
                 <h3 class="m-0" style="font-family: var(--font-serif); letter-spacing: -0.05em; font-weight: 800;">
                     FreshCart<span style="color: var(--accent-color)">.</span>
                 </h3>
