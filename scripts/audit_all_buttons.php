@@ -68,14 +68,14 @@ checkBtn("Guest", "Hero 'Start Shopping' Button", stripos($res['body'], 'Start S
 checkBtn("Guest", "Hero 'Browse Aisles' Button", stripos($res['body'], 'Browse Aisles') !== false, "Anchored to #categories");
 
 // 1.3 Nav Bar Links
-$resLogin = sendReq("$baseUrl/auth/login.php");
-checkBtn("Guest", "Nav 'Login' Button", $resLogin['code'] === 200, "HTTP 200");
+$resLogin = sendReq("$baseUrl/login");
+checkBtn("Guest", "Nav 'Login' Button", $resLogin['code'] === 200, "HTTP 200 via /login");
 
-$resRegister = sendReq("$baseUrl/auth/register.php");
-checkBtn("Guest", "Nav 'Sign Up' Button", $resRegister['code'] === 200, "HTTP 200");
+$resRegister = sendReq("$baseUrl/register");
+checkBtn("Guest", "Nav 'Sign Up' Button", $resRegister['code'] === 200, "HTTP 200 via /register");
 
 $resCart = sendReq("$baseUrl/cart/");
-checkBtn("Guest", "Nav 'Cart Bag' Button", $resCart['code'] === 200, "HTTP 200");
+checkBtn("Guest", "Nav 'Cart Bag' Button", $resCart['code'] === 200, "HTTP 200 via /cart");
 
 // 1.4 Category & Search AJAX Buttons
 $resSearch = sendReq("$baseUrl/products/fetch.php?search=Organic");
@@ -87,15 +87,15 @@ $catJson = json_decode($resCat['body'], true);
 checkBtn("Guest", "Category Filter Pill Buttons", $resCat['code'] === 200 && isset($catJson['grid']), "Valid filtered JSON");
 
 // 1.5 Guest Add-to-Cart Interception
-$resGuestAdd = sendReq("$baseUrl/cart/add.php", ['product_id' => 1]);
+$resGuestAdd = sendReq("$baseUrl/cart/add", ['product_id' => 1]);
 $addJson = json_decode($resGuestAdd['body'], true);
 checkBtn("Guest", "Card 'Add to Cart' Guard", ($addJson['status'] ?? '') === 'login_required', "Intercepted: login_required");
 
-// 1.6 Informational Footer Buttons & Pages
-$pages = ['about.php', 'sustainability.php', 'farmers.php', 'contact.php', 'terms_of_service.php', 'privacy_policy.php'];
+// 1.6 Informational Footer Buttons & Pages (Clean Routes)
+$pages = ['about', 'sustainability', 'farmers', 'contact', 'terms', 'privacy'];
 $allPagesOk = true;
 foreach ($pages as $p) {
-    $r = sendReq("$baseUrl/pages/$p");
+    $r = sendReq("$baseUrl/$p");
     if ($r['code'] !== 200) $allPagesOk = false;
 }
 checkBtn("Guest", "Footer Navigation Links (6 Pages)", $allPagesOk, "All 6 informational pages HTTP 200");
@@ -107,9 +107,9 @@ checkBtn("Guest", "Footer Navigation Links (6 Pages)", $allPagesOk, "All 6 infor
 echo "\n2. AUDITING CUSTOMER BUTTONS & TRANSACTION PROCESSES:\n";
 
 // 2.1 Customer Login Form & Button
-$loginPage = sendReq("$baseUrl/auth/login.php", null, $customerCookie);
+$loginPage = sendReq("$baseUrl/login", null, $customerCookie);
 $custCsrf = getCsrf($loginPage['body']);
-$loginPost = sendReq("$baseUrl/auth/login.php", [
+$loginPost = sendReq("$baseUrl/login", [
     'email' => 'customer@example.com',
     'password' => 'password',
     'csrf_token' => $custCsrf
@@ -117,16 +117,16 @@ $loginPost = sendReq("$baseUrl/auth/login.php", [
 checkBtn("Customer", "Sign In Form Submit Button", $loginPost['code'] === 302, "Authenticated session active");
 
 // 2.2 Customer Add to Cart (AJAX)
-$resAdd = sendReq("$baseUrl/cart/add.php", ['product_id' => 1], $customerCookie);
+$resAdd = sendReq("$baseUrl/cart/add", ['product_id' => 1], $customerCookie);
 $addJson = json_decode($resAdd['body'], true);
 checkBtn("Customer", "Product Card 'Add' Button", ($addJson['status'] ?? '') === 'success', "Stock checked & added");
 
-// 2.3 Product Detail Page & Review Form
-$viewPage = sendReq("$baseUrl/products/view.php?id=1", null, $customerCookie);
+// 2.3 Product Detail Page & Review Form (Clean Masked Slug Route)
+$viewPage = sendReq("$baseUrl/product/red-apple", null, $customerCookie);
 $viewCsrf = getCsrf($viewPage['body']);
-checkBtn("Customer", "Product Detail Page Loaded", $viewPage['code'] === 200, "HTTP 200");
+checkBtn("Customer", "Product Detail Page Loaded (Masked Slug)", $viewPage['code'] === 200, "HTTP 200 via /product/red-apple");
 
-$reviewPost = sendReq("$baseUrl/products/view.php?id=1", [
+$reviewPost = sendReq("$baseUrl/product/red-apple", [
     'submit_review' => '1',
     'rating' => 5,
     'comment' => 'Verified automated test review',
@@ -135,14 +135,14 @@ $reviewPost = sendReq("$baseUrl/products/view.php?id=1", [
 checkBtn("Customer", "Post Review Submit Button", strpos($reviewPost['body'], 'Review submitted successfully') !== false, "Review inserted with CSRF");
 
 // 2.4 Cart Quantity Increase (+) Button
-$resInc = sendReq("$baseUrl/cart/update.php", [
+$resInc = sendReq("$baseUrl/cart/update", [
     'product_id' => 1,
     'action' => 'increase'
 ], $customerCookie);
 checkBtn("Customer", "Cart Quantity Plus (+) Button", $resInc['code'] === 302, "Quantity incremented");
 
 // 2.5 Cart Quantity Decrease (-) Button
-$resDec = sendReq("$baseUrl/cart/update.php", [
+$resDec = sendReq("$baseUrl/cart/update", [
     'product_id' => 1,
     'action' => 'decrease'
 ], $customerCookie);
@@ -159,11 +159,11 @@ $resRemoveCoupon = sendReq("$baseUrl/cart/?remove_coupon=true", null, $customerC
 checkBtn("Customer", "Remove Coupon Button", $resRemoveCoupon['code'] === 302, "Discount removed");
 
 // 2.7 Checkout & Place Order Button
-$checkoutPage = sendReq("$baseUrl/orders/checkout.php", null, $customerCookie);
+$checkoutPage = sendReq("$baseUrl/checkout", null, $customerCookie);
 $checkoutCsrf = getCsrf($checkoutPage['body']);
 checkBtn("Customer", "Proceed to Checkout Button", $checkoutPage['code'] === 200, "Checkout loaded");
 
-$placeOrder = sendReq("$baseUrl/orders/place.php", [
+$placeOrder = sendReq("$baseUrl/orders/place", [
     'customer_name' => 'Audited Customer',
     'address' => '456 Test Blvd, Suite 101',
     'payment_method' => 'COD',
@@ -181,18 +181,18 @@ checkBtn("Customer", "Success 'Print Receipt' & 'Continue' Buttons", $successPag
 // 2.9 Order History & Cancel Order Button
 $ordersPage = sendReq("$baseUrl/orders/", null, $customerCookie);
 $cancelCsrf = getCsrf($ordersPage['body']);
-checkBtn("Customer", "Orders History 'View Details' Button", $ordersPage['code'] === 200 && strpos($ordersPage['body'], "details.php?order_id=$createdOrderId") !== false, "Order visible in timeline");
+checkBtn("Customer", "Orders History 'View Details' Button", $ordersPage['code'] === 200 && strpos($ordersPage['body'], "order/$createdOrderId") !== false, "Order visible in timeline");
 
-$cancelPost = sendReq("$baseUrl/orders/cancel.php", [
+$cancelPost = sendReq("$baseUrl/orders/cancel", [
     'order_id' => $createdOrderId,
     'csrf_token' => $cancelCsrf
 ], $customerCookie);
 checkBtn("Customer", "Cancel Order Button (Atomic Restock)", $cancelPost['code'] === 302, "Restocked & status Cancelled");
 
 // 2.10 Account Profile Save Changes Button
-$profilePage = sendReq("$baseUrl/account/profile.php", null, $customerCookie);
+$profilePage = sendReq("$baseUrl/profile", null, $customerCookie);
 $profileCsrf = getCsrf($profilePage['body']);
-$profilePost = sendReq("$baseUrl/account/profile.php", [
+$profilePost = sendReq("$baseUrl/profile", [
     'full_name' => 'Audited Customer Verified',
     'address' => '789 Updated Lane',
     'password' => '',

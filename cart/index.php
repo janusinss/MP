@@ -121,13 +121,13 @@ if (isset($_SESSION['discount'])) {
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <span class="badge bg-light text-dark border mb-1"><?= htmlspecialchars($item['category']) ?></span>
-                                    <a href="../products/view.php?id=<?= $item['id'] ?>" class="cart-item-title d-block"><?= htmlspecialchars($item['name']) ?></a>
+                                    <a href="../product/<?= slugify($item['name']) ?>" class="cart-item-title d-block"><?= htmlspecialchars($item['name']) ?></a>
                                     <div class="cart-item-meta mt-1">
                                         $<?= number_format($item['price'], 2) ?> / unit
                                     </div>
                                 </div>
                                 
-                                <form action="remove.php" method="POST">
+                                <form action="remove" method="POST">
                                     <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
                                     <button type="submit" class="btn-remove border-0" title="Remove Item">
                                         <i class="bi bi-x-lg"></i>
@@ -136,7 +136,7 @@ if (isset($_SESSION['discount'])) {
                             </div>
 
                             <div class="d-flex align-items-center border rounded-pill px-2" style="width: fit-content;">
-                                <form action="update.php" method="POST" class="d-flex align-items-center">
+                                <form action="update" method="POST" class="d-flex align-items-center">
                                     <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
                                     <input type="hidden" name="action" value="decrease">
                                     <button type="submit" class="btn btn-sm text-muted p-0 border-0"><i class="bi bi-dash"></i></button>
@@ -144,7 +144,7 @@ if (isset($_SESSION['discount'])) {
                                 
                                 <span class="mx-3 fw-bold small"><?= $item['qty'] ?></span>
                                 
-                                <form action="update.php" method="POST" class="d-flex align-items-center">
+                                <form action="update" method="POST" class="d-flex align-items-center">
                                     <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
                                     <input type="hidden" name="action" value="increase">
                                     <button type="submit" class="btn btn-sm text-muted p-0 border-0"><i class="bi bi-plus"></i></button>
@@ -231,7 +231,7 @@ if (isset($_SESSION['discount'])) {
                         <span class="summary-total-price">$<?= number_format($finalTotal, 2) ?></span>
                     </div>
 
-                    <a href="../orders/checkout.php" class="btn btn-primary w-100 py-3 mt-4 shadow rounded-pill text-uppercase" style="letter-spacing: 0.1em;">
+                    <a href="../checkout" class="btn btn-primary w-100 py-3 mt-4 shadow rounded-pill text-uppercase" style="letter-spacing: 0.1em;">
                         Proceed to Checkout
                     </a>
                     

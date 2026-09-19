@@ -75,10 +75,19 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>FreshCart Market | Organic & Fresh</title>
+    <title>FreshCart Market | Clean Organic Sourcing</title>
+    <meta name="description" content="Certified organic produce, local dairy, and pantry staples direct from family farms.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
+
+    <!-- Overdrive Creative Engineering Suite Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+    <script defer src="assets/js/overdrive.js?v=<?php echo time(); ?>"></script>
 </head>
 <body>
 
@@ -119,7 +128,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                 <ul class="navbar-nav ms-auto align-items-center gap-3">
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <li class="nav-item">
-                            <a class="nav-link-custom d-flex align-items-center gap-2" href="account/profile.php">
+                            <a class="nav-link-custom d-flex align-items-center gap-2" href="profile">
                                 <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
                                     <?= strtoupper(substr($_SESSION['user_name'], 0, 1)) ?>
                                 </div>
@@ -127,12 +136,12 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                             </a>
                         </li>
                     <?php else: ?>
-                        <li class="nav-item"><a href="auth/login.php" class="nav-link-custom">Login</a></li>
-                        <li class="nav-item"><a href="auth/register.php" class="btn btn-primary rounded-pill px-4 shadow-sm">Sign Up</a></li>
+                        <li class="nav-item"><a href="login" class="nav-link-custom">Login</a></li>
+                        <li class="nav-item"><a href="register" class="btn btn-primary rounded-pill px-4 shadow-sm">Sign Up</a></li>
                     <?php endif; ?>
 
                     <li class="nav-item position-relative">
-                        <a href="cart/index.php" class="btn btn-outline-secondary border-0 position-relative">
+                        <a href="cart" class="btn btn-outline-secondary border-0 position-relative">
                             <i class="bi bi-bag" style="font-size: 1.3rem;"></i>
                             <?php if($cartCount > 0): ?>
                                 <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.65rem;">
@@ -146,46 +155,122 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
         </div>
     </nav>
 
-    <header class="hero-wrapper">
-        <div class="container hero-content">
+    <header class="hero-overdrive" id="hero-overdrive">
+        <canvas id="ambient-canvas" class="hero-webgl-canvas"></canvas>
+        <div class="hero-scrim"></div>
+
+        <div class="container hero-content-overdrive">
             <div class="row align-items-center">
-                
-                <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="col-lg-6">
+                    <div class="trust-badge-rail mb-3">
+                        <span class="trust-pill"><i class="bi bi-patch-check-fill text-success"></i> Certified Organic</span>
+                        <span class="trust-pill"><i class="bi bi-clock-history text-primary"></i> 24h Farm to Door</span>
+                        <span class="trust-pill"><i class="bi bi-shield-check text-warning"></i> 100% Pesticide Free</span>
+                    </div>
+
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <div class="welcome-badge">
+                        <div class="welcome-badge mb-3">
                             <i class="bi bi-basket-fill"></i> 
                             <span>Welcome back, <strong><?= htmlspecialchars($_SESSION['user_name']) ?></strong></span>
                         </div>
-                        <h1 class="hero-display-text animate-fade-in">Restock your<br>kitchen staples.</h1>
-                        <p class="hero-lead">Seasonal organic vegetables, fresh dairy, and pantry essentials ready for packing.</p>
+                        <h1 class="hero-title-overdrive">Restock your kitchen directly from local growers.</h1>
+                        <p class="hero-desc-overdrive">Seasonal produce, artisan cheeses, and morning-baked loaves picked at peak flavor and delivered to your doorstep.</p>
                     <?php else: ?>
-                        <span class="text-uppercase text-success fw-bold small mb-2 d-block tracking-wider"><i class="bi bi-patch-check-fill me-1"></i> Certified Organic</span>
-                        <h1 class="hero-display-text animate-fade-in">Farm-fresh food,<br> harvested for you.</h1>
-                        <p class="hero-lead">Direct from local certified growers to your kitchen table. Hand-picked vegetables, organic dairy, and artisan baked goods.</p>
+                        <h1 class="hero-title-overdrive">Clean food from certified local growers.</h1>
+                        <p class="hero-desc-overdrive">Harvested within 24 hours. Certified organic produce, pasture-raised dairy, and artisan baked goods delivered directly to your door.</p>
                     <?php endif; ?>
-                    
-                    <div class="d-flex gap-3">
-                        <a href="#shop" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm">Start Shopping</a>
+
+                    <div class="d-flex flex-wrap gap-3 mt-4">
+                        <a href="#shop" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm fw-bold">Start Shopping</a>
                         <a href="#categories" class="btn btn-outline-secondary btn-lg rounded-pill px-4">Browse Aisles</a>
                     </div>
                 </div>
 
-                <div class="col-lg-6">
-                    <div class="hero-image-container">
-                        <img src="assets/images/gulay.jpg" id="dynamic-hero-img" class="hero-img-front" alt="Fresh Grocery Bag">
-                        
-                        <div class="floating-card card-1">
-                            <i class="bi bi-star-fill text-warning"></i> 4.9 Rating
+                <div class="col-lg-6 mt-5 mt-lg-0">
+                    <div class="hero-showcase-card">
+                        <img src="assets/images/gulay.jpg" id="dynamic-hero-img" class="hero-img-front" alt="Harvested Fresh Produce">
+                        <div class="hero-showcase-overlay">
+                            <div class="hero-stat-badge">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-geo-alt-fill text-success fs-5"></i>
+                                    <div>
+                                        <div class="fw-bold small text-dark">Sun Valley Farm</div>
+                                        <div class="text-muted" style="font-size: 0.72rem;">Harvested 3 hours ago</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="floating-card card-2">
-                            <i class="bi bi-truck text-success"></i> Free Delivery
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="bento-section" id="story">
+        <div class="container">
+            <div class="bento-header">
+                <span class="trust-pill mb-2 d-inline-block"><i class="bi bi-diagram-3-fill text-success"></i> Direct Agricultural Sourcing</span>
+                <h2 class="bento-title">Radical transparency from soil to doorstep.</h2>
+                <p class="bento-subtitle">No multi-week cold storage. Every order is sourced directly from independent family farms practicing regenerative agriculture.</p>
+            </div>
+
+            <div class="bento-matrix">
+                <div class="bento-card bento-col-7">
+                    <div class="bento-spotlight"></div>
+                    <div class="bento-card-content">
+                        <div class="bento-icon-box">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div class="bento-metric-large">42 Local Farms</div>
+                        <h3 class="bento-card-title">Direct Grower Traceability</h3>
+                        <p class="bento-card-desc">Every vegetable and carton of milk links directly to the family farm that harvested it. Scan product QR codes to view field origin and harvest timestamp.</p>
+                        <div class="bento-visual-preview">
+                            <img src="assets/images/gulay1.jpg" alt="Organic Farm Harvest" loading="lazy">
                         </div>
                     </div>
                 </div>
 
+                <div class="bento-card bento-col-5">
+                    <div class="bento-spotlight"></div>
+                    <div class="bento-card-content">
+                        <div class="bento-icon-box">
+                            <i class="bi bi-flower1"></i>
+                        </div>
+                        <div class="bento-metric-large">100%</div>
+                        <h3 class="bento-card-title">Pesticide Free Soil</h3>
+                        <p class="bento-card-desc">Zero chemical insecticides, petroleum fertilizers, or synthetic wax coatings. Clean, mineral-rich soil produces nutrient-dense food with exceptional taste.</p>
+                    </div>
+                </div>
+
+                <div class="bento-card bento-col-5">
+                    <div class="bento-spotlight"></div>
+                    <div class="bento-card-content">
+                        <div class="bento-icon-box">
+                            <i class="bi bi-thermometer-snow"></i>
+                        </div>
+                        <div class="bento-metric-large">4°C Guaranteed</div>
+                        <h3 class="bento-card-title">Continuous Cold-Chain Transit</h3>
+                        <p class="bento-card-desc">Insulated, recyclable crates keep tender greens, farm-churned butter, and eggs at optimal temperature until delivery at your threshold.</p>
+                    </div>
+                </div>
+
+                <div class="bento-card bento-col-7">
+                    <div class="bento-spotlight"></div>
+                    <div class="bento-card-content">
+                        <div class="bento-icon-box">
+                            <i class="bi bi-currency-dollar"></i>
+                        </div>
+                        <div class="bento-metric-large">78% Revenue Return</div>
+                        <h3 class="bento-card-title">Fair Price Direct to Growers</h3>
+                        <p class="bento-card-desc">Conventional grocery models leave farmers with less than 15 cents on the dollar. FreshCart bypasses wholesalers to deliver 78% of proceeds directly to growers.</p>
+                        <div class="bento-visual-preview">
+                            <img src="assets/images/gulay2.jpg" alt="Fair Trade Farmer Produce" loading="lazy">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </header>
+    </section>
 
     <div class="container search-capsule-container" id="shop">
         <div class="row justify-content-center">
@@ -232,14 +317,14 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                        echo '<div class="col-6 col-md-4 col-lg-3"><div class="product-card"><div class="product-thumb"><div class="card-badge-container">';
                        if($product['stock_qty'] < 5 && $product['stock_qty'] > 0) echo '<span class="badge-pill badge-stock">Low Stock</span>';
                        echo '<span class="badge-pill badge-cat">'.htmlspecialchars($product['category']).'</span></div>';
-                       echo '<a href="products/view.php?id='.$product['id'].'"><img src="assets/images/'.$imgName.'" class="card-img-front" alt="'.htmlspecialchars($product['name']).'"></a>';
+                       echo '<a href="product/'.slugify($product['name']).'"><img src="assets/images/'.$imgName.'" class="card-img-front" alt="'.htmlspecialchars($product['name']).'"></a>';
                        echo '<div class="card-action-overlay">';
                        if ($product['stock_qty'] > 0) {
-                           echo '<form action="cart/add.php" method="POST" class="add-cart-form"><input type="hidden" name="product_id" value="'.$product['id'].'"><button type="submit" class="btn-quick-add"><i class="bi bi-plus-lg fs-5"></i><span>Add</span></button></form>';
+                           echo '<form action="cart/add" method="POST" class="add-cart-form"><input type="hidden" name="product_id" value="'.$product['id'].'"><button type="submit" class="btn-quick-add"><i class="bi bi-plus-lg fs-5"></i><span>Add</span></button></form>';
                        } else {
                            echo '<button class="btn-quick-add" disabled style="opacity:0.5"><i class="bi bi-x-lg"></i></button>';
                        }
-                       echo '</div></div><div class="product-details"><a href="products/view.php?id='.$product['id'].'" class="product-title-link text-truncate">'.htmlspecialchars($product['name']).'</a><div class="d-flex align-items-center justify-content-between"><span class="product-price">$'.number_format($product['price'], 2).'</span><span class="product-unit">per unit</span></div></div></div></div>';
+                       echo '</div></div><div class="product-details"><a href="product/'.slugify($product['name']).'" class="product-title-link text-truncate">'.htmlspecialchars($product['name']).'</a><div class="d-flex align-items-center justify-content-between"><span class="product-price">$'.number_format($product['price'], 2).'</span><span class="product-unit">per unit</span></div></div></div></div>';
                    }
                } else {
                    echo '<div class="col-12 text-center py-5"><h3 class="text-muted">No products found.</h3></div>';
@@ -268,7 +353,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
             <div class="row g-5">
                 
                 <div class="col-lg-4 col-md-6">
-                    <a href="index.php" class="text-decoration-none">
+                    <a href="./" class="text-decoration-none">
                         <span class="footer-brand">FreshCart<span style="color: var(--accent-color)">.</span></span>
                     </a>
                     <p class="text-muted small lh-lg mb-4">
@@ -295,10 +380,10 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                 <div class="col-lg-2 col-md-3 col-6">
                     <h6 class="footer-heading">Company</h6>
                     <ul class="list-unstyled footer-link-list">
-                        <li><a href="pages/about.php" class="footer-link">About Us</a></li>
-                        <li><a href="pages/sustainability.php" class="footer-link">Sustainability</a></li>
-                        <li><a href="pages/farmers.php" class="footer-link">Farmers</a></li>
-                        <li><a href="pages/contact.php" class="footer-link">Contact</a></li>
+                        <li><a href="about" class="footer-link">About Us</a></li>
+                        <li><a href="sustainability" class="footer-link">Sustainability</a></li>
+                        <li><a href="farmers" class="footer-link">Farmers</a></li>
+                        <li><a href="contact" class="footer-link">Contact</a></li>
                     </ul>
                 </div>
 
@@ -329,8 +414,8 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
             <div class="border-top mt-5 pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
                 <small class="text-muted mb-2 mb-md-0">&copy; 2025 FreshCart Market. Student Project by <span style="color: var(--accent-color); text-transform: uppercase; font-weight: bold">Janus Dominic</span>.</small>
                 <div class="small text-muted">
-                    <a href="pages/privacy_policy.php" class="text-decoration-none text-muted fw-bold me-3">Privacy Policy</a>
-                    <a href="pages/terms_of_service.php" class="text-decoration-none text-muted fw-bold">Terms of Service</a>
+                    <a href="privacy" class="text-decoration-none text-muted fw-bold me-3">Privacy Policy</a>
+                    <a href="terms" class="text-decoration-none text-muted fw-bold">Terms of Service</a>
                 </div>
             </div>
         </div>
@@ -473,7 +558,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
             if (e.target && e.target.classList.contains('add-cart-form')) {
                 e.preventDefault();
                 const formData = new FormData(e.target);
-                fetch('cart/add.php', { method: 'POST', body: formData })
+                fetch('cart/add', { method: 'POST', body: formData })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -483,7 +568,7 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                         const toast = new bootstrap.Toast(document.getElementById('liveToast'));
                         toast.show();
                     } else if (data.status === 'login_required') {
-                        window.location.href = 'auth/login.php';
+                        window.location.href = 'login';
                     } else {
                         alert(data.message);
                     }

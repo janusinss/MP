@@ -1,6 +1,6 @@
 <?php
 /**
- * End-to-end test for restructured storefront workflows with CSRF & canonical URL verification
+ * End-to-end test for clean URL architecture, CSRF defense, and canonical redirection
  */
 $baseUrl = 'http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app';
 $cookieFile = __DIR__ . '/test_cookies.txt';
@@ -32,66 +32,96 @@ function extractCsrfToken($html) {
 }
 
 echo "=== E2E Storefront Web Verification ===\n";
+$allPass = true;
 
 // 1. Home (Clean URL)
 $res = makeReq("$baseUrl/");
-echo "1. Clean Home URL: HTTP {$res['code']}" . ($res['code'] === 200 ? " [PASS]\n" : " [FAIL]\n");
+$ok = $res['code'] === 200;
+echo "1. Clean Home URL: HTTP {$res['code']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
 
 // 1b. Canonical Redirect of index.php
 $res = makeReq("$baseUrl/index.php");
-echo "1b. Canonical Redirect of index.php: HTTP {$res['code']}" . (in_array($res['code'], [301, 302]) ? " [PASS]\n" : " [FAIL]\n");
+$ok = in_array($res['code'], [301, 302]);
+echo "1b. Canonical Redirect of index.php: HTTP {$res['code']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
 
-// 2. Fetch Login & CSRF
-$loginPage = makeReq("$baseUrl/auth/login.php");
+// 1c. Canonical Redirect of auth/login.php
+$res = makeReq("$baseUrl/auth/login.php");
+$ok = $res['code'] === 301 && str_contains($res['redirect'], '/login');
+echo "1c. Canonical Redirect of auth/login.php -> /login: HTTP {$res['code']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
+
+// 2. Fetch Clean Login Route & CSRF
+$loginPage = makeReq("$baseUrl/login");
 $token = extractCsrfToken($loginPage['body']);
 
 // 2b. Customer Login with CSRF Token
-$res = makeReq("$baseUrl/auth/login.php", [
+$res = makeReq("$baseUrl/login", [
     'email' => 'customer@example.com',
     'password' => 'password',
     'csrf_token' => $token
 ]);
-echo "2. Customer Login (auth/login.php): HTTP {$res['code']} -> Redirect: {$res['redirect']}" . ($res['code'] === 302 ? " [PASS]\n" : " [FAIL]\n");
+$ok = $res['code'] === 302;
+echo "2. Customer Login (/login): HTTP {$res['code']} -> Redirect: {$res['redirect']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
 
-// 3. Profile
-$res = makeReq("$baseUrl/account/profile.php");
-echo "3. Account Profile (account/profile.php): HTTP {$res['code']}" . ($res['code'] === 200 && strpos($res['body'], 'Account Settings') !== false ? " [PASS]\n" : " [FAIL]\n");
+// 3. Clean Profile Route
+$res = makeReq("$baseUrl/profile");
+$ok = $res['code'] === 200 && strpos($res['body'], 'Account Settings') !== false;
+echo "3. Account Profile (/profile): HTTP {$res['code']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
 
-// 4. Products View
-$res = makeReq("$baseUrl/products/view.php?id=1");
-echo "4. Product View (products/view.php?id=1): HTTP {$res['code']}" . ($res['code'] === 200 && strpos($res['body'], 'Add to Cart') !== false ? " [PASS]\n" : " [FAIL]\n");
+// 4. Products View (Masked Clean URL)
+$res = makeReq("$baseUrl/product/red-apple");
+$ok = $res['code'] === 200 && strpos($res['body'], 'Add to Cart') !== false;
+echo "4. Product View (/product/red-apple): HTTP {$res['code']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
 
 // 5. Products Fetch (AJAX)
 $res = makeReq("$baseUrl/products/fetch.php?search=Apple");
 $json = json_decode($res['body'], true);
-echo "5. Products Fetch (products/fetch.php): HTTP {$res['code']}" . ($res['code'] === 200 && isset($json['grid']) ? " [PASS]\n" : " [FAIL]\n");
+$ok = $res['code'] === 200 && isset($json['grid']);
+echo "5. Products Fetch (products/fetch.php): HTTP {$res['code']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
 
-// 6. Add to Cart (authenticated)
-$res = makeReq("$baseUrl/cart/add.php", ['product_id' => 1]);
+// 6. Add to Cart (authenticated via clean route cart/add)
+$res = makeReq("$baseUrl/cart/add", ['product_id' => 1]);
 $json = json_decode($res['body'], true);
-echo "6. Cart Add (cart/add.php): HTTP {$res['code']} (Status: " . ($json['status'] ?? 'unknown') . ")" . (($json['status'] ?? '') === 'success' ? " [PASS]\n" : " [FAIL]\n");
+$ok = $res['code'] === 200 && ($json['status'] ?? '') === 'success';
+echo "6. Cart Add (/cart/add): HTTP {$res['code']} (Status: " . ($json['status'] ?? 'unknown') . ")" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
 
-// 7. Cart View
-$res = makeReq("$baseUrl/cart/index.php");
-echo "7. Cart Page (cart/index.php): HTTP {$res['code']}" . ($res['code'] === 200 && strpos($res['body'], 'Shopping Bag') !== false ? " [PASS]\n" : " [FAIL]\n");
+// 7. Cart View (Clean URL)
+$res = makeReq("$baseUrl/cart/");
+$ok = $res['code'] === 200 && strpos($res['body'], 'Shopping Bag') !== false;
+echo "7. Cart Page (/cart/): HTTP {$res['code']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
 
-// 8. Orders Checkout View & Extract CSRF
-$checkoutPage = makeReq("$baseUrl/orders/checkout.php");
+// 8. Orders Checkout View & Extract CSRF (Clean Route)
+$checkoutPage = makeReq("$baseUrl/checkout");
 $checkoutCsrf = extractCsrfToken($checkoutPage['body']);
-echo "8. Orders Checkout (orders/checkout.php): HTTP {$checkoutPage['code']}" . ($checkoutPage['code'] === 200 && strpos($checkoutPage['body'], 'Secure Checkout') !== false ? " [PASS]\n" : " [FAIL]\n");
+$ok = $checkoutPage['code'] === 200 && strpos($checkoutPage['body'], 'Secure Checkout') !== false;
+echo "8. Orders Checkout (/checkout): HTTP {$checkoutPage['code']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
 
-// 9. Orders Place with CSRF
-$res = makeReq("$baseUrl/orders/place.php", [
+// 9. Orders Place with CSRF (Clean Route)
+$res = makeReq("$baseUrl/orders/place", [
     'customer_name' => 'John Customer',
     'address' => '123 Main St, Test City',
     'payment_method' => 'COD',
     'csrf_token' => $checkoutCsrf
 ]);
-echo "9. Orders Place (orders/place.php): HTTP {$res['code']} -> Redirect: {$res['redirect']}" . ($res['code'] === 302 && strpos($res['redirect'], 'success.php') !== false ? " [PASS]\n" : " [FAIL]\n");
+$ok = $res['code'] === 302 && strpos($res['redirect'], 'success.php') !== false;
+echo "9. Orders Place (/orders/place): HTTP {$res['code']} -> Redirect: {$res['redirect']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
 
-// 10. Orders History
-$res = makeReq("$baseUrl/orders/index.php");
-echo "10. Orders History (orders/index.php): HTTP {$res['code']}" . ($res['code'] === 200 && strpos($res['body'], 'My Orders') !== false ? " [PASS]\n" : " [FAIL]\n");
+// 10. Orders History (Clean Route)
+$res = makeReq("$baseUrl/orders/");
+$ok = $res['code'] === 200 && strpos($res['body'], 'My Orders') !== false;
+echo "10. Orders History (/orders/): HTTP {$res['code']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
 
 if (file_exists($cookieFile)) unlink($cookieFile);
 echo "=== All Tests Complete ===\n";
+exit($allPass ? 0 : 1);

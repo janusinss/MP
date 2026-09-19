@@ -6,7 +6,7 @@ session_start();
 
 // Security Check: Must be logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
+    header("Location: ../login");
     exit;
 }
 
@@ -118,13 +118,13 @@ try {
 
                                 <div class="col-md-4 text-md-end d-flex flex-column align-items-end gap-2">
 
-                                    <a href="details.php?order_id=<?= $order['id'] ?>"
+                                    <a href="../order/<?= $order['id'] ?>"
                                         class="btn btn-light rounded-circle border" title="View Details">
                                         <i class="bi bi-chevron-right"></i>
                                     </a>
 
                                     <?php if ($status == 'Pending'): ?>
-                                        <form action="cancel.php" method="POST"
+                                        <form action="cancel" method="POST"
                                             onsubmit="return confirm('Are you sure you want to cancel this order?');">
                                             <?= csrf_input() ?>
                                             <input type="hidden" name="order_id" value="<?= $order['id'] ?>">

@@ -72,32 +72,36 @@ assertTest("Canonical 301 Redirect Stripping index.php", in_array($res['code'], 
 $res = httpReq("$baseUrl/login");
 assertTest("Clean Extensionless Route /login Serves Auth", $res['code'] === 200 && strpos($res['body'], 'Sign In') !== false, "HTTP {$res['code']}");
 
-// 6. CSRF Negative Test: Login Without CSRF Token
-$res = httpReq("$baseUrl/auth/login.php", ['email' => 'customer@example.com', 'password' => 'password']);
+// 6. Canonical 301 Redirect on Legacy .php URL
+$legacyRes = httpReq("$baseUrl/auth/login.php");
+assertTest("Canonical 301 Redirect Stripping .php from /auth/login.php", $legacyRes['code'] === 301 && str_contains($legacyRes['redirect'], '/login'), "HTTP {$legacyRes['code']} -> {$legacyRes['redirect']}");
+
+// 7. CSRF Negative Test: Login Without CSRF Token
+$res = httpReq("$baseUrl/login", ['email' => 'customer@example.com', 'password' => 'password']);
 assertTest("Reject POST Without CSRF Token (Login)", strpos($res['body'], 'Security validation failed') !== false, "Blocked forged submission");
 
-// 7. CSRF Negative Test: Profile Password Change Without CSRF Token
-$res = httpReq("$baseUrl/account/profile.php", ['full_name' => 'Attacker', 'password' => 'hacked']);
+// 8. CSRF Negative Test: Profile Password Change Without CSRF Token
+$res = httpReq("$baseUrl/profile", ['full_name' => 'Attacker', 'password' => 'hacked']);
 assertTest("Reject Profile Update Without Valid Session/CSRF", $res['code'] === 302 || $res['code'] === 403, "HTTP {$res['code']}");
 
-// 8. Legitimate Auth Handshake With CSRF Token Extraction
-$loginPage = httpReq("$baseUrl/auth/login.php");
+// 9. Legitimate Auth Handshake With CSRF Token Extraction
+$loginPage = httpReq("$baseUrl/login");
 $csrfToken = extractCsrf($loginPage['body']);
 assertTest("Extract CSRF Token from Form", !empty($csrfToken), "Token: " . substr($csrfToken, 0, 8) . "...");
 
-$loginPost = httpReq("$baseUrl/auth/login.php", [
+$loginPost = httpReq("$baseUrl/login", [
     'email' => 'customer@example.com',
     'password' => 'password',
     'csrf_token' => $csrfToken
 ]);
 assertTest("Authenticated Login with CSRF Token", $loginPost['code'] === 302, "HTTP {$loginPost['code']} -> {$loginPost['redirect']}");
 
-// 9. Verify Session & Profile Access
-$profileRes = httpReq("$baseUrl/account/profile.php");
+// 10. Verify Session & Profile Access
+$profileRes = httpReq("$baseUrl/profile");
 assertTest("Access Profile With Authenticated Session", $profileRes['code'] === 200 && strpos($profileRes['body'], 'Account Settings') !== false, "HTTP {$profileRes['code']}");
 
-// 10. CSRF Protection on Order Cancellation
-$cancelForged = httpReq("$baseUrl/orders/cancel.php", ['order_id' => 999]);
+// 11. CSRF Protection on Order Cancellation (must be logged in first or rejected)
+$cancelForged = httpReq("$baseUrl/orders/cancel", ['order_id' => 999]);
 assertTest("Reject Order Cancellation Without CSRF Token", $cancelForged['code'] === 403, "HTTP {$cancelForged['code']}");
 
 // 11. Admin Deletion Protection Without CSRF Token

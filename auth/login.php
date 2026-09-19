@@ -2,7 +2,9 @@
 // auth/login.php
 // Customer Authentication Portal for FreshCart
 require_once __DIR__ . '/../config/db.php';
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $error_message = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -29,6 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 }
+$appRoot = rtrim(str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
+$appRoot = $appRoot ? $appRoot . '/' : '/';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -38,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Login - FreshCart</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?= $appRoot ?>assets/css/style.css?v=<?= time() ?>">
 </head>
 <body>
 
@@ -46,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="row g-0 h-100">
             
             <div class="col-lg-6 d-none d-lg-block">
-                <div class="auth-banner-side login-bg">
+                <div class="auth-banner-side login-bg" style="background-image: url('<?= $appRoot ?>assets/images/login1.jpg');">
                     <div class="auth-banner-content">
                         <h1 style="font-family: var(--font-serif);font-size: 3rem;margin-bottom: 1.5rem;line-height: 1.1; color: #fff; opacity: 0.9;">Quality you can taste, aesthetics you can feel.</h1>
                         <p class="fs-5 opacity-75">Welcome back to your curated grocery experience.</p>
@@ -70,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </div>
                         <?php endif; ?>
 
-                        <form action="login.php" method="POST">
+                        <form method="POST">
                             <?= csrf_input() ?>
                             <div class="mb-2">
                                 <label class="auth-label">Email Address</label>
@@ -91,8 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <button type="submit" class="btn btn-auth w-100 py-3 mb-4 shadow">Sign In</button>
 
                             <div class="text-center d-flex flex-column gap-2">
-                                <span class="text-muted">Don't have an account? <a href="register.php" class="text-dark fw-bold text-decoration-underline">Create one</a></span>
-                                <a href="../index.php" class="text-muted small text-decoration-none mt-2">← Back to Shop</a>
+                                <span class="text-muted">Don't have an account? <a href="register" class="text-dark fw-bold text-decoration-underline">Create one</a></span>
+                                <a href="../" class="text-muted small text-decoration-none mt-2">← Back to Shop</a>
                             </div>
                         </form>
                     </div>

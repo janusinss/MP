@@ -2,13 +2,45 @@
 require_once __DIR__ . '/../config/db.php';
 session_start();
 
-$id = $_GET['id'] ?? null;
-if (!$id) {
+$slugParam = $_GET['slug'] ?? null;
+$idParam = $_GET['id'] ?? null;
+
+if (!$slugParam && !$idParam) {
     header("Location: ../");
     exit;
 }
 
-// 1. Handle Review Submission
+// 0. Fetch Product Details by Slug (Clean SEO route) or ID
+if ($slugParam) {
+    if (is_numeric($slugParam)) {
+        $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
+        $stmt->execute([(int)$slugParam]);
+    } else {
+        $cleanName = str_replace('-', ' ', $slugParam);
+        $stmt = $pdo->prepare("SELECT * FROM products WHERE LOWER(REPLACE(REPLACE(name, ' ', '-'), '/', '-')) = ? OR LOWER(name) = ?");
+        $stmt->execute([strtolower($slugParam), strtolower($cleanName)]);
+    }
+} else {
+    $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
+    $stmt->execute([(int)$idParam]);
+}
+
+$product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$product) {
+    header("Location: ../");
+    exit;
+}
+
+$id = (int)$product['id'];
+
+// Canonical redirect: If accessed via legacy query string (view.php?id=...), redirect to clean masked URL (/product/slug)
+if (isset($_GET['id']) && !isset($_GET['slug']) && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+    $cleanSlug = slugify($product['name']);
+    header("Location: ../product/" . $cleanSlug, true, 301);
+    exit;
+}
+
 $review_msg = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_review'])) {
     if (!isset($_SESSION['user_id'])) {
@@ -31,15 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_review'])) {
             $review_msg = "Error submitting review.";
         }
     }
-}
-
-// 2. Fetch Product Details
-$stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
-$stmt->execute([$id]);
-$product = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$product) {
-    die("Product not found.");
 }
 
 // 3. Fetch Reviews
@@ -130,7 +153,7 @@ if (count($reviews) > 0) {
                     </ul>
 
                     <?php if ($product['stock_qty'] > 0): ?>
-                        <form action="../cart/add.php" method="POST" id="addToCartForm" class="mt-4">
+                        <form action="../cart/add" method="POST" id="addToCartForm" class="mt-4">
                             <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                             <button type="submit" class="btn-add-large">
                                 Add to Cart — $<?= number_format($product['price'], 2) ?>
@@ -177,7 +200,7 @@ if (count($reviews) > 0) {
                 <?php else: ?>
                     <div class="text-center py-2">
                         <p class="text-muted mb-3">Have you tried this product?</p>
-                        <a href="../auth/login.php" class="btn btn-outline-dark rounded-pill px-4">Login to Review</a>
+                        <a href="<?= $rootPath ?>login" class="btn btn-outline-dark rounded-pill px-4">Login to Review</a>
                     </div>
                 <?php endif; ?>
             </div>
@@ -217,7 +240,7 @@ if (count($reviews) > 0) {
                 <?php foreach ($relatedProducts as $rp): ?>
                     <?php $rImg = $rp['image'] ? $rp['image'] : 'default.jpg'; ?>
                     
-                    <a href="view.php?id=<?= $rp['id'] ?>" class="text-decoration-none text-dark">
+                    <a href="../product/<?= slugify($rp['name']) ?>" class="text-decoration-none text-dark">
                         <div class="mini-product-card">
                             <div class="mini-img-box">
                                 <img src="../assets/images/<?= $rImg ?>" alt="<?= htmlspecialchars($rp['name']) ?>">

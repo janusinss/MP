@@ -33,7 +33,47 @@ Options -Indexes -MultiViews
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/index\.php([^\ ]*)\ +HTTP/ [NC]
     RewriteRule ^index\.php$ %1/ [R=301,L,NE]
 
-    # Route clean friendly URLs
+    # Canonical 301 Redirects: Strip internal folders & .php from browser address bar
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/auth/login\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^auth/login\.php$ %1/login [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/auth/register\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^auth/register\.php$ %1/register [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/auth/logout\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^auth/logout\.php$ %1/logout [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/cart/index\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^cart/index\.php$ %1/cart [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/orders/checkout\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^orders/checkout\.php$ %1/checkout [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/orders/index\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^orders/index\.php$ %1/orders [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/account/profile\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^account/profile\.php$ %1/profile [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/pages/about\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^pages/about\.php$ %1/about [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/pages/contact\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^pages/contact\.php$ %1/contact [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/pages/farmers\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^pages/farmers\.php$ %1/farmers [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/pages/sustainability\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^pages/sustainability\.php$ %1/sustainability [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/pages/privacy_policy\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^pages/privacy_policy\.php$ %1/privacy [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/pages/terms_of_service\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^pages/terms_of_service\.php$ %1/terms [R=301,L,NE]
+
+    # Route clean friendly URLs internally
     RewriteRule ^login/?$ auth/login.php [L,QSA]
     RewriteRule ^register/?$ auth/register.php [L,QSA]
     RewriteRule ^logout/?$ auth/logout.php [L,QSA]
@@ -41,6 +81,14 @@ Options -Indexes -MultiViews
     RewriteRule ^checkout/?$ orders/checkout.php [L,QSA]
     RewriteRule ^orders/?$ orders/index.php [L,QSA]
     RewriteRule ^profile/?$ account/profile.php [L,QSA]
+    RewriteRule ^about/?$ pages/about.php [L,QSA]
+    RewriteRule ^contact/?$ pages/contact.php [L,QSA]
+    RewriteRule ^farmers/?$ pages/farmers.php [L,QSA]
+    RewriteRule ^sustainability/?$ pages/sustainability.php [L,QSA]
+    RewriteRule ^privacy/?$ pages/privacy_policy.php [L,QSA]
+    RewriteRule ^terms/?$ pages/terms_of_service.php [L,QSA]
+    RewriteRule ^product/([a-zA-Z0-9_-]+)/?$ products/view.php?slug=$1 [L,QSA]
+    RewriteRule ^order/([0-9]+)/?$ orders/details.php?order_id=$1 [L,QSA]
 
     # Support extensionless PHP files
     RewriteCond %{REQUEST_FILENAME} !-d

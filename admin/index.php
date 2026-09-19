@@ -70,7 +70,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
             </nav>
 
             <div class="mt-auto border-top pt-4">
-                <a href="../index.php" class="admin-nav-link mb-1">
+                <a href="../" class="admin-nav-link mb-1">
                     <i class="bi bi-shop-window"></i> Storefront
                 </a>
                 <a href="logout.php" class="admin-nav-link text-danger">

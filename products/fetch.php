@@ -69,12 +69,12 @@ if (count($products) > 0) {
                         <?php endif; ?>
                         <span class="badge-pill badge-cat"><?= htmlspecialchars($product['category']) ?></span>
                     </div>
-                    <a href="products/view.php?id=<?= $product['id'] ?>">
+                    <a href="product/<?= slugify($product['name']) ?>">
                         <img src="assets/images/<?= $imgName ?>" class="card-img-front" alt="<?= htmlspecialchars($product['name']) ?>">
                     </a>
                     <div class="card-action-overlay">
                         <?php if ($product['stock_qty'] > 0): ?>
-                            <form action="cart/add.php" method="POST" class="add-cart-form">
+                            <form action="cart/add" method="POST" class="add-cart-form">
                                 <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                                 <button type="submit" class="btn-quick-add" title="Add to Cart">
                                     <i class="bi bi-plus-lg fs-5"></i>
@@ -89,7 +89,7 @@ if (count($products) > 0) {
                     </div>
                 </div>
                 <div class="product-details">
-                    <a href="products/view.php?id=<?= $product['id'] ?>" class="product-title-link text-truncate">
+                    <a href="product/<?= slugify($product['name']) ?>" class="product-title-link text-truncate">
                         <?= htmlspecialchars($product['name']) ?>
                     </a>
                     <div class="d-flex align-items-center justify-content-between">

@@ -28,7 +28,7 @@ if (!headers_sent()) {
     header('X-Frame-Options: SAMEORIGIN');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('X-XSS-Protection: 1; mode=block');
-    header("Content-Security-Policy: default-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;");
+    header("Content-Security-Policy: default-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;");
 }
 
 // 3. Cryptographically Secure Anti-CSRF Functions
@@ -79,3 +79,71 @@ if (!function_exists('check_rate_limit')) {
         return true;
     }
 }
+
+if (!function_exists('slugify')) {
+    function slugify(string $text): string {
+        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+        $text = preg_replace('~[^-\w]+~', '', $text);
+        $text = trim($text, '-');
+        $text = preg_replace('~-+~', '-', $text);
+        return strtolower($text ?: 'product');
+    }
+}
+
+// 5. Enforce Canonical Clean URLs (Zero Technology Stack Exposure)
+if (!function_exists('enforce_clean_url')) {
+    function enforce_clean_url(): void {
+        if (php_sapi_name() === 'cli') return;
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') return;
+        
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        if (empty($requestUri)) return;
+
+        $parsed = parse_url($requestUri);
+        $path = $parsed['path'] ?? '';
+        $query = isset($parsed['query']) && $parsed['query'] !== '' ? '?' . $parsed['query'] : '';
+        
+        // Exclude admin and scripts
+        if (str_contains($path, '/admin/') || str_contains($path, '/scripts/')) {
+            return;
+        }
+
+        $routeMap = [
+            '/auth/login.php' => '/login',
+            '/auth/register.php' => '/register',
+            '/auth/logout.php' => '/logout',
+            '/cart/index.php' => '/cart',
+            '/orders/checkout.php' => '/checkout',
+            '/orders/index.php' => '/orders',
+            '/account/profile.php' => '/profile',
+            '/pages/about.php' => '/about',
+            '/pages/contact.php' => '/contact',
+            '/pages/farmers.php' => '/farmers',
+            '/pages/sustainability.php' => '/sustainability',
+            '/pages/privacy_policy.php' => '/privacy',
+            '/pages/terms_of_service.php' => '/terms',
+            '/index.php' => '/',
+        ];
+
+        foreach ($routeMap as $phpPath => $cleanRoute) {
+            if (str_ends_with($path, $phpPath)) {
+                $base = substr($path, 0, strlen($path) - strlen($phpPath));
+                $target = rtrim($base, '/') . $cleanRoute . $query;
+                header("Location: " . $target, true, 301);
+                exit;
+            }
+        }
+
+        if (str_ends_with($path, '/orders/details.php')) {
+            $base = substr($path, 0, strlen($path) - strlen('/orders/details.php'));
+            if (isset($_GET['order_id']) && is_numeric($_GET['order_id'])) {
+                header("Location: " . rtrim($base, '/') . '/order/' . (int)$_GET['order_id'], true, 301);
+                exit;
+            } else {
+                header("Location: " . rtrim($base, '/') . '/orders', true, 301);
+                exit;
+            }
+        }
+    }
+}
+enforce_clean_url();

@@ -33,10 +33,10 @@ $rootPath = (basename(dirname($_SERVER['SCRIPT_FILENAME'])) === 'grocery_app') ?
                 <div class="col-lg-2 col-md-3 col-6">
                     <h6 class="footer-heading">Company</h6>
                     <ul class="list-unstyled footer-link-list">
-                        <li><a href="<?= $rootPath ?>pages/about.php" class="footer-link">About Us</a></li>
-                        <li><a href="<?= $rootPath ?>pages/sustainability.php" class="footer-link">Sustainability</a></li>
-                        <li><a href="<?= $rootPath ?>pages/farmers.php" class="footer-link">Farmers</a></li>
-                        <li><a href="<?= $rootPath ?>pages/contact.php" class="footer-link">Contact</a></li>
+                        <li><a href="<?= $rootPath ?>about" class="footer-link">About Us</a></li>
+                        <li><a href="<?= $rootPath ?>sustainability" class="footer-link">Sustainability</a></li>
+                        <li><a href="<?= $rootPath ?>farmers" class="footer-link">Farmers</a></li>
+                        <li><a href="<?= $rootPath ?>contact" class="footer-link">Contact</a></li>
                     </ul>
                 </div>
 
@@ -67,8 +67,8 @@ $rootPath = (basename(dirname($_SERVER['SCRIPT_FILENAME'])) === 'grocery_app') ?
             <div class="border-top mt-5 pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
                 <small class="text-muted mb-2 mb-md-0">&copy; 2025 FreshCart Market. Student Project by Janus Dominic.</small>
                 <div class="small text-muted">
-                    <a href="<?= $rootPath ?>pages/privacy_policy.php" class="text-decoration-none text-muted fw-bold me-3">Privacy Policy</a>
-                    <a href="<?= $rootPath ?>pages/terms_of_service.php" class="text-decoration-none text-muted fw-bold">Terms of Service</a>
+                    <a href="<?= $rootPath ?>privacy" class="text-decoration-none text-muted fw-bold me-3">Privacy Policy</a>
+                    <a href="<?= $rootPath ?>terms" class="text-decoration-none text-muted fw-bold">Terms of Service</a>
                 </div>
             </div>
         </div>

@@ -3,7 +3,7 @@ require_once __DIR__ . '/../config/db.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
+    header("Location: ../login");
     exit;
 }
 
@@ -60,10 +60,10 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                         <h2 class="m-0" style="font-family: var(--font-serif);">Account Settings</h2>
                         
                         <div class="d-flex gap-2">
-                            <a href="../orders/index.php" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                            <a href="../orders" class="btn btn-outline-primary btn-sm rounded-pill px-3">
                                 <i class="bi bi-box-seam me-1"></i> Order History
                             </a>
-                            <a href="../auth/logout.php" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                            <a href="../logout" class="btn btn-outline-danger btn-sm rounded-pill px-3">
                                 <i class="bi bi-box-arrow-right me-1"></i> Logout
                             </a>
                         </div>

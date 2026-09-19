@@ -2,7 +2,9 @@
 // auth/register.php
 // Customer Registration Portal for FreshCart
 require_once __DIR__ . '/../config/db.php';
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $error = '';
 $success = '';
@@ -32,13 +34,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt = $pdo->prepare($sql);
             if ($stmt->execute([$name, $email, $hashed_password, $address])) {
                 $success = "Account created successfully! Redirecting to login...";
-                echo "<script>setTimeout(function(){ window.location.href = 'login.php'; }, 1500);</script>";
+                echo "<script>setTimeout(function(){ window.location.href = 'login'; }, 1500);</script>";
             } else {
                 $error = "Registration failed. Please try again.";
             }
         }
     }
 }
+$appRoot = rtrim(str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
+$appRoot = $appRoot ? $appRoot . '/' : '/';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Sign Up - FreshCart</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?= $appRoot ?>assets/css/style.css?v=<?= time() ?>">
 </head>
 <body>
 
@@ -56,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="row g-0 h-100">
             
             <div class="col-lg-6 d-none d-lg-block">
-                <div class="auth-banner-side register-bg">
+                <div class="auth-banner-side register-bg" style="background-image: url('<?= $appRoot ?>assets/images/register1.jpg');">
                     <div class="auth-banner-content">
                         <h1 style="font-family: var(--font-serif);font-size: 3rem;margin-bottom: 1.5rem;line-height: 1.1; color: #fff; opacity: 0.9;">Join the community of clean, fresh food lovers.</h1>
                         <p class="fs-5 opacity-75">Track orders, save favorites, and get exclusive organic deals.</p>
@@ -122,8 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <button type="submit" class="btn btn-auth w-100 py-3 mb-4 shadow">Register Now</button>
 
                             <div class="text-center d-flex flex-column gap-2">
-                                <span class="text-muted">Already have an account? <a href="login.php" class="text-dark fw-bold text-decoration-underline">Login</a></span>
-                                <a href="../index.php" class="text-muted small text-decoration-none mt-2">← Back to Shop</a>
+                                <span class="text-muted">Already have an account? <a href="login" class="text-dark fw-bold text-decoration-underline">Login</a></span>
+                                <a href="../" class="text-muted small text-decoration-none mt-2">← Back to Shop</a>
                             </div>
                         </form>
                     </div>

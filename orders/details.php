@@ -6,12 +6,12 @@ session_start();
 
 // 1. Security Check
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
+    header("Location: ../login");
     exit;
 }
 
 if (!isset($_GET['order_id'])) {
-    header("Location: index.php");
+    header("Location: ../orders");
     exit;
 }
 
@@ -24,7 +24,7 @@ $stmt->execute([$order_id, $user_id]);
 $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$order) {
-    header("Location: index.php");
+    header("Location: ../orders");
     exit;
 }
 
@@ -64,7 +64,7 @@ if ($s === 'Cancelled') {
 <div class="container mt-5 mb-5 order-ticket-wrapper">
     
     <div class="mb-4 animate-fade-in">
-        <a href="index.php" class="text-decoration-none text-muted small fw-bold text-uppercase">
+        <a href="../orders" class="text-decoration-none text-muted small fw-bold text-uppercase">
             <i class="bi bi-arrow-left me-1"></i> Back to Order History
         </a>
     </div>
@@ -144,7 +144,7 @@ if ($s === 'Cancelled') {
 
         <?php if ($s === 'Pending'): ?>
             <div class="p-4 text-center bg-light border-top">
-                <form action="cancel.php" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                <form action="cancel" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
                     <?= csrf_input() ?>
                     <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
                     <button type="submit" class="btn btn-outline-danger rounded-pill px-4 text-uppercase small fw-bold">
@@ -158,7 +158,7 @@ if ($s === 'Cancelled') {
     </div>
     
     <div class="text-center mt-4">
-        <a href="../pages/contact.php" class="text-muted small text-decoration-none">Need help with this order? Contact Support</a>
+        <a href="../contact" class="text-muted small text-decoration-none">Need help with this order? Contact Support</a>
     </div>
 
 </div>

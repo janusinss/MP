@@ -61,11 +61,11 @@ include __DIR__ . '/../includes/header.php';
     <div class="container">
         
         <div class="mb-4">
-            <a href="../cart/index.php" class="text-decoration-none text-muted small text-uppercase fw-bold"><i class="bi bi-arrow-left me-1"></i> Back to Cart</a>
+            <a href="../cart" class="text-decoration-none text-muted small text-uppercase fw-bold"><i class="bi bi-arrow-left me-1"></i> Back to Cart</a>
             <h2 class="mt-2" style="font-family: var(--font-serif);">Secure Checkout</h2>
         </div>
 
-        <form action="place.php" method="POST">
+        <form action="place" method="POST">
             <?= csrf_input() ?>
             <div class="row g-5">
                 
