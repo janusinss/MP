@@ -1064,7 +1064,7 @@ $firstKey = array_key_first($aisleReels);
             <div class="container">
                 <div class="bento-header">
                     <div class="section-kicker">
-                        <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
+                        <i class="bi bi-geo-alt-fill me-1" aria-hidden="true"></i>
                         <span>Direct Agricultural Sourcing &bull; Soil to Threshold</span>
                     </div>
                     <h2 class="bento-heading">Radical transparency from soil to doorstep.</h2>
@@ -1084,21 +1084,25 @@ $firstKey = array_key_first($aisleReels);
                             <div class="bento-live-farm-preview">
                                 <img src="assets/images/gulay1.jpg" alt="Misty Morning Organic Farm" class="bento-farm-img" loading="lazy" width="800" height="340">
                                 <div class="bento-scrim-overlay"></div>
+                                <div class="bento-farm-tag">
+                                    <i class="bi bi-patch-check-fill text-brand me-1" aria-hidden="true"></i>
+                                    <span>Misty Morning Organic Farm</span>
+                                </div>
                                 <div class="bento-telemetry-glass-badge">
                                     <div class="telemetry-badge-row">
                                         <div class="telemetry-badge-item">
                                             <span class="badge-item-label">Origin Farm</span>
-                                            <strong class="badge-item-value"><i class="bi bi-geo-alt-fill me-1 text-success"></i>Highland Valley · Parcel 4B</strong>
+                                            <strong class="badge-item-value"><i class="bi bi-geo-alt-fill me-1 text-brand"></i>Highland Valley · Parcel 4B</strong>
                                         </div>
                                         <div class="telemetry-badge-divider"></div>
                                         <div class="telemetry-badge-item">
                                             <span class="badge-item-label">Harvest Time</span>
-                                            <strong class="badge-item-value"><i class="bi bi-clock-fill me-1 text-warning"></i>5:45 AM Today</strong>
+                                            <strong class="badge-item-value"><i class="bi bi-clock-fill me-1 text-brand"></i>5:45 AM Today</strong>
                                         </div>
                                         <div class="telemetry-badge-divider"></div>
                                         <div class="telemetry-badge-item">
                                             <span class="badge-item-label">Soil Quality</span>
-                                            <strong class="badge-item-value"><i class="bi bi-moisture me-1 text-info"></i>Living Loam (pH 6.8)</strong>
+                                            <strong class="badge-item-value"><i class="bi bi-moisture me-1 text-brand"></i>Living Loam (pH 6.8)</strong>
                                         </div>
                                     </div>
                                 </div>
@@ -1119,7 +1123,7 @@ $firstKey = array_key_first($aisleReels);
                                 <div class="soil-metric-item">
                                     <div class="soil-metric-header">
                                         <span>Antioxidant &amp; Polyphenol Density</span>
-                                        <strong>+340%</strong>
+                                        <strong class="text-brand">+340%</strong>
                                     </div>
                                     <div class="soil-progress-bar">
                                         <div class="soil-progress-fill" style="width: 88%;"></div>
@@ -1128,7 +1132,7 @@ $firstKey = array_key_first($aisleReels);
                                 <div class="soil-metric-item">
                                     <div class="soil-metric-header">
                                         <span>Soil Organic Matter Content</span>
-                                        <strong>8.4%</strong>
+                                        <strong class="text-brand">8.4%</strong>
                                     </div>
                                     <div class="soil-progress-bar">
                                         <div class="soil-progress-fill" style="width: 76%;"></div>
@@ -1137,14 +1141,14 @@ $firstKey = array_key_first($aisleReels);
                                 <div class="soil-metric-item">
                                     <div class="soil-metric-header">
                                         <span>Synthetic Chemical Residue</span>
-                                        <strong class="text-success">0.00 ppm</strong>
+                                        <strong class="text-brand">0.00 ppm</strong>
                                     </div>
                                     <div class="soil-progress-bar">
-                                        <div class="soil-progress-fill bg-success" style="width: 0%;"></div>
+                                        <div class="soil-progress-fill bg-brand" style="width: 0%;"></div>
                                     </div>
                                 </div>
                                 <div class="soil-cert-tag">
-                                    <i class="bi bi-patch-check-fill text-success" aria-hidden="true"></i>
+                                    <i class="bi bi-patch-check-fill text-brand" aria-hidden="true"></i>
                                     <span>Regenerative Organic Certified™ (ROC) Standards</span>
                                 </div>
                             </div>
@@ -1162,8 +1166,11 @@ $firstKey = array_key_first($aisleReels);
                             <!-- Live Transit Timeline & Thermal Reading -->
                             <div class="bento-transit-timeline-card">
                                 <div class="transit-temp-readout">
-                                    <span class="temp-readout-label">Real-Time Crate Sensor</span>
-                                    <span class="temp-readout-val">3.8&deg;C <small class="text-success fw-normal">&bull; Optimal Freshness</small></span>
+                                    <div class="temp-readout-left">
+                                        <span class="sensor-pulse-dot" aria-hidden="true"></span>
+                                        <span class="temp-readout-label">Real-Time Crate Sensor</span>
+                                    </div>
+                                    <span class="temp-readout-val">3.8&deg;C <small class="text-brand fw-semibold">&bull; Optimal Freshness</small></span>
                                 </div>
                                 <div class="transit-step-chain">
                                     <div class="transit-node is-done">
@@ -1206,13 +1213,18 @@ $firstKey = array_key_first($aisleReels);
                             <div class="bento-economics-wrap">
                                 <div class="econ-comparison-row">
                                     <div class="econ-bar-label-group">
-                                        <span class="econ-brand-label"><i class="bi bi-cart-check-fill text-success me-1"></i>FreshCart Direct Model</span>
-                                        <span class="econ-percentage text-success">78% to Farmers</span>
+                                        <span class="econ-brand-label"><i class="bi bi-cart-check-fill text-brand me-1"></i>FreshCart Direct Model</span>
+                                        <span class="econ-percentage text-brand">78% to Farmers</span>
                                     </div>
                                     <div class="econ-segmented-bar">
-                                        <div class="bar-segment bar-farmer" style="width: 78%;" title="78% Direct to Independent Farmers">78% Grower</div>
-                                        <div class="bar-segment bar-logistics" style="width: 12%;" title="12% Cold-Chain Transit">12% Transit</div>
-                                        <div class="bar-segment bar-platform" style="width: 10%;" title="10% Operations">10% Platform</div>
+                                        <div class="bar-segment bar-farmer" style="width: 78%;" title="78% Direct to Independent Farmers">78%</div>
+                                        <div class="bar-segment bar-logistics" style="width: 12%;" title="12% Cold-Chain Transit">12%</div>
+                                        <div class="bar-segment bar-platform" style="width: 10%;" title="10% Operations">10%</div>
+                                    </div>
+                                    <div class="econ-breakdown-legend">
+                                        <span class="legend-item"><span class="legend-dot bg-brand"></span>78% Grower</span>
+                                        <span class="legend-item"><span class="legend-dot bg-logistics"></span>12% Transit</span>
+                                        <span class="legend-item"><span class="legend-dot bg-platform"></span>10% Platform</span>
                                     </div>
                                 </div>
                                 <div class="econ-comparison-row">
@@ -1222,14 +1234,20 @@ $firstKey = array_key_first($aisleReels);
                                     </div>
                                     <div class="econ-segmented-bar is-conventional">
                                         <div class="bar-segment bar-comm-farmer" style="width: 14%;" title="14% Farmer Share">14%</div>
-                                        <div class="bar-segment bar-comm-middle" style="width: 46%;" title="46% Middlemen & Wholesalers">46% Brokers</div>
-                                        <div class="bar-segment bar-comm-markup" style="width: 40%;" title="40% Store Markup">40% Store</div>
+                                        <div class="bar-segment bar-comm-middle" style="width: 46%;" title="46% Middlemen & Wholesalers">46%</div>
+                                        <div class="bar-segment bar-comm-markup" style="width: 40%;" title="40% Store Markup">40%</div>
+                                    </div>
+                                    <div class="econ-breakdown-legend is-conventional">
+                                        <span class="legend-item"><span class="legend-dot bg-comm-farmer"></span>14% Farmers</span>
+                                        <span class="legend-item"><span class="legend-dot bg-comm-middle"></span>46% Brokers</span>
+                                        <span class="legend-item"><span class="legend-dot bg-comm-markup"></span>40% Store</span>
                                     </div>
                                 </div>
 
                                 <div class="bento-farmer-quote-row">
-                                    <img src="https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=120&auto=format&fit=crop&q=80" alt="Mateo Alvarez, Independent Organic Farmer" class="farmer-avatar-sm" loading="lazy" width="40" height="40">
+                                    <img src="https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=160&auto=format&fit=crop&q=80" alt="Mateo Alvarez, Independent Organic Farmer" class="farmer-avatar-sm" loading="lazy" width="44" height="44">
                                     <div class="farmer-quote-content">
+                                        <div class="farmer-quote-kicker">Mateo Alvarez, Independent Organic Farmer</div>
                                         <p class="farmer-quote-text">&ldquo;FreshCart’s direct revenue guarantee allowed our family to convert 40 additional acres to heirloom varieties without debt.&rdquo;</p>
                                         <span class="farmer-quote-author">Mateo &amp; Clara Alvarez &bull; Alvarez Organic Groves</span>
                                     </div>

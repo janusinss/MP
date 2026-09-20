@@ -7216,6 +7216,81 @@ html, body {
     letter-spacing: 0.02em;
 }
 
+.bento-farm-tag {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.85rem;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-full, 9999px);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-brand-dark, #375743);
+    z-index: 3;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+}
+
+.sensor-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-brand, #4A745B);
+    display: inline-block;
+    box-shadow: 0 0 0 3px rgba(74, 116, 91, 0.25);
+    flex-shrink: 0;
+}
+
+.temp-readout-left {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.econ-breakdown-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin-top: 0.4rem;
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-secondary, #6E7368);
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.bg-brand { background: var(--color-brand, #4A745B) !important; }
+.bg-logistics { background: #6E7368 !important; }
+.bg-platform { background: #989E92 !important; }
+
+.bg-comm-farmer { background: #C98B32 !important; }
+.bg-comm-middle { background: #8A8F84 !important; }
+.bg-comm-markup { background: #B5B0A4 !important; }
+
+.farmer-quote-kicker {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-brand, #4A745B);
+    margin-bottom: 0.2rem;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 991px) {
     .bento-col-8, .bento-col-7, .bento-col-6, .bento-col-5, .bento-col-4 {
@@ -7234,74 +7309,206 @@ html, body {
         margin-bottom: 2rem;
     }
     .bento-heading {
-        font-size: clamp(1.6rem, 5vw, 2.1rem);
+        font-size: clamp(1.75rem, 5.5vw, 2.2rem);
+        line-height: 1.15;
         margin-bottom: 0.5rem;
     }
     .bento-subtitle {
-        font-size: 0.92rem;
+        font-size: 0.925rem;
+        line-height: 1.5;
     }
     .bento-matrix {
-        gap: 1rem;
+        gap: 1.25rem;
     }
     .bento-card {
         padding: 1.35rem;
         min-height: auto;
+        border-radius: 20px;
     }
     .bento-metric-large {
-        font-size: 2.15rem;
+        font-size: 2.25rem;
         margin-bottom: 0.35rem;
     }
     .bento-card-title {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
+        margin-bottom: 0.35rem;
     }
     .bento-card-desc {
-        font-size: 0.88rem;
+        font-size: 0.9rem;
+        line-height: 1.5;
     }
     .bento-live-farm-preview {
-        height: 180px;
-        margin-top: 1rem;
+        height: 250px;
+        min-height: 250px;
+        margin-top: 1.25rem;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .bento-farm-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .bento-farm-tag {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 0.35rem 0.75rem;
+        font-size: 0.75rem;
     }
     .bento-telemetry-glass-badge {
-        position: static;
-        margin-top: 0.75rem;
+        position: relative;
+        z-index: 3;
+        margin: 0.65rem;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
         padding: 0.75rem 0.85rem;
-        border-radius: var(--radius-sm);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
     }
     .telemetry-badge-row {
-        flex-direction: column;
-        align-items: flex-start;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
         gap: 0.45rem;
+        text-align: left;
+    }
+    .telemetry-badge-divider {
+        display: none;
+    }
+    .telemetry-badge-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    .badge-item-label {
+        font-size: 0.62rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--color-text-secondary, #6E7368);
+    }
+    .badge-item-value {
+        font-size: 0.76rem;
+        font-weight: 700;
+        color: var(--color-text-primary, #232620);
+        line-height: 1.25;
+    }
+    .badge-item-value i {
+        color: var(--color-brand, #4A745B) !important;
     }
     .bento-soil-metrics-card,
     .bento-transit-timeline-card,
     .bento-economics-wrap {
-        margin-top: 1rem;
-        padding: 1rem;
+        margin-top: 1.15rem;
+        padding: 1.15rem;
+        border-radius: 16px;
+    }
+    .transit-temp-readout {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 0.75rem;
+        margin-bottom: 0.85rem;
+        border-bottom: 1px dashed var(--color-border, #E5E0D5);
+    }
+    .transit-step-chain {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.25rem;
+    }
+    .transit-node {
+        min-width: 62px;
+    }
+    .node-marker {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+        margin-bottom: 0.35rem;
+    }
+    .transit-connector {
+        flex-grow: 1;
+        height: 2px;
+        margin-bottom: 1.35rem;
+    }
+    .econ-segmented-bar {
+        height: 24px;
+        line-height: 24px;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+    .econ-breakdown-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.75rem;
+        margin-top: 0.35rem;
+    }
+    .legend-item {
+        font-size: 0.72rem;
+    }
+    .bento-farmer-quote-row {
+        gap: 0.75rem;
+        padding: 0.85rem;
+        margin-top: 0.65rem;
+        align-items: flex-start;
+        border-radius: 14px;
+    }
+    .farmer-avatar-sm {
+        width: 44px;
+        height: 44px;
+    }
+    .farmer-quote-kicker {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-brand, #4A745B);
+        margin-bottom: 0.2rem;
+    }
+    .farmer-quote-text {
+        font-size: 0.82rem;
+        line-height: 1.45;
+    }
+    .farmer-quote-author {
+        font-size: 0.72rem;
     }
 }
 
 @media (max-width: 576px) {
     .bento-card {
-        padding: 1.15rem;
+        padding: 1.25rem;
     }
     .bento-live-farm-preview {
-        height: 160px;
+        height: 230px;
+        min-height: 230px;
     }
-    .transit-temp-readout {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.35rem;
+    .telemetry-badge-row {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
     }
-    .transit-step-chain {
-        gap: 0.2rem;
+    .telemetry-badge-item {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
     .transit-node {
-        min-width: 54px;
+        min-width: 52px;
     }
-    .transit-node .node-text strong {
+    .node-text strong {
         font-size: 0.65rem;
     }
-    .transit-node .node-text span {
+    .node-text span {
         font-size: 0.6rem;
     }
 }
@@ -11794,9 +12001,3 @@ body.modal-open-freeze {
     color: #ffffff !important;
     border-color: #0f172a !important;
 }
-
-
-
-
-
-
