@@ -618,15 +618,19 @@ $firstKey = array_key_first($aisleReels);
                 <?php if (empty($category) && empty($search) && !empty($spotlightItems)): ?>
                 <section class="harvest-spotlight-section" id="peak-harvest">
                     <div class="container">
-                        <div class="d-flex justify-content-between align-items-baseline mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
                                 <div class="text-uppercase text-success" style="font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em;">Daily Chef &amp; Grower Selection</div>
-                                <h2 style="font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; color: #1c1917; margin: 0;">Today's Peak Harvest Spotlights</h2>
+                                <h2 style="font-family: var(--font-serif); font-size: 1.45rem; font-weight: 700; color: #1c1917; margin: 0;">Today's Peak Harvest Spotlights</h2>
                             </div>
-                            <span class="text-muted small d-none d-md-inline"><i class="bi bi-stars text-warning me-1"></i> Harvested at optimal nutrient density</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="spotlight-counter badge rounded-pill bg-white text-success border border-success-subtle px-2 py-1 shadow-sm d-lg-none" id="spotlightCounter" style="font-size: 0.75rem; font-weight: 800;">1 / <?= count($spotlightItems) ?></span>
+                                <span class="text-muted small d-none d-lg-inline"><i class="bi bi-stars text-warning me-1"></i> Harvested at optimal nutrient density</span>
+                            </div>
                         </div>
 
-                        <div class="spotlight-grid">
+                        <div class="spotlight-carousel-stage">
+                            <div class="spotlight-grid" id="spotlightGrid">
                             <?php foreach ($spotlightItems as $idx => $sItem): 
                                 $sCat = $sItem['category'] ?? 'Pantry';
                                 $sMeta = $farmOrigins[$sCat] ?? [
@@ -637,7 +641,7 @@ $firstKey = array_key_first($aisleReels);
                                 ];
                                 $isMain = ($idx === 0);
                             ?>
-                                <div class="spotlight-food-card <?= $isMain ? 'featured-spotlight' : '' ?>">
+                                <div class="spotlight-food-card <?= $isMain ? 'featured-spotlight' : '' ?>" data-index="<?= $idx ?>">
                                     <div>
                                         <div class="spotlight-badge-top">
                                             <i class="bi bi-patch-check-fill"></i>
@@ -683,13 +687,22 @@ $firstKey = array_key_first($aisleReels);
                                     </div>
                                 </div>
                             <?php endforeach; ?>
+                            </div>
                         </div>
 
-                        <!-- Mobile Swipe Indicator Dots -->
-                        <div class="spotlight-dots-wrap d-flex d-lg-none justify-content-center align-items-center gap-1 mt-3" id="spotlightDots">
-                            <?php foreach ($spotlightItems as $idx => $sItem): ?>
-                                <span class="spotlight-dot <?= ($idx === 0) ? 'active' : '' ?>" data-index="<?= $idx ?>" aria-hidden="true"></span>
-                            <?php endforeach; ?>
+                        <!-- Mobile Swipe Indicator Dots & Navigation Controller -->
+                        <div class="spotlight-dots-wrap d-flex d-lg-none justify-content-center align-items-center gap-3 mt-3" id="spotlightDots">
+                            <button type="button" class="spotlight-dot-nav-btn" id="spotlightBottomPrev" onclick="navigateSpotlight(-1)" aria-label="Previous spotlight card">
+                                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                            </button>
+                            <div class="spotlight-dots-track d-flex align-items-center gap-2">
+                                <?php foreach ($spotlightItems as $idx => $sItem): ?>
+                                    <button type="button" class="spotlight-dot <?= ($idx === 0) ? 'active' : '' ?>" data-index="<?= $idx ?>" onclick="goToSpotlight(<?= $idx ?>)" aria-label="Go to spotlight slide <?= $idx + 1 ?>"></button>
+                                <?php endforeach; ?>
+                            </div>
+                            <button type="button" class="spotlight-dot-nav-btn" id="spotlightBottomNext" onclick="navigateSpotlight(1)" aria-label="Next spotlight card">
+                                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                            </button>
                         </div>
                     </div>
                 </section>
@@ -2111,7 +2124,7 @@ $firstKey = array_key_first($aisleReels);
                     if (newSpotlight) {
                         spotlightSection.innerHTML = newSpotlight.innerHTML;
                         spotlightSection.style.display = '';
-                        setupSpotlightDots();
+                        setupSpotlightSwipe();
                     } else {
                         spotlightSection.style.display = 'none';
                     }
@@ -2277,22 +2290,157 @@ $firstKey = array_key_first($aisleReels);
             }
         });
 
-        // Sync mobile spotlight indicator dots on scroll
-        function setupSpotlightDots() {
-            const grid = document.querySelector('.spotlight-grid');
-            const dots = document.querySelectorAll('#spotlightDots .spotlight-dot');
-            if (!grid || dots.length === 0) return;
-            grid.addEventListener('scroll', function() {
-                const scrollLeft = grid.scrollLeft;
-                const cardW = grid.firstElementChild ? grid.firstElementChild.offsetWidth : 300;
-                const activeIdx = Math.min(dots.length - 1, Math.max(0, Math.round(scrollLeft / (cardW + 12))));
-                dots.forEach((d, i) => {
-                    if (i === activeIdx) d.classList.add('active');
-                    else d.classList.remove('active');
-                });
-            }, { passive: true });
+        // Interactive Peak Harvest Spotlight Carousel (Touch Swipe, Mouse Drag, Dots & Arrows)
+        let currentSpotlightIdx = 0;
+
+        function getSpotlightGrid() {
+            return document.getElementById('spotlightGrid');
         }
-        setupSpotlightDots();
+
+        function getSpotlightCards() {
+            const grid = getSpotlightGrid();
+            return grid ? grid.querySelectorAll('.spotlight-food-card') : [];
+        }
+
+        function updateSpotlightUI(index) {
+            const cards = getSpotlightCards();
+            const total = cards.length;
+            if (total === 0) return;
+            currentSpotlightIdx = Math.max(0, Math.min(index, total - 1));
+
+            // Update header counter
+            const counter = document.getElementById('spotlightCounter');
+            if (counter) {
+                counter.textContent = (currentSpotlightIdx + 1) + ' / ' + total;
+            }
+
+            // Update dots
+            const dots = document.querySelectorAll('#spotlightDots .spotlight-dot');
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === currentSpotlightIdx);
+            });
+
+            // Update arrow disabled states
+            const prevBtns = [document.getElementById('spotlightBottomPrev'), document.getElementById('spotlightPrevBtn')];
+            const nextBtns = [document.getElementById('spotlightBottomNext'), document.getElementById('spotlightNextBtn')];
+            prevBtns.forEach(btn => { if (btn) btn.disabled = (currentSpotlightIdx === 0); });
+            nextBtns.forEach(btn => { if (btn) btn.disabled = (currentSpotlightIdx === total - 1); });
+        }
+
+        window.goToSpotlight = function(index) {
+            const grid = getSpotlightGrid();
+            const cards = getSpotlightCards();
+            if (!grid || !cards.length) return;
+
+            const targetIdx = Math.max(0, Math.min(index, cards.length - 1));
+            const targetCard = cards[targetIdx];
+            if (targetCard) {
+                const scrollDest = targetCard.offsetLeft - grid.offsetLeft;
+                grid.scrollTo({
+                    left: scrollDest,
+                    behavior: 'smooth'
+                });
+            }
+            updateSpotlightUI(targetIdx);
+        };
+
+        window.navigateSpotlight = function(direction) {
+            window.goToSpotlight(currentSpotlightIdx + direction);
+        };
+
+        function setupSpotlightSwipe() {
+            const grid = getSpotlightGrid();
+            if (!grid) return;
+
+            // Sync on scroll (e.g. native scroll-snap)
+            let scrollTimeout;
+            grid.addEventListener('scroll', function() {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(function() {
+                    const cards = getSpotlightCards();
+                    if (!cards.length) return;
+                    const scrollLeft = grid.scrollLeft;
+                    const cardW = cards[0].offsetWidth || 300;
+                    const active = Math.min(cards.length - 1, Math.max(0, Math.round(scrollLeft / cardW)));
+                    updateSpotlightUI(active);
+                }, 50);
+            }, { passive: true });
+
+            // Touch swipe gesture engine
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let touchStartTime = 0;
+            let isHorizontalSwipe = null;
+
+            grid.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                touchStartTime = Date.now();
+                isHorizontalSwipe = null;
+            }, { passive: true });
+
+            grid.addEventListener('touchmove', function(e) {
+                if (isHorizontalSwipe === false) return;
+                const diffX = e.touches[0].clientX - touchStartX;
+                const diffY = e.touches[0].clientY - touchStartY;
+                if (isHorizontalSwipe === null) {
+                    if (Math.abs(diffX) > 8 || Math.abs(diffY) > 8) {
+                        isHorizontalSwipe = Math.abs(diffX) > Math.abs(diffY);
+                    }
+                }
+            }, { passive: true });
+
+            grid.addEventListener('touchend', function(e) {
+                if (!isHorizontalSwipe) return;
+                const diffX = e.changedTouches[0].clientX - touchStartX;
+                const elapsed = Date.now() - touchStartTime;
+                if (Math.abs(diffX) > 35 || (Math.abs(diffX) > 20 && elapsed < 250)) {
+                    if (diffX < 0) {
+                        window.navigateSpotlight(1);
+                    } else {
+                        window.navigateSpotlight(-1);
+                    }
+                }
+            }, { passive: true });
+
+            // Mouse drag gesture engine (for desktop responsive test and trackpad)
+            let isMouseDown = false;
+            let mouseStartX = 0;
+            let mouseScrollStart = 0;
+
+            grid.addEventListener('mousedown', function(e) {
+                if (e.button !== 0) return;
+                if (e.target.closest('button, a, input, form')) return;
+                isMouseDown = true;
+                mouseStartX = e.pageX;
+                mouseScrollStart = grid.scrollLeft;
+                grid.classList.add('is-dragging');
+            });
+
+            window.addEventListener('mousemove', function(e) {
+                if (!isMouseDown) return;
+                e.preventDefault();
+                const walk = (e.pageX - mouseStartX) * 1.2;
+                grid.scrollLeft = mouseScrollStart - walk;
+            });
+
+            window.addEventListener('mouseup', function(e) {
+                if (!isMouseDown) return;
+                isMouseDown = false;
+                grid.classList.remove('is-dragging');
+                const cards = getSpotlightCards();
+                if (!cards.length) return;
+                const scrollLeft = grid.scrollLeft;
+                const cardW = cards[0].offsetWidth || 300;
+                const active = Math.min(cards.length - 1, Math.max(0, Math.round(scrollLeft / cardW)));
+                window.goToSpotlight(active);
+            });
+
+            updateSpotlightUI(0);
+        }
+
+        window.setupSpotlightSwipe = setupSpotlightSwipe;
+        setupSpotlightSwipe();
 
         // Popstate handler for Browser Back/Forward buttons without scroll jumps
         window.addEventListener('popstate', function() {

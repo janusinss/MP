@@ -11767,9 +11767,86 @@ body.modal-open-freeze {
     box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
 }
 
-/* Spotlight Carousel Dots */
+/* Spotlight Carousel Header Controls & Counter */
+.spotlight-arrow-btn {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 9999px;
+    border: 1.5px solid rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    color: #1c1917;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.spotlight-arrow-btn:hover:not(:disabled) {
+    background: #f0fdf4;
+    border-color: #22c55e;
+    color: #15803d;
+}
+
+.spotlight-arrow-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    background: #f9fafb;
+    border-color: rgba(0, 0, 0, 0.04);
+}
+
+.spotlight-counter {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #4b5563;
+    padding: 2px 6px;
+    letter-spacing: 0.02em;
+}
+
+/* Spotlight Carousel Dots & Bottom Nav Buttons */
 .spotlight-dots-wrap {
-    padding: 4px 0 8px;
+    padding: 6px 0 10px;
+}
+
+.spotlight-dot-nav-btn {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 9999px;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    background: #f0fdf4;
+    color: #15803d;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.spotlight-dot-nav-btn:hover:not(:disabled) {
+    background: #15803d;
+    color: #ffffff;
+    border-color: #15803d;
+}
+
+.spotlight-dot-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    background: #f9fafb;
+    border-color: rgba(0, 0, 0, 0.06);
+    color: #9ca3af;
+}
+
+.spotlight-dots-track {
+    padding: 0 4px;
 }
 
 .spotlight-dot {
@@ -11777,12 +11854,18 @@ body.modal-open-freeze {
     height: 8px;
     border-radius: 9999px;
     background: rgba(0, 0, 0, 0.2);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    border: none;
+    padding: 0;
     cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spotlight-dot:hover {
+    background: rgba(0, 0, 0, 0.35);
 }
 
 .spotlight-dot.active {
-    width: 24px;
+    width: 26px;
     background: var(--color-primary, #15803d);
 }
 
@@ -11999,20 +12082,36 @@ body.modal-open-freeze {
         font-size: 16px !important; /* Prevents iOS Safari auto-zoom */
     }
 
-    /* Peak Harvest Spotlights: Clean full-width swipe cards with snap */
+    /* Peak Harvest Spotlights: Tactile swipeable carousel with gesture support */
     .spotlight-grid {
         display: flex !important;
         overflow-x: auto !important;
         scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
         gap: 0.85rem;
         padding-bottom: 0.5rem;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none !important;
         -ms-overflow-style: none !important;
+        touch-action: pan-y pinch-zoom;
+        user-select: none;
+        cursor: grab;
         margin-left: 0;
         margin-right: 0;
         padding-left: 0;
         padding-right: 0;
+    }
+
+    .spotlight-grid.is-dragging {
+        cursor: grabbing !important;
+        scroll-snap-type: none !important;
+        scroll-behavior: auto !important;
+    }
+
+    .spotlight-grid img {
+        pointer-events: none !important;
+        -webkit-user-drag: none !important;
+        user-select: none !important;
     }
     
     .spotlight-grid::-webkit-scrollbar {
@@ -12022,11 +12121,13 @@ body.modal-open-freeze {
     }
     
     .spotlight-food-card {
-        flex: 0 0 100%;
-        max-width: 100%;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
         scroll-snap-align: center;
+        scroll-snap-stop: always;
         padding: 1.35rem 1.25rem;
         border-radius: 20px;
+        user-select: none;
     }
 
     .spotlight-card-footer form .btn {
