@@ -1332,129 +1332,514 @@ h5{
     50% { transform: translateY(-10px); }
 }
 
-/* --- FOOTER REDESIGN --- */
+/* =============================================================
+   SITE FOOTER REDESIGN (Refined Organic Baseline)
+   Standards: UI_Always.md & frontend.md
+   ============================================================= */
 .site-footer {
-    background-color: #fff;
-    border-top: 1px solid rgba(0,0,0,0.05);
-    padding-top: 5rem;
-    padding-bottom: 2rem;
-    margin-top: 6rem;
+    background-color: var(--color-surface-subtle, #F0EEE6);
+    border-top: 1px solid var(--color-border, #E5E0D5);
+    padding-top: 0;
+    padding-bottom: 2.5rem;
+    margin-top: auto;
     position: relative;
     font-size: 0.9rem;
-}
-
-/* Brand Section */
-.footer-brand {
-    font-family: var(--font-serif);
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--text-main);
-    display: inline-block;
-    margin-bottom: 1rem;
-    letter-spacing: -0.03em;
-}
-
-/* Links with Hover Slide Effect */
-.footer-heading {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 800;
-    color: var(--text-main);
-    margin-bottom: 1.5rem;
-}
-
-.footer-link-list li {
-    margin-bottom: 0.8rem;
-}
-
-.footer-link {
-    color: var(--text-muted);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    display: inline-block;
-}
-
-.footer-link:hover {
-    color: var(--accent-color);
-    transform: translateX(5px); /* Slide right effect */
-}
-
-/* Newsletter Input */
-.footer-newsletter-group {
-    background: #f8f9fa;
-    border: 1px solid #eee;
-    border-radius: 50px;
-    padding: 5px;
-    display: flex;
-    transition: all 0.3s ease;
-}
-
-.footer-newsletter-group:focus-within {
-    border-color: var(--accent-color);
-    background: #fff;
-    box-shadow: 0 5px 15px rgba(93, 134, 108, 0.1);
-}
-
-.footer-email-input {
-    border: none;
-    background: transparent;
-    padding: 10px 20px;
+    color: var(--color-text-primary, #232620);
     width: 100%;
-    outline: none;
-    color: var(--text-main);
+    overflow: hidden;
 }
 
-.footer-subscribe-btn {
-    background: var(--text-main);
-    color: #fff;
-    border: none;
-    border-radius: 50px;
-    padding: 8px 25px;
-    font-weight: 600;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
+/* 1. Agricultural Sourcing Trust Strip */
+.footer-trust-banner {
+    background: #EAE6DC;
+    border-bottom: 1px solid var(--color-border, #E5E0D5);
+    padding: 1.25rem 0;
+    margin-bottom: 3.5rem;
 }
 
-.footer-subscribe-btn:hover {
-    background: var(--accent-color);
-    transform: translateY(-2px);
+.footer-trust-grid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
 }
 
-/* Social & Payment */
-.social-icon-link {
+.footer-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.footer-trust-icon {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
-    background: #f8f9fa;
-    color: var(--text-main);
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: var(--radius-md, 12px);
+    background: #FFFFFF;
+    color: var(--color-brand, #4A745B);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-right: 10px;
-    transition: all 0.3s ease;
+    font-size: 1.15rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border-subtle, #EDEAE1);
+    flex-shrink: 0;
+}
+
+.footer-trust-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.footer-trust-text strong {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text-primary, #232620);
+    line-height: 1.25;
+}
+
+.footer-trust-text span {
+    font-size: 0.76rem;
+    color: var(--color-text-secondary, #6E7368);
+    line-height: 1.35;
+    margin-top: 1px;
+}
+
+.footer-trust-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--color-border, #E5E0D5);
+    flex-shrink: 0;
+}
+
+/* 2. Main Columns */
+.footer-main-row {
+    margin-bottom: 1rem;
+}
+
+.footer-brand-anchor {
     text-decoration: none;
+    display: inline-block;
+    margin-bottom: 0.85rem;
+}
+
+.footer-brand {
+    font-family: var(--font-serif);
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: var(--color-text-primary, #232620);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    display: inline-block;
+}
+
+.footer-brand-dot {
+    color: var(--color-brand, #4A745B);
+}
+
+.footer-brand-desc {
+    color: var(--color-text-secondary, #6E7368);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    max-width: 36ch;
+    margin-bottom: 1.5rem;
+}
+
+/* Social Media - Minimum 44px touch targets */
+.footer-social-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.social-icon-link {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 1px solid var(--color-border, #E5E0D5);
+    color: var(--color-text-primary, #232620);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    text-decoration: none;
+    transition: transform var(--duration-fast, 150ms) var(--ease-smooth), 
+                background-color var(--duration-fast, 150ms) var(--ease-smooth), 
+                color var(--duration-fast, 150ms) var(--ease-smooth), 
+                border-color var(--duration-fast, 150ms) var(--ease-smooth),
+                box-shadow var(--duration-fast, 150ms) var(--ease-smooth);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
 }
 
 .social-icon-link:hover {
-    background: var(--accent-color);
-    color: #fff;
-    transform: translateY(-3px);
+    background: var(--color-brand, #4A745B);
+    color: #FFFFFF;
+    border-color: var(--color-brand, #4A745B);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
-/* Payment Badges (Pure CSS) */
-.payment-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #555;
-    margin-right: 5px;
+.social-icon-link:active {
+    transform: translateY(0);
+    opacity: 0.9;
+}
+
+.social-icon-link:focus-visible {
+    outline: 2px solid var(--color-brand, #4A745B);
+    outline-offset: 2px;
+}
+
+/* 3. Navigation Columns & Headings */
+.footer-heading {
     font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-primary, #232620);
+    margin-bottom: 1.25rem;
+}
+
+.footer-link-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-link-list li {
+    margin-bottom: 0.25rem;
+}
+
+.footer-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.25rem 0;
+    color: var(--color-text-secondary, #6E7368);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    line-height: 1.4;
+    transition: color var(--duration-fast, 150ms) var(--ease-smooth), 
+                transform var(--duration-fast, 150ms) var(--ease-smooth);
+    cursor: pointer;
+}
+
+.footer-link:hover {
+    color: var(--color-brand, #4A745B);
+    transform: translateX(4px);
+}
+
+.footer-link:active {
+    color: var(--color-brand-dark, #375743);
+}
+
+.footer-link:focus-visible {
+    outline: 2px solid var(--color-brand, #4A745B);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* 4. Newsletter Section */
+.footer-newsletter-desc {
+    color: var(--color-text-secondary, #6E7368);
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.footer-newsletter-form {
+    margin-bottom: 1.5rem;
+}
+
+.footer-newsletter-group {
+    display: flex;
+    align-items: center;
+    background: #FFFFFF;
+    border: 1.5px solid var(--color-border, #E5E0D5);
+    border-radius: var(--radius-full, 9999px);
+    padding: 4px 4px 4px 16px;
+    transition: border-color var(--duration-fast, 150ms) var(--ease-smooth), 
+                box-shadow var(--duration-fast, 150ms) var(--ease-smooth);
+    box-shadow: var(--shadow-sm);
+    min-height: 52px;
+}
+
+.footer-newsletter-group:focus-within {
+    border-color: var(--color-brand, #4A745B);
+    box-shadow: 0 0 0 3px var(--color-brand-glow, rgba(74, 116, 91, 0.22));
+}
+
+/* Font-size: 16px strictly enforced to prevent iOS Safari auto-zoom */
+.footer-email-input {
+    border: none;
+    background: transparent;
+    padding: 10px 8px;
+    width: 100%;
+    min-width: 0;
+    outline: none;
+    font-size: 16px;
+    color: var(--color-text-primary, #232620);
+    font-family: var(--font-sans);
+}
+
+.footer-email-input::placeholder {
+    color: var(--color-text-tertiary, #989E92);
+    font-size: 0.88rem;
+}
+
+.footer-subscribe-btn {
+    background: var(--color-brand, #4A745B);
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--radius-full, 9999px);
+    padding: 0 20px;
+    height: 44px;
+    min-height: 44px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color var(--duration-fast, 150ms) var(--ease-smooth), 
+                transform var(--duration-fast, 150ms) var(--ease-smooth),
+                opacity var(--duration-fast, 150ms) var(--ease-smooth);
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.footer-subscribe-btn:hover {
+    background: var(--color-brand-dark, #375743);
+    transform: translateY(-1px);
+}
+
+.footer-subscribe-btn:active {
+    transform: translateY(0);
+}
+
+.footer-subscribe-btn:focus-visible {
+    outline: 2px solid var(--color-brand-dark, #375743);
+    outline-offset: 2px;
+}
+
+.footer-subscribe-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.footer-newsletter-msg {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    padding-left: 0.5rem;
+    min-height: 1.2rem;
+}
+
+.footer-newsletter-msg.is-success {
+    color: var(--color-brand, #4A745B);
+}
+
+/* 5. Payment Badges */
+.footer-payment-section {
+    margin-top: 1.25rem;
+}
+
+.footer-payment-title {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary, #6E7368);
+    margin-bottom: 0.6rem;
+}
+
+.footer-payment-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.payment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 6px 10px;
+    background: #FFFFFF;
+    border: 1px solid var(--color-border, #E5E0D5);
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-text-secondary, #6E7368);
+    box-shadow: var(--shadow-sm);
+    font-family: var(--font-sans);
+}
+
+.payment-badge i {
+    color: var(--color-text-tertiary, #989E92);
+    font-size: 0.85rem;
+}
+
+/* 6. Footer Bottom Bar */
+.footer-bottom-bar {
+    border-top: 1px solid var(--color-border, #E5E0D5);
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer-copyright {
+    font-size: 0.82rem;
+    color: var(--color-text-secondary, #6E7368);
+    line-height: 1.5;
+}
+
+.footer-author-name {
+    color: var(--color-brand, #4A745B);
+    font-weight: 700;
+}
+
+.footer-bottom-right {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+}
+
+.footer-ssl-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-secondary, #6E7368);
+    margin-right: 0.5rem;
+}
+
+.footer-legal-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-secondary, #6E7368);
+    text-decoration: none;
+    transition: color var(--duration-fast, 150ms) var(--ease-smooth);
+    cursor: pointer;
+}
+
+.footer-legal-link:hover {
+    color: var(--color-brand, #4A745B);
+}
+
+.footer-legal-link:focus-visible {
+    outline: 2px solid var(--color-brand, #4A745B);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.footer-legal-sep {
+    color: var(--color-border, #E5E0D5);
+    font-size: 0.75rem;
+}
+
+/* 7. Mobile Responsiveness */
+@media (max-width: 991px) {
+    .footer-trust-grid {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .footer-trust-divider {
+        display: none;
+    }
+    .footer-trust-item {
+        width: 100%;
+    }
+    .footer-newsletter-col {
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .site-footer {
+        padding-bottom: 2rem;
+    }
+    .footer-trust-banner {
+        margin-bottom: 2.5rem;
+        padding: 1rem 0;
+    }
+    .footer-trust-grid {
+        gap: 0.85rem;
+    }
+    .footer-trust-icon {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+        font-size: 1rem;
+    }
+    .footer-trust-text strong {
+        font-size: 0.8rem;
+    }
+    .footer-trust-text span {
+        font-size: 0.72rem;
+    }
+    .footer-brand {
+        font-size: 1.85rem;
+    }
+    .footer-brand-desc {
+        font-size: 0.85rem;
+        max-width: 100%;
+    }
+    .footer-bottom-bar {
+        margin-top: 2.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.85rem;
+    }
+    .footer-bottom-right {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 0.5rem;
+    }
+    .footer-ssl-badge {
+        width: 100%;
+        margin-bottom: 0.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-newsletter-group {
+        min-height: 48px;
+    }
+    .footer-subscribe-btn {
+        padding: 0 16px;
+        font-size: 0.78rem;
+    }
+    .footer-payment-badges {
+        gap: 0.35rem;
+    }
+    .payment-badge {
+        padding: 5px 8px;
+        font-size: 0.68rem;
+    }
 }
 
 .badge-pill {

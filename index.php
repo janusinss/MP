@@ -1262,74 +1262,127 @@ $firstKey = array_key_first($aisleReels);
     </main>
     <?php endif; ?>
 
-    <footer class="site-footer">
+    <footer class="site-footer" id="siteFooter">
+        <!-- Top Agricultural Sourcing Trust Strip -->
+        <div class="footer-trust-banner">
+            <div class="container">
+                <div class="footer-trust-grid">
+                    <div class="footer-trust-item">
+                        <span class="footer-trust-icon" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>
+                        <div class="footer-trust-text">
+                            <strong>Direct Farm Traceability</strong>
+                            <span>Every item linked to parcel origin</span>
+                        </div>
+                    </div>
+                    <div class="footer-trust-divider" aria-hidden="true"></div>
+                    <div class="footer-trust-item">
+                        <span class="footer-trust-icon" aria-hidden="true"><i class="bi bi-snow2"></i></span>
+                        <div class="footer-trust-text">
+                            <strong>4&deg;C Cold-Chain Transit</strong>
+                            <span>Insulated zero-heat degraded packing</span>
+                        </div>
+                    </div>
+                    <div class="footer-trust-divider" aria-hidden="true"></div>
+                    <div class="footer-trust-item">
+                        <span class="footer-trust-icon" aria-hidden="true"><i class="bi bi-patch-check-fill"></i></span>
+                        <div class="footer-trust-text">
+                            <strong>78% Direct Grower Revenue</strong>
+                            <span>Fair price to independent family farms</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="container">
-            <div class="row g-5">
+            <div class="row g-4 g-lg-5 footer-main-row">
                 
-                <div class="col-lg-4 col-md-6">
-                    <a href="./" class="text-decoration-none">
-                        <span class="footer-brand">FreshCart<span style="color: var(--accent-color)">.</span></span>
+                <!-- Col 1: Brand & Sourcing Statement -->
+                <div class="col-lg-4 col-md-6 col-12 footer-brand-col">
+                    <a href="./" class="footer-brand-anchor" aria-label="FreshCart Home">
+                        <span class="footer-brand">FreshCart<span class="footer-brand-dot">.</span></span>
                     </a>
-                    <p class="text-muted small lh-lg mb-4">
-                        Delivering nature's best to your doorstep. We partner directly with local organic farmers to ensure freshness, sustainability, and fair trade practices.
+                    <p class="footer-brand-desc">
+                        Direct agricultural sourcing from independent family farms practicing certified regenerative agriculture. No multi-week cold storage or speculative broker markups.
                     </p>
-                    <div class="d-flex">
-                        <a href="https://www.facebook.com/notagirlgamer69" target="_blank" class="social-icon-link"><i class="bi bi-facebook"></i></a>
-                        <a href="https://www.instagram.com/janusinss/" target="_blank" class="social-icon-link"><i class="bi bi-instagram"></i></a>
-                        <a href="https://x.com/Syrupynut" target="_blank" class="social-icon-link"><i class="bi bi-twitter"></i></a>
-                        <a href="https://www.linkedin.com/in/janusdominic/" target="_blank" class="social-icon-link"><i class="bi bi-linkedin"></i></a>
+                    <div class="footer-social-wrap">
+                        <a href="https://www.facebook.com/notagirlgamer69" target="_blank" rel="noopener noreferrer" class="social-icon-link" aria-label="FreshCart on Facebook">
+                            <i class="bi bi-facebook" aria-hidden="true"></i>
+                        </a>
+                        <a href="https://www.instagram.com/janusinss/" target="_blank" rel="noopener noreferrer" class="social-icon-link" aria-label="FreshCart on Instagram">
+                            <i class="bi bi-instagram" aria-hidden="true"></i>
+                        </a>
+                        <a href="https://x.com/Syrupynut" target="_blank" rel="noopener noreferrer" class="social-icon-link" aria-label="FreshCart on Twitter">
+                            <i class="bi bi-twitter-x" aria-hidden="true"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/janusdominic/" target="_blank" rel="noopener noreferrer" class="social-icon-link" aria-label="FreshCart on LinkedIn">
+                            <i class="bi bi-linkedin" aria-hidden="true"></i>
+                        </a>
                     </div>
                 </div>
 
-                <div class="col-lg-2 col-md-3 col-6">
-                    <h6 class="footer-heading">Shop</h6>
-                    <ul class="list-unstyled footer-link-list">
-                        <li><a href="#shop" class="footer-link">All Products</a></li>
+                <!-- Col 2: Shop Catalog -->
+                <div class="col-lg-2 col-md-3 col-6 footer-nav-col">
+                    <h6 class="footer-heading">Shop Aisles</h6>
+                    <ul class="footer-link-list">
+                        <li><a href="#shop" class="footer-link">All Harvests</a></li>
                         <li><a href="#categories" class="footer-link">Fresh Produce</a></li>
-                        <li><a href="#categories" class="footer-link">Dairy & Eggs</a></li>
-                        <li><a href="#categories" class="footer-link">Bakery</a></li>
+                        <li><a href="#categories" class="footer-link">Dairy &amp; Eggs</a></li>
+                        <li><a href="#categories" class="footer-link">Artisan Bakery</a></li>
                     </ul>
                 </div>
 
-                <div class="col-lg-2 col-md-3 col-6">
-                    <h6 class="footer-heading">Company</h6>
-                    <ul class="list-unstyled footer-link-list">
+                <!-- Col 3: Company & Integrity -->
+                <div class="col-lg-2 col-md-3 col-6 footer-nav-col">
+                    <h6 class="footer-heading">Standards</h6>
+                    <ul class="footer-link-list">
                         <li><a href="about" class="footer-link">About Us</a></li>
                         <li><a href="sustainability" class="footer-link">Sustainability</a></li>
-                        <li><a href="farmers" class="footer-link">Farmers</a></li>
+                        <li><a href="farmers" class="footer-link">Our Farmers</a></li>
                         <li><a href="contact" class="footer-link">Contact</a></li>
                     </ul>
                 </div>
 
-                <div class="col-lg-4 col-md-12">
+                <!-- Col 4: Newsletter & Verification -->
+                <div class="col-lg-4 col-md-12 col-12 footer-newsletter-col">
                     <h6 class="footer-heading">Stay Fresh</h6>
-                    <p class="small text-muted mb-3">Join our newsletter for exclusive organic deals and recipes.</p>
+                    <p class="footer-newsletter-desc">Morning harvest alerts and seasonal heirloom arrivals. Zero spam.</p>
                     
-                    <form action="#">
+                    <form id="footerNewsletterForm" class="footer-newsletter-form" onsubmit="handleFooterNewsletter(event)">
+                        <label for="footerEmailInput" class="visually-hidden">Email address</label>
                         <div class="footer-newsletter-group">
-                            <input type="email" class="footer-email-input" placeholder="Your email address">
-                            <button class="footer-subscribe-btn" type="button">Join</button>
+                            <input type="email" id="footerEmailInput" class="footer-email-input" placeholder="Enter your email" required autocomplete="email">
+                            <button class="footer-subscribe-btn" type="submit" id="footerSubscribeBtn">
+                                <span>Join</span>
+                                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                            </button>
                         </div>
+                        <div id="footerNewsletterMsg" class="footer-newsletter-msg" role="status" aria-live="polite"></div>
                     </form>
 
-                    <div class="mt-4">
-                        <p class="small text-muted mb-2">Secure Payment</p>
-                        <div class="d-flex flex-wrap">
-                            <span class="payment-badge">VISA</span>
-                            <span class="payment-badge">MasterCard</span>
-                            <span class="payment-badge">PayPal</span>
-                            <span class="payment-badge">GCash</span>
+                    <div class="footer-payment-section">
+                        <span class="footer-payment-title">Guaranteed Secure Checkout</span>
+                        <div class="footer-payment-badges">
+                            <span class="payment-badge"><i class="bi bi-credit-card-2-front" aria-hidden="true"></i> VISA</span>
+                            <span class="payment-badge"><i class="bi bi-credit-card" aria-hidden="true"></i> Mastercard</span>
+                            <span class="payment-badge"><i class="bi bi-paypal" aria-hidden="true"></i> PayPal</span>
+                            <span class="payment-badge"><i class="bi bi-phone" aria-hidden="true"></i> GCash</span>
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <div class="border-top mt-5 pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
-                <small class="text-muted mb-2 mb-md-0">&copy; 2025 FreshCart Market. Student Project by <span style="color: var(--accent-color); text-transform: uppercase; font-weight: bold">Janus Dominic</span>.</small>
-                <div class="small text-muted">
-                    <a href="privacy" class="text-decoration-none text-muted fw-bold me-3">Privacy Policy</a>
-                    <a href="terms" class="text-decoration-none text-muted fw-bold">Terms of Service</a>
+            <!-- Footer Bottom Legal & Attribution Bar -->
+            <div class="footer-bottom-bar">
+                <div class="footer-bottom-left">
+                    <span class="footer-copyright">&copy; <?= date('Y') ?> FreshCart Market. Student Project by <strong class="footer-author-name">Janus Dominic</strong>.</span>
+                </div>
+                <div class="footer-bottom-right">
+                    <span class="footer-ssl-badge"><i class="bi bi-shield-check text-brand me-1" aria-hidden="true"></i>256-Bit SSL Encrypted</span>
+                    <a href="privacy" class="footer-legal-link">Privacy Policy</a>
+                    <span class="footer-legal-sep" aria-hidden="true">&bull;</span>
+                    <a href="terms" class="footer-legal-link">Terms of Service</a>
                 </div>
             </div>
         </div>
@@ -1348,6 +1401,28 @@ $firstKey = array_key_first($aisleReels);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+    function handleFooterNewsletter(e) {
+        e.preventDefault();
+        const input = document.getElementById('footerEmailInput');
+        const msg = document.getElementById('footerNewsletterMsg');
+        const btn = document.getElementById('footerSubscribeBtn');
+        if (input && input.value.trim()) {
+            btn.disabled = true;
+            btn.innerHTML = '<span>Joined</span> <i class="bi bi-check2" aria-hidden="true"></i>';
+            if (msg) {
+                msg.textContent = 'Subscribed! Welcome to morning harvest drops.';
+                msg.className = 'footer-newsletter-msg is-success';
+            }
+            setTimeout(function() {
+                input.value = '';
+                btn.disabled = false;
+                btn.innerHTML = '<span>Join</span> <i class="bi bi-arrow-right" aria-hidden="true"></i>';
+            }, 3500);
+        }
+    }
+    </script>
     
     <?php if (!$isLoggedIn): ?>
     <script>
