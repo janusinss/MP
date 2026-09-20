@@ -519,52 +519,81 @@ $firstKey = array_key_first($aisleReels);
                             </form>
                         </div>
 
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <div class="text-uppercase text-muted" style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;">
-                                Browse by Food Department
+                        <!-- Mobile Department Dropdown Selector -->
+                        <div class="mobile-department-select-wrap d-lg-none mb-3">
+                            <div class="d-flex align-items-center justify-content-between mb-1" id="mobileDeptHeader">
+                                <label for="mobileDeptSelect" class="form-label text-uppercase text-muted m-0" style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;">
+                                    Browse Department
+                                </label>
+                                <?php if (!empty($category) || !empty($search)): ?>
+                                    <a href="./" class="small text-success text-decoration-none fw-bold" id="showAllFoodsBtnMobile">Show All (<?= $totalFoodCount ?>)</a>
+                                <?php endif; ?>
                             </div>
-                            <?php if (!empty($category) || !empty($search)): ?>
-                                <a href="./" class="small text-success text-decoration-none fw-bold" id="showAllFoodsBtn">Show All (<?= $totalFoodCount ?>)</a>
-                            <?php endif; ?>
+                            <div class="mobile-select-shell">
+                                <i class="bi bi-grid-fill mobile-select-icon" aria-hidden="true"></i>
+                                <select id="mobileDeptSelect" class="form-select mobile-dept-select" aria-label="Select Food Department">
+                                    <option value="./" <?= (empty($category)) ? 'selected' : '' ?>>All Departments (<?= $totalFoodCount ?> items)</option>
+                                    <?php foreach ($categories as $catName): 
+                                        $catCount = $categoryCounts[$catName] ?? 0;
+                                    ?>
+                                        <option value="?category=<?= urlencode($catName) ?>" <?= ($category === $catName) ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($catName) ?> (<?= $catCount ?>)
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <i class="bi bi-chevron-down mobile-select-chevron" aria-hidden="true"></i>
+                            </div>
                         </div>
 
-                        <div class="food-aisles-scroller">
-                            <a href="./" class="food-aisle-pill <?= (empty($category) && empty($search)) ? 'active' : '' ?>" data-category="">
-                                <i class="bi bi-grid-fill"></i>
-                                <span>All Departments</span>
-                                <span class="aisle-count"><?= $totalFoodCount ?></span>
-                            </a>
-
-                            <!-- Desktop Search Pill beside All Departments -->
-                            <form action="./" method="GET" class="food-aisle-search-form d-none d-lg-block">
-                                <div class="food-aisle-search-pill <?= !empty($search) ? 'has-value' : '' ?>">
-                                    <i class="bi bi-search search-icon" aria-hidden="true"></i>
-                                    <input type="text" name="search" class="food-aisle-search-input" placeholder="Search foods..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
-                                    <?php if (!empty($category)): ?>
-                                        <input type="hidden" name="category" value="<?= htmlspecialchars($category) ?>">
-                                    <?php endif; ?>
-                                    <?php if (!empty($sort)): ?>
-                                        <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
-                                    <?php endif; ?>
-                                    <?php if (!empty($search)): ?>
-                                        <a href="<?= catalog_url(1, '', $category, $sort) ?>" class="search-clear-pill-btn" aria-label="Clear search" title="Clear search">
-                                            <i class="bi bi-x"></i>
-                                        </a>
-                                    <?php endif; ?>
+                        <!-- Desktop Department Rail (Hidden on Mobile) -->
+                        <div class="d-none d-lg-block">
+                            <div class="d-flex align-items-center justify-content-between mb-2" id="desktopDeptHeader">
+                                <div class="text-uppercase text-muted" style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;">
+                                    Browse by Food Department
                                 </div>
-                            </form>
+                                <?php if (!empty($category) || !empty($search)): ?>
+                                    <a href="./" class="small text-success text-decoration-none fw-bold" id="showAllFoodsBtn">Show All (<?= $totalFoodCount ?>)</a>
+                                <?php endif; ?>
+                            </div>
 
-                            <?php foreach ($categories as $catName): 
-                                $catCount = $categoryCounts[$catName] ?? 0;
-                                $iconClass = $categoryIcons[$catName] ?? 'bi-basket2';
-                                $isCatActive = ($category === $catName);
-                            ?>
-                                <a href="?category=<?= urlencode($catName) ?>" class="food-aisle-pill <?= $isCatActive ? 'active' : '' ?>" data-category="<?= htmlspecialchars($catName) ?>">
-                                    <i class="bi <?= $iconClass ?>"></i>
-                                    <span><?= htmlspecialchars($catName) ?></span>
-                                    <span class="aisle-count"><?= $catCount ?></span>
+                            <div class="food-aisles-scroller">
+                                <a href="./" class="food-aisle-pill <?= (empty($category) && empty($search)) ? 'active' : '' ?>" data-category="">
+                                    <i class="bi bi-grid-fill"></i>
+                                    <span>All Departments</span>
+                                    <span class="aisle-count"><?= $totalFoodCount ?></span>
                                 </a>
-                            <?php endforeach; ?>
+
+                                <!-- Desktop Search Pill beside All Departments -->
+                                <form action="./" method="GET" class="food-aisle-search-form">
+                                    <div class="food-aisle-search-pill <?= !empty($search) ? 'has-value' : '' ?>">
+                                        <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                                        <input type="text" name="search" class="food-aisle-search-input" placeholder="Search foods..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                                        <?php if (!empty($category)): ?>
+                                            <input type="hidden" name="category" value="<?= htmlspecialchars($category) ?>">
+                                        <?php endif; ?>
+                                        <?php if (!empty($sort)): ?>
+                                            <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
+                                        <?php endif; ?>
+                                        <?php if (!empty($search)): ?>
+                                            <a href="<?= catalog_url(1, '', $category, $sort) ?>" class="search-clear-pill-btn" aria-label="Clear search" title="Clear search">
+                                                <i class="bi bi-x"></i>
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                </form>
+
+                                <?php foreach ($categories as $catName): 
+                                    $catCount = $categoryCounts[$catName] ?? 0;
+                                    $iconClass = $categoryIcons[$catName] ?? 'bi-basket2';
+                                    $isCatActive = ($category === $catName);
+                                ?>
+                                    <a href="?category=<?= urlencode($catName) ?>" class="food-aisle-pill <?= $isCatActive ? 'active' : '' ?>" data-category="<?= htmlspecialchars($catName) ?>">
+                                        <i class="bi <?= $iconClass ?>"></i>
+                                        <span><?= htmlspecialchars($catName) ?></span>
+                                        <span class="aisle-count"><?= $catCount ?></span>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -637,6 +666,13 @@ $firstKey = array_key_first($aisleReels);
                                         </form>
                                     </div>
                                 </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <!-- Mobile Swipe Indicator Dots -->
+                        <div class="spotlight-dots-wrap d-flex d-lg-none justify-content-center align-items-center gap-1 mt-3" id="spotlightDots">
+                            <?php foreach ($spotlightItems as $idx => $sItem): ?>
+                                <span class="spotlight-dot <?= ($idx === 0) ? 'active' : '' ?>" data-index="<?= $idx ?>" aria-hidden="true"></span>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -733,18 +769,38 @@ $firstKey = array_key_first($aisleReels);
 
                             <!-- Pagination -->
                             <?php if ($totalPages > 1): ?>
-                                <nav aria-label="Page navigation" class="mt-5">
-                                    <ul class="pagination justify-content-center flex-wrap gap-1">
+                                <nav aria-label="Page navigation" class="mt-4 mt-md-5">
+                                    <!-- Mobile Pagination: Clean single-row bar, no awkward line wrap -->
+                                    <div class="mobile-pagination-bar d-flex d-md-none align-items-center justify-content-between">
+                                        <a class="mobile-page-btn <?= ($page <= 1) ? 'disabled' : '' ?>" href="<?= ($page > 1) ? catalog_url($page - 1, $search, $category, $sort) : '#' ?>" aria-label="Previous page">
+                                            <i class="bi bi-chevron-left me-1"></i> Prev
+                                        </a>
+                                        <div class="mobile-page-status">
+                                            <span class="mobile-page-current">Page <?= $page ?></span>
+                                            <span class="mobile-page-total">of <?= $totalPages ?></span>
+                                            <div class="mobile-page-count text-muted"><?= $totalItems ?> items</div>
+                                        </div>
+                                        <a class="mobile-page-btn <?= ($page >= $totalPages) ? 'disabled' : '' ?>" href="<?= ($page < $totalPages) ? catalog_url($page + 1, $search, $category, $sort) : '#' ?>" aria-label="Next page">
+                                            Next <i class="bi bi-chevron-right ms-1"></i>
+                                        </a>
+                                    </div>
+
+                                    <!-- Desktop Pagination: Custom green styling -->
+                                    <ul class="pagination custom-pagination justify-content-center align-items-center gap-1 d-none d-md-flex m-0">
                                         <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                                            <a class="page-link rounded-pill px-3" href="<?= catalog_url($page - 1, $search, $category, $sort) ?>">Previous</a>
+                                            <a class="page-link rounded-pill px-3" href="<?= catalog_url($page - 1, $search, $category, $sort) ?>">
+                                                <i class="bi bi-chevron-left me-1"></i> Previous
+                                            </a>
                                         </li>
                                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                                             <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
-                                                <a class="page-link rounded-circle mx-1 text-center" style="width: 38px; height: 38px; line-height: 24px;" href="<?= catalog_url($i, $search, $category, $sort) ?>"><?= $i ?></a>
+                                                <a class="page-link rounded-circle mx-1 text-center" href="<?= catalog_url($i, $search, $category, $sort) ?>"><?= $i ?></a>
                                             </li>
                                         <?php endfor; ?>
                                         <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : '' ?>">
-                                            <a class="page-link rounded-pill px-3" href="<?= catalog_url($page + 1, $search, $category, $sort) ?>">Next</a>
+                                            <a class="page-link rounded-pill px-3" href="<?= catalog_url($page + 1, $search, $category, $sort) ?>">
+                                                Next <i class="bi bi-chevron-right ms-1"></i>
+                                            </a>
                                         </li>
                                     </ul>
                                 </nav>
@@ -2039,15 +2095,30 @@ $firstKey = array_key_first($aisleReels);
                     if (newSpotlight) {
                         spotlightSection.innerHTML = newSpotlight.innerHTML;
                         spotlightSection.style.display = '';
+                        setupSpotlightDots();
                     } else {
                         spotlightSection.style.display = 'none';
                     }
                 }
 
-                // C. Update "Show All" action row above pills
-                const newHeaderAction = doc.querySelector('.food-aisles-section .d-flex.align-items-center.justify-content-between');
-                if (headerActionContainer && newHeaderAction) {
-                    headerActionContainer.innerHTML = newHeaderAction.innerHTML;
+                // C. Update "Show All" action row above pills or dropdown
+                const newMobileHeader = doc.getElementById('mobileDeptHeader');
+                const curMobileHeader = document.getElementById('mobileDeptHeader');
+                if (curMobileHeader && newMobileHeader) {
+                    curMobileHeader.innerHTML = newMobileHeader.innerHTML;
+                }
+                const newDesktopHeader = doc.getElementById('desktopDeptHeader');
+                const curDesktopHeader = document.getElementById('desktopDeptHeader');
+                if (curDesktopHeader && newDesktopHeader) {
+                    curDesktopHeader.innerHTML = newDesktopHeader.innerHTML;
+                }
+
+                // Sync mobile department dropdown
+                const newDeptSelect = doc.getElementById('mobileDeptSelect');
+                const curDeptSelect = document.getElementById('mobileDeptSelect');
+                if (curDeptSelect && newDeptSelect) {
+                    curDeptSelect.innerHTML = newDeptSelect.innerHTML;
+                    curDeptSelect.value = newDeptSelect.value;
                 }
 
                 // D. Update Search Pill Form state
@@ -2084,8 +2155,8 @@ $firstKey = array_key_first($aisleReels);
                 return;
             }
 
-            // "Show All" button above pills
-            const showAllBtn = e.target.closest('#showAllFoodsBtn, .food-aisles-section a[href^="./"]');
+            // "Show All" button above pills or dropdown
+            const showAllBtn = e.target.closest('#showAllFoodsBtn, #showAllFoodsBtnMobile, .food-aisles-section a[href^="./"]');
             if (showAllBtn) {
                 e.preventDefault();
                 loadCategoryAsync('./');
@@ -2101,8 +2172,8 @@ $firstKey = array_key_first($aisleReels);
                 return;
             }
 
-            // In-catalog Sort Buttons, Pagination, and Empty State links
-            const catalogLink = e.target.closest('#all-foods .market-catalog-header a, #all-foods .pagination a, #all-foods .btn-outline-success');
+            // In-catalog Sort Buttons, Pagination, Mobile Pagination, and Empty State links
+            const catalogLink = e.target.closest('#all-foods .market-catalog-header a, #all-foods .pagination a, #all-foods .mobile-page-btn, #all-foods .btn-outline-success');
             if (catalogLink && !catalogLink.classList.contains('disabled')) {
                 const href = catalogLink.getAttribute('href');
                 if (href && !href.startsWith('#')) {
@@ -2110,6 +2181,14 @@ $firstKey = array_key_first($aisleReels);
                     loadCategoryAsync(href);
                     return;
                 }
+            }
+        });
+
+        // Mobile Department Dropdown Change
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.id === 'mobileDeptSelect') {
+                const targetUrl = e.target.value || './';
+                loadCategoryAsync(targetUrl);
             }
         });
 
@@ -2131,6 +2210,23 @@ $firstKey = array_key_first($aisleReels);
                 loadCategoryAsync(url);
             }
         });
+
+        // Sync mobile spotlight indicator dots on scroll
+        function setupSpotlightDots() {
+            const grid = document.querySelector('.spotlight-grid');
+            const dots = document.querySelectorAll('#spotlightDots .spotlight-dot');
+            if (!grid || dots.length === 0) return;
+            grid.addEventListener('scroll', function() {
+                const scrollLeft = grid.scrollLeft;
+                const cardW = grid.firstElementChild ? grid.firstElementChild.offsetWidth : 300;
+                const activeIdx = Math.min(dots.length - 1, Math.max(0, Math.round(scrollLeft / (cardW + 12))));
+                dots.forEach((d, i) => {
+                    if (i === activeIdx) d.classList.add('active');
+                    else d.classList.remove('active');
+                });
+            }, { passive: true });
+        }
+        setupSpotlightDots();
 
         // Popstate handler for Browser Back/Forward buttons without scroll jumps
         window.addEventListener('popstate', function() {

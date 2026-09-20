@@ -11225,6 +11225,60 @@ body.modal-open-freeze {
     color: #ef4444;
 }
 
+/* Mobile Department Dropdown */
+.mobile-department-select-wrap {
+    width: 100%;
+}
+
+.mobile-select-shell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.mobile-select-icon {
+    position: absolute;
+    left: 14px;
+    font-size: 1.05rem;
+    color: var(--color-primary, #15803d);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.mobile-dept-select {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 40px 0 42px;
+    background-color: #ffffff;
+    border: 1.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    font-size: 16px !important; /* Prevents iOS auto-zoom */
+    font-weight: 600;
+    color: #1c1917;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mobile-dept-select:focus {
+    border-color: var(--color-primary, #15803d);
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.16);
+    outline: none;
+}
+
+.mobile-select-chevron {
+    position: absolute;
+    right: 14px;
+    font-size: 0.9rem;
+    color: #6b7280;
+    pointer-events: none;
+    z-index: 2;
+}
+
 /* 2. Interactive Food Aisle Departments Rail */
 .food-aisles-section {
     padding: 1.5rem 0 0.75rem;
@@ -11688,6 +11742,136 @@ body.modal-open-freeze {
     box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
 }
 
+/* Spotlight Carousel Dots */
+.spotlight-dots-wrap {
+    padding: 4px 0 8px;
+}
+
+.spotlight-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, 0.2);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+
+.spotlight-dot.active {
+    width: 24px;
+    background: var(--color-primary, #15803d);
+}
+
+/* Custom Green Brand Pagination */
+.mobile-pagination-bar {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 18px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    width: 100%;
+}
+
+.mobile-page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 86px;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    background: #f0fdf4;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    color: #15803d;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.mobile-page-btn:hover {
+    background: #15803d;
+    color: #ffffff;
+    border-color: #15803d;
+}
+
+.mobile-page-btn.disabled {
+    background: #f3f4f6;
+    border-color: rgba(0, 0, 0, 0.06);
+    color: #9ca3af;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.mobile-page-status {
+    text-align: center;
+    line-height: 1.25;
+}
+
+.mobile-page-current {
+    font-weight: 800;
+    color: #1c1917;
+    font-size: 0.95rem;
+}
+
+.mobile-page-total {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin-left: 2px;
+}
+
+.mobile-page-count {
+    font-size: 0.72rem;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* Desktop Custom Green Pagination (Bans generic blue) */
+.custom-pagination {
+    margin: 0;
+    flex-wrap: nowrap !important;
+}
+
+.custom-pagination .page-item .page-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #374151 !important;
+    font-weight: 600;
+    font-size: 0.88rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    transition: all 0.18s ease;
+}
+
+.custom-pagination .page-item .page-link.rounded-circle {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    line-height: 1;
+}
+
+.custom-pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+    background: #f0fdf4 !important;
+    color: #15803d !important;
+    border-color: #22c55e !important;
+}
+
+.custom-pagination .page-item.active .page-link {
+    background-color: var(--color-primary, #15803d) !important;
+    border-color: var(--color-primary, #15803d) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.28);
+}
+
+.custom-pagination .page-item.disabled .page-link {
+    color: #9ca3af !important;
+    background: #f9fafb !important;
+    border-color: rgba(0, 0, 0, 0.05) !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
 /* 5. Floating Persistent Quick Cart Bar (Bottom Right) */
 .floating-cart-tray {
     position: fixed;
@@ -11790,20 +11974,20 @@ body.modal-open-freeze {
         font-size: 16px !important; /* Prevents iOS Safari auto-zoom */
     }
 
-    /* Peak Harvest Spotlights: Convert vertical stack into smooth horizontal scroll-snap rail */
+    /* Peak Harvest Spotlights: Clean full-width swipe cards with snap */
     .spotlight-grid {
         display: flex !important;
         overflow-x: auto !important;
         scroll-snap-type: x mandatory;
         gap: 0.85rem;
-        padding-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none !important;
         -ms-overflow-style: none !important;
-        margin-left: -0.5rem;
-        margin-right: -0.5rem;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
     }
     
     .spotlight-grid::-webkit-scrollbar {
@@ -11813,11 +11997,11 @@ body.modal-open-freeze {
     }
     
     .spotlight-food-card {
-        flex: 0 0 calc(82vw - 12px);
-        max-width: 300px;
-        scroll-snap-align: start;
-        padding: 1.25rem;
-        border-radius: 18px;
+        flex: 0 0 100%;
+        max-width: 100%;
+        scroll-snap-align: center;
+        padding: 1.35rem 1.25rem;
+        border-radius: 20px;
     }
 
     .spotlight-card-footer form .btn {
@@ -11829,7 +12013,7 @@ body.modal-open-freeze {
     }
 
     .spotlight-img-wrap {
-        height: 130px;
+        height: 140px;
     }
 
     /* Market Sort Toolbar on Mobile */
@@ -11874,7 +12058,7 @@ body.modal-open-freeze {
 
     .food-card {
         padding: 0.85rem;
-        border-radius: 14px;
+        border-radius: 16px;
     }
 
     .food-card-img-wrap {
@@ -11892,20 +12076,6 @@ body.modal-open-freeze {
     .food-card-btn-add {
         min-height: 44px;
         font-size: 0.85rem;
-    }
-
-    .pagination {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 4px;
-        row-gap: 8px;
-    }
-
-    .pagination .page-link {
-        min-height: 44px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .floating-cart-tray {
@@ -11932,6 +12102,99 @@ body.modal-open-freeze {
     .food-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.65rem;
+    }
+
+    .food-card {
+        padding: 0.75rem;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .food-card-top-tags {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 4px;
+        margin-bottom: 0.4rem;
+    }
+
+    .food-card-cat-tag {
+        font-size: 0.65rem;
+        padding: 2px 7px;
+        font-weight: 700;
+        text-transform: uppercase;
+        max-width: 55%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .food-card-stock {
+        font-size: 0.65rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .food-card-img-wrap {
+        height: 110px;
+        padding: 0.35rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.4rem;
+    }
+
+    .food-card-img-wrap img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    .food-card-title {
+        font-size: 0.88rem;
+        line-height: 1.25;
+        min-height: 2.5em;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 0.35rem;
+    }
+
+    .food-card-origin-meta {
+        font-size: 0.7rem;
+        color: #78716c;
+        margin-bottom: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .food-card-price-row {
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+    }
+
+    .food-card-price {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #15803d;
+    }
+
+    .food-card-unit {
+        font-size: 0.68rem;
+        color: #78716c;
+    }
+
+    .food-card-btn-add {
+        min-height: 44px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        border-radius: 9999px;
     }
 
     .food-card {
