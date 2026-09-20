@@ -159,12 +159,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <i class="bi bi-arrow-right" aria-hidden="true"></i>
                     </button>
 
-                    <!-- Fast One-Tap Demo Fill for Reviewers & Mobile Testing -->
-                    <div class="auth-quick-fill">
-                        <span class="quick-fill-label"><i class="bi bi-lightning-charge-fill text-warning me-1"></i>Demo:</span>
-                        <button type="button" class="quick-fill-pill" onclick="fillDemo('customer@gmail.com', 'password')">Customer</button>
-                        <button type="button" class="quick-fill-pill" onclick="fillDemo('admin@freshcart.com', 'admin123')">Admin</button>
-                    </div>
 
                     <div class="auth-footer-nav">
                         <div>Don't have an account? <a href="register" class="auth-nav-link">Create an account</a></div>
@@ -196,16 +190,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             icon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
         }
         btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
-    }
-
-    function fillDemo(email, pass) {
-        const emailInput = document.getElementById('loginEmail');
-        const passInput = document.getElementById('loginPassword');
-        if (emailInput && passInput) {
-            emailInput.value = email;
-            passInput.value = pass;
-            passInput.focus();
-        }
     }
     </script>
 </body>

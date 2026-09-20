@@ -1049,53 +1049,6 @@ h5{
     transform: scale(0.99);
 }
 
-/* Quick Demo Fill Pills */
-.auth-quick-fill {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-    margin-top: 1rem;
-    padding: 0.6rem 0.85rem;
-    background: var(--color-surface-subtle, #F0EEE6);
-    border-radius: 12px;
-    border: 1px dashed var(--color-border, #E5E0D5);
-}
-
-.quick-fill-label {
-    font-size: 0.74rem;
-    font-weight: 700;
-    color: var(--color-text-secondary, #6E7368);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.quick-fill-pill {
-    background: #FFFFFF;
-    border: 1px solid var(--color-border, #E5E0D5);
-    border-radius: var(--radius-full, 9999px);
-    padding: 0.25rem 0.75rem;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--color-brand-dark, #375743);
-    cursor: pointer;
-    min-height: 32px;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.15s var(--ease-smooth);
-}
-
-.quick-fill-pill:hover,
-.quick-fill-pill:focus-visible {
-    background: var(--color-brand, #4A745B);
-    color: #FFFFFF;
-    border-color: var(--color-brand, #4A745B);
-    outline: none;
-}
-
 /* Auth Nav Links */
 .auth-footer-nav {
     text-align: center;
