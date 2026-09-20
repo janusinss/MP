@@ -787,8 +787,8 @@ elseif ($view == 'products') {
                     </ul>
                 </div>
 
-                <?php if ($categoryFilter !== 'All' || $stockFilter !== 'All'): ?>
-                    <button type="button" onclick="loadView('products')" class="btn btn-sm btn-link text-muted text-decoration-none small py-1 px-2" title="Reset all category and stock filters">
+                <?php if ($categoryFilter !== 'All'): ?>
+                    <button type="button" onclick="selectAisle('All')" class="btn btn-sm btn-link text-muted text-decoration-none small py-1 px-2" title="Reset selected aisle">
                         <i class="bi bi-x-circle me-1"></i>Reset
                     </button>
                 <?php endif; ?>
@@ -1084,12 +1084,6 @@ elseif ($view == 'users') {
                         </button>
                     <?php endforeach; ?>
                 </div>
-
-                <?php if ($filter !== 'all' || $search !== ''): ?>
-                    <button type="button" onclick="loadView('users')" class="btn btn-sm btn-link text-muted text-decoration-none small py-1 px-2" title="Reset all filters">
-                        <i class="bi bi-x-circle me-1"></i>Reset
-                    </button>
-                <?php endif; ?>
             </div>
         </div>
     </div>
