@@ -1,6 +1,18 @@
 # Prevent script execution in upload directory
-<FilesMatch "\.(php|phtml|php3|php4|php5|phps|cgi|pl|py)$">
+<FilesMatch "\.(php|phtml|php3|php4|php5|phps|phar|cgi|pl|py|sh|bash|exe)$">
     Require all denied
 </FilesMatch>
+
+# Disable script handlers and engines
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+RemoveHandler .php .phtml .php3 .php4 .php5 .phps .phar .cgi .pl .py
 
 Options -Indexes -ExecCGI

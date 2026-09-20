@@ -4,17 +4,21 @@
 # 1. Disable Directory Listing / Browsing
 Options -Indexes -MultiViews
 
-# 2. Block Direct HTTP Access to Sensitive Files
-<FilesMatch "(^\.env|\.sql$|\.md$|composer\.(json|lock)$|package\.(json|lock)$|skills-lock\.json$)">
+# 2. Block Direct HTTP Access to Sensitive Files & Dotfiles
+<FilesMatch "(^\.env|\.sql$|\.sqlite$|\.db$|\.log$|\.bak$|\.old$|\.conf$|\.md$|composer\.(json|lock)$|package\.(json|lock)$|skills-lock\.json$)">
     Require all denied
 </FilesMatch>
 
-# 3. HTTP Security Headers (Defense in Depth)
+# 3. HTTP Security Headers & Fingerprint Suppression
 <IfModule mod_headers.c>
+    Header unset Server
+    Header unset X-Powered-By
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
     Header set X-XSS-Protection "1; mode=block"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" "expr=%{HTTPS} == 'on'"
 </IfModule>
 
 # 4. URL Rewriting & Information Masking
@@ -27,7 +31,7 @@ Options -Indexes -MultiViews
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
     # Block direct HTTP access to internal backend directories
-    RewriteRule ^(database|config|scripts|\.agents|\.git) - [F,L,NC]
+    RewriteRule ^(database|config|scripts|\.agents|\.git|scratch) - [F,L,NC]
 
     # Canonical Redirect: Hide index.php from URL (NE prevents double-escaping spaces, QSA preserves query parameters)
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/index\.php([^\ ]*)\ +HTTP/ [NC]

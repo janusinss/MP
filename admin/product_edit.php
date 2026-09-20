@@ -33,10 +33,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $target_dir = __DIR__ . "/../assets/images/";
         $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $allowed_mimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         $file_extension = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
         
         $check = getimagesize($_FILES["image"]["tmp_name"]);
-        if ($check !== false && in_array($file_extension, $allowed_types)) {
+        $mime = '';
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $_FILES["image"]["tmp_name"]);
+            finfo_close($finfo);
+        } elseif (function_exists('mime_content_type')) {
+            $mime = mime_content_type($_FILES["image"]["tmp_name"]);
+        }
+
+        if ($check !== false && in_array($file_extension, $allowed_types, true) && in_array($mime, $allowed_mimes, true)) {
             $new_filename = uniqid('prod_') . "." . $file_extension;
             $target_file = $target_dir . $new_filename;
             

@@ -13,6 +13,7 @@ function httpReq($url, $postData = null, $headers = []) {
     curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFile);
     curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFile);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+    curl_setopt($ch, CURLOPT_HEADER, true);
     if (!empty($headers)) {
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     }
@@ -20,11 +21,14 @@ function httpReq($url, $postData = null, $headers = []) {
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, is_array($postData) ? http_build_query($postData) : $postData);
     }
-    $body = curl_exec($ch);
+    $raw = curl_exec($ch);
+    $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+    $rawHeaders = substr($raw, 0, $headerSize);
+    $body = substr($raw, $headerSize);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $redirect = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
     curl_close($ch);
-    return ['code' => $code, 'body' => $body, 'redirect' => $redirect];
+    return ['code' => $code, 'body' => $body, 'redirect' => $redirect, 'headers' => $rawHeaders];
 }
 
 function extractCsrf($html) {
@@ -104,9 +108,28 @@ assertTest("Access Profile With Authenticated Session", $profileRes['code'] === 
 $cancelForged = httpReq("$baseUrl/orders/cancel", ['order_id' => 999]);
 assertTest("Reject Order Cancellation Without CSRF Token", $cancelForged['code'] === 403, "HTTP {$cancelForged['code']}");
 
-// 11. Admin Deletion Protection Without CSRF Token
+// 12. Admin Deletion Protection Without CSRF Token
 $adminDeleteForged = httpReq("$baseUrl/admin/actions/product_delete.php?id=1");
 assertTest("Reject Admin Delete Without CSRF Token or Admin Session", in_array($adminDeleteForged['code'], [302, 403], true), "HTTP {$adminDeleteForged['code']}");
+
+// 13. Reconnaissance: Direct SQLite / DB Extension Access Block
+$sqliteRes = httpReq("$baseUrl/database/app.sqlite");
+assertTest("Block Direct Access to .sqlite Database File", $sqliteRes['code'] === 403, "HTTP {$sqliteRes['code']}");
+
+// 14. Reconnaissance: Internal .agents Directory Shielding
+$agentsRes = httpReq("$baseUrl/.agents/");
+assertTest("Block Direct Access to Internal .agents Directory", $agentsRes['code'] === 403, "HTTP {$agentsRes['code']}");
+
+// 15. Security Headers: X-Content-Type-Options, X-Frame-Options, Permissions-Policy
+$homeRes = httpReq("$baseUrl/");
+$hasNoSniff = stripos($homeRes['headers'], 'X-Content-Type-Options: nosniff') !== false;
+$hasFrameOpt = stripos($homeRes['headers'], 'X-Frame-Options') !== false;
+$hasPermPolicy = stripos($homeRes['headers'], 'Permissions-Policy') !== false;
+assertTest("Enforce Defense-in-Depth Security Headers", $hasNoSniff && $hasFrameOpt && $hasPermPolicy, "nosniff, frame-options, permissions-policy verified");
+
+// 16. Server Fingerprinting: Suppression of X-Powered-By
+$noPoweredBy = stripos($homeRes['headers'], 'X-Powered-By') === false;
+assertTest("Server Fingerprint Suppression (Zero X-Powered-By)", $noPoweredBy, "X-Powered-By header suppressed");
 
 echo "\n=========================================================\n";
 echo "Results: $testsPassed / $totalTests Tests Passed\n";
