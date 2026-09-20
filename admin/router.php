@@ -918,58 +918,284 @@ elseif ($view == 'products') {
 }
 
 // =========================================================================
-// VIEW 3: USERS
+// VIEW 3: USERS (REGISTERED CUSTOMERS)
 // =========================================================================
 elseif ($view == 'users') {
-    $stmt = $pdo->query("SELECT * FROM users ORDER BY created_at DESC");
-    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // 1. Telemetry across full customer base
+    $totalUsers = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+
+    $stmtBuyerStats = $pdo->query("
+        SELECT 
+            COUNT(DISTINCT user_id) as active_buyers,
+            COALESCE(SUM(total_amount), 0) as total_spend,
+            COUNT(*) as total_orders
+        FROM orders 
+        WHERE status != 'Cancelled' AND user_id IS NOT NULL
+    ");
+    $buyerStats = $stmtBuyerStats->fetch(PDO::FETCH_ASSOC) ?: [];
+    $activeBuyers = (int)($buyerStats['active_buyers'] ?? 0);
+    $totalSpend = (float)($buyerStats['total_spend'] ?? 0);
+    $totalOrdersCount = (int)($buyerStats['total_orders'] ?? 0);
+    $avgSpendPerBuyer = $activeBuyers > 0 ? $totalSpend / $activeBuyers : 0.0;
+    $buyerConversionRate = $totalUsers > 0 ? round(($activeBuyers / $totalUsers) * 100, 1) : 0;
+
+    // 2. Query filters & search
+    $search = trim($_GET['search'] ?? '');
+    $filter = trim($_GET['filter'] ?? 'all'); // 'all', 'buyers', 'inactive'
+
+    $where = [];
+    $params = [];
+
+    if ($search !== '') {
+        $where[] = "(u.full_name LIKE ? OR u.email LIKE ? OR CAST(u.id AS CHAR) LIKE ?)";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+    }
+
+    $sql = "
+        SELECT 
+            u.*,
+            COUNT(CASE WHEN o.status != 'Cancelled' THEN o.id END) as valid_order_count,
+            COALESCE(SUM(CASE WHEN o.status != 'Cancelled' THEN o.total_amount ELSE 0 END), 0) as lifetime_spent,
+            MAX(o.created_at) as latest_order_date
+        FROM users u
+        LEFT JOIN orders o ON u.id = o.user_id
+    ";
+
+    if (!empty($where)) {
+        $sql .= " WHERE " . implode(" AND ", $where);
+    }
+
+    $sql .= " GROUP BY u.id";
+
+    if ($filter === 'buyers') {
+        $sql .= " HAVING valid_order_count > 0";
+    } elseif ($filter === 'inactive') {
+        $sql .= " HAVING valid_order_count = 0";
+    }
+
+    $sql .= " ORDER BY u.created_at DESC";
+
+    $stmtUsers = $pdo->prepare($sql);
+    $stmtUsers->execute($params);
+    $users = $stmtUsers->fetchAll(PDO::FETCH_ASSOC);
     ?>
     <div class="admin-view-header">
         <div>
-            <span class="admin-kicker">Customer Directory</span>
+            <span class="admin-kicker">Client Accounts &amp; Profiles</span>
             <h1 class="admin-view-title">Registered Customers</h1>
-            <p class="admin-view-subtitle">Registered account holders and client transaction profiles.</p>
+            <p class="admin-view-subtitle">Verified customer accounts, transaction histories, and lifetime store value.</p>
         </div>
-        <div>
-            <span class="text-muted small fw-semibold"><?= count($users) ?> Total Customers</span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-muted small me-2 d-none d-md-inline">
+                <i class="bi bi-people text-success me-1"></i> <?= $totalUsers ?> Total Profiles
+            </span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadView('users')" title="Refresh Customer Directory">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
         </div>
     </div>
 
-    <div class="row g-3">
-        <?php foreach ($users as $u): ?>
-            <div class="col-md-6 col-xl-4">
-                <div class="admin-card p-3 d-flex flex-column justify-content-between h-100">
-                    <div>
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <span class="badge bg-light text-muted border" style="font-family: monospace; font-size: 0.7rem;">
-                                ID: #<?= str_pad($u['id'], 3, '0', STR_PAD_LEFT) ?>
-                            </span>
-                            <a href="actions/user_delete.php?id=<?= $u['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="text-muted hover-danger" onclick="return confirm('Delete this user account?');" title="Delete User">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                        </div>
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="admin-avatar-initial" style="width: 40px; height: 40px; font-size: 1rem;">
-                                <?= strtoupper(substr($u['full_name'], 0, 1)) ?>
-                            </div>
-                            <div class="overflow-hidden">
-                                <div class="fw-semibold text-dark text-truncate small"><?= htmlspecialchars($u['full_name']) ?></div>
-                                <div class="text-muted text-truncate" style="font-size: 0.75rem;"><?= htmlspecialchars($u['email']) ?></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center">
-                        <span class="text-muted" style="font-size: 0.72rem;">
-                            Joined <?= date('M d, Y', strtotime($u['created_at'])) ?>
-                        </span>
-                        <a href="#" onclick="loadView('customer_details&id=<?= $u['id'] ?>')" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.75rem;">
-                            View Orders
-                        </a>
-                    </div>
+    <!-- 1. Operational Telemetry Strip -->
+    <div class="admin-card p-0 mb-4 overflow-hidden">
+        <div class="row g-0">
+            <!-- Col 1: Total Registered Accounts -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-xl-bottom-0">
+                <div class="admin-kpi-label mb-1">Total Accounts</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;"><?= number_format($totalUsers) ?> Profiles</span>
+                    <span class="text-muted small">Registered</span>
+                </div>
+                <div class="text-muted small">
+                    <span class="text-dark fw-semibold"><?= number_format($totalUsers) ?></span> client records
                 </div>
             </div>
-        <?php endforeach; ?>
+
+            <!-- Col 2: Active Buyers -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-xl-bottom-0">
+                <div class="admin-kpi-label mb-1">Active Buyers</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;"><?= number_format($activeBuyers) ?> Buyers</span>
+                    <span class="text-muted small"><?= $buyerConversionRate ?>% Rate</span>
+                </div>
+                <div class="text-muted small">
+                    <span class="text-success fw-semibold"><i class="bi bi-bag-check me-1"></i>Purchased</span> &bull; Placed &ge;1 order
+                </div>
+            </div>
+
+            <!-- Col 3: Customer Spend -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-sm-bottom-0">
+                <div class="admin-kpi-label mb-1">Customer Spend</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-success fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format($totalSpend, 2) ?></span>
+                    <span class="text-muted small">Gross Total</span>
+                </div>
+                <div class="text-muted small">
+                    <span class="text-dark fw-semibold"><?= number_format($totalOrdersCount) ?></span> orders fulfilled
+                </div>
+            </div>
+
+            <!-- Col 4: Average Spend per Buyer -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4">
+                <div class="admin-kpi-label mb-1">Avg. Value / Buyer</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format($avgSpendPerBuyer, 2) ?></span>
+                    <span class="text-muted small">Per Buyer</span>
+                </div>
+                <div class="text-muted small">
+                    <span class="text-secondary fw-semibold">Lifetime AOV</span> &bull; Active accounts
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Search & Filter Bar -->
+    <div class="admin-card p-3 mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <!-- Search Form -->
+            <form onsubmit="event.preventDefault(); loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="d-flex align-items-center gap-2" style="max-width: 320px; width: 100%;">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by name, email, or ID..." value="<?= htmlspecialchars($search) ?>" style="font-size: 0.82rem;">
+                </div>
+                <button type="submit" class="btn btn-sm btn-dark px-3 fw-semibold text-nowrap">Search</button>
+                <?php if ($search !== ''): ?>
+                    <button type="button" onclick="loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>')" class="btn btn-sm btn-outline-secondary px-2 text-nowrap">Clear</button>
+                <?php endif; ?>
+            </form>
+
+            <!-- Segmented Filter Control -->
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Customer Filter">
+                    <?php
+                    $filterTabs = [
+                        'all' => ['label' => 'All Accounts', 'count' => $totalUsers],
+                        'buyers' => ['label' => 'Active Buyers', 'count' => $activeBuyers],
+                        'inactive' => ['label' => 'No Orders Yet', 'count' => max(0, $totalUsers - $activeBuyers)]
+                    ];
+                    foreach ($filterTabs as $fKey => $fData):
+                        $isActive = ($filter === $fKey);
+                        $activeClass = $isActive ? 'btn-dark' : 'btn-outline-secondary';
+                        $param = "users&filter=$fKey" . ($search !== '' ? "&search=" . urlencode($search) : '');
+                    ?>
+                        <button type="button" onclick="loadView('<?= $param ?>')" class="btn <?= $activeClass ?>">
+                            <?= $fData['label'] ?> <span class="badge <?= $isActive ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?> ms-1" style="font-size: 0.68rem;"><?= $fData['count'] ?></span>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+
+                <?php if ($filter !== 'all' || $search !== ''): ?>
+                    <button type="button" onclick="loadView('users')" class="btn btn-sm btn-link text-muted text-decoration-none small py-1 px-2" title="Reset all filters">
+                        <i class="bi bi-x-circle me-1"></i>Reset
+                    </button>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Customer Directory Data Table -->
+    <div class="admin-card p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light border-bottom">
+                    <tr>
+                        <th class="ps-3 py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Customer Profile</th>
+                        <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Account ID</th>
+                        <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Joined Date</th>
+                        <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Orders</th>
+                        <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Lifetime Spend</th>
+                        <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Status</th>
+                        <th class="pe-3 py-3 text-end text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($users)): ?>
+                        <?php foreach ($users as $u): 
+                            $orderCount = (int)($u['valid_order_count'] ?? 0);
+                            $spend = (float)($u['lifetime_spent'] ?? 0);
+                            $isBuyer = ($orderCount > 0);
+                        ?>
+                            <tr class="border-bottom">
+                                <td class="ps-3 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="admin-avatar-initial" style="width: 38px; height: 38px; font-size: 0.95rem; flex-shrink: 0; background-color: #0f172a; color: #ffffff; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center;">
+                                            <?= strtoupper(substr($u['full_name'], 0, 1)) ?>
+                                        </div>
+                                        <div class="overflow-hidden">
+                                            <div class="fw-semibold text-dark text-truncate small" title="<?= htmlspecialchars($u['full_name']) ?>">
+                                                <?= htmlspecialchars($u['full_name']) ?>
+                                            </div>
+                                            <div class="text-muted text-truncate" style="font-size: 0.75rem;" title="<?= htmlspecialchars($u['email']) ?>">
+                                                <?= htmlspecialchars($u['email']) ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3">
+                                    <span class="badge bg-light text-dark border" style="font-family: monospace; font-size: 0.75rem;">
+                                        #<?= str_pad($u['id'], 4, '0', STR_PAD_LEFT) ?>
+                                    </span>
+                                </td>
+                                <td class="py-3 text-muted small">
+                                    <?= date('M d, Y', strtotime($u['created_at'])) ?>
+                                </td>
+                                <td class="py-3">
+                                    <?php if ($orderCount > 0): ?>
+                                        <span class="badge bg-dark-subtle text-dark border fw-semibold" style="font-size: 0.75rem;">
+                                            <?= $orderCount ?> <?= $orderCount === 1 ? 'Order' : 'Orders' ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="text-muted small">0 Orders</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="py-3">
+                                    <span class="fw-semibold <?= $spend > 0 ? 'text-success' : 'text-muted' ?>" style="font-variant-numeric: tabular-nums; font-size: 0.88rem;">
+                                        $<?= number_format($spend, 2) ?>
+                                    </span>
+                                </td>
+                                <td class="py-3">
+                                    <?php if ($isBuyer): ?>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold px-2 py-1" style="font-size: 0.72rem;">
+                                            <i class="bi bi-check-circle me-1"></i>Active Buyer
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1" style="font-size: 0.72rem;">
+                                            New Member
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="pe-3 py-3 text-end">
+                                    <div class="d-inline-flex align-items-center gap-1">
+                                        <button type="button" onclick="loadView('customer_details&id=<?= $u['id'] ?>')" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 py-1 px-2" style="font-size: 0.78rem;" title="View Customer Profile &amp; Orders">
+                                            <i class="bi bi-eye"></i> <span>View</span>
+                                        </button>
+                                        <a href="actions/user_delete.php?id=<?= $u['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size: 0.78rem;" onclick="return confirm('Delete user <?= htmlspecialchars(addslashes($u['full_name'])) ?>? This cannot be undone.');" title="Delete Account">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <div class="py-4">
+                                    <i class="bi bi-people text-muted opacity-50 fs-2 d-block mb-2"></i>
+                                    <div class="fw-semibold text-dark">No customers found</div>
+                                    <div class="small text-muted mb-2">No registered customer accounts match the current filter or search criteria.</div>
+                                    <?php if ($filter !== 'all' || $search !== ''): ?>
+                                        <button type="button" onclick="loadView('users')" class="btn btn-sm btn-link text-decoration-none">
+                                            Reset Filters
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
     <?php
 }
@@ -1059,86 +1285,187 @@ elseif ($view == 'customer_details') {
     $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
-        echo '<div class="alert alert-danger">Customer not found.</div>';
+        echo '<div class="alert alert-danger p-4 text-center my-4 admin-card"><i class="bi bi-exclamation-triangle me-2"></i>Customer account not found. <button onclick="loadView(\'users\')" class="btn btn-sm btn-dark ms-3">Back to Directory</button></div>';
         exit;
     }
 
-    $stmtOrders = $pdo->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
+    $stmtOrders = $pdo->prepare("
+        SELECT o.*, 
+               (SELECT COUNT(*) FROM order_items oi WHERE oi.order_id = o.id) as item_count
+        FROM orders o 
+        WHERE o.user_id = ? 
+        ORDER BY o.created_at DESC
+    ");
     $stmtOrders->execute([$userId]);
     $userOrders = $stmtOrders->fetchAll(PDO::FETCH_ASSOC);
 
     try {
         $stmtFn = $pdo->prepare("SELECT fn_get_total_spent(?)");
         $stmtFn->execute([$userId]);
-        $lifetimeSpend = $stmtFn->fetchColumn() ?: 0.00;
+        $lifetimeSpend = (float)($stmtFn->fetchColumn() ?: 0.00);
     } catch (PDOException $e) {
         $stmtAlloc = $pdo->prepare("SELECT SUM(total_amount) FROM orders WHERE user_id = ? AND status != 'Cancelled'");
         $stmtAlloc->execute([$userId]);
-        $lifetimeSpend = $stmtAlloc->fetchColumn() ?: 0.00;
+        $lifetimeSpend = (float)($stmtAlloc->fetchColumn() ?: 0.00);
     }
 
     $totalOrders = count($userOrders);
-    $avgOrder = $totalOrders > 0 ? $lifetimeSpend / $totalOrders : 0;
+    $deliveredOrders = 0;
+    foreach ($userOrders as $ord) {
+        if ($ord['status'] === 'Delivered') {
+            $deliveredOrders++;
+        }
+    }
+    $avgOrder = $totalOrders > 0 ? $lifetimeSpend / $totalOrders : 0.0;
     ?>
+    <!-- Back Button -->
     <div class="mb-3">
-        <a href="#" onclick="loadView('users')" class="text-decoration-none text-muted small fw-semibold">
-            <i class="bi bi-arrow-left me-1"></i> Back to Customers
-        </a>
+        <button type="button" onclick="loadView('users')" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
+            <i class="bi bi-arrow-left"></i> <span>Back to Customers</span>
+        </button>
     </div>
 
-    <div class="admin-card p-4 mb-4">
-        <div class="d-flex align-items-center gap-3 mb-4">
-            <div class="admin-avatar-initial" style="width: 52px; height: 52px; font-size: 1.4rem;">
+    <!-- View Header -->
+    <div class="admin-view-header">
+        <div>
+            <span class="admin-kicker">Client Record &bull; ID #<?= str_pad($user['id'], 4, '0', STR_PAD_LEFT) ?></span>
+            <h1 class="admin-view-title"><?= htmlspecialchars($user['full_name'] ?? 'Customer Profile') ?></h1>
+            <p class="admin-view-subtitle"><?= htmlspecialchars($user['email'] ?? '') ?> &bull; Registered <?= date('F d, Y', strtotime($user['created_at'])) ?></p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="actions/user_delete.php?id=<?= $user['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1" onclick="return confirm('Delete user account <?= htmlspecialchars(addslashes($user['full_name'] ?? '')) ?>? This cannot be undone.');" title="Delete User Account">
+                <i class="bi bi-trash"></i> <span>Delete Account</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Customer Telemetry Strip -->
+    <div class="admin-card p-0 mb-4 overflow-hidden">
+        <div class="row g-0">
+            <!-- Metric 1: Lifetime Spend -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-xl-bottom-0">
+                <div class="admin-kpi-label mb-1">Lifetime Spend</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-success fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format($lifetimeSpend, 2) ?></span>
+                    <span class="text-muted small">Total Spent</span>
+                </div>
+                <div class="text-muted small">
+                    <span class="text-success fw-semibold">ADS Stored Routine</span> &bull; Verified
+                </div>
+            </div>
+
+            <!-- Metric 2: Total Orders -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-xl-bottom-0">
+                <div class="admin-kpi-label mb-1">Orders Placed</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;"><?= $totalOrders ?> Orders</span>
+                    <span class="text-muted small"><?= $deliveredOrders ?> Delivered</span>
+                </div>
+                <div class="text-muted small">
+                    <span class="text-dark fw-semibold"><?= $totalOrders > 0 ? 'Active Customer' : 'No Transactions' ?></span>
+                </div>
+            </div>
+
+            <!-- Metric 3: Average Order Value -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-sm-bottom-0">
+                <div class="admin-kpi-label mb-1">Average Order Value</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format($avgOrder, 2) ?></span>
+                    <span class="text-muted small">Per Order</span>
+                </div>
+                <div class="text-muted small">
+                    <span class="text-secondary fw-semibold">AOV</span> &bull; Lifetime performance
+                </div>
+            </div>
+
+            <!-- Metric 4: Account Status -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4">
+                <div class="admin-kpi-label mb-1">Account Standing</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold <?= $totalOrders > 0 ? 'text-success' : 'text-secondary' ?> fs-5">
+                        <?= $totalOrders > 0 ? 'Active Buyer' : 'New Member' ?>
+                    </span>
+                    <span class="badge bg-light text-dark border"><?= htmlspecialchars($user['role'] ?? 'customer') ?></span>
+                </div>
+                <div class="text-muted small">
+                    Joined <?= date('M Y', strtotime($user['created_at'])) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Profile Information Card -->
+    <div class="admin-card p-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="admin-avatar-initial" style="width: 48px; height: 48px; font-size: 1.25rem; flex-shrink: 0; background-color: #0f172a; color: #ffffff; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center;">
                 <?= strtoupper(substr($user['full_name'] ?? '?', 0, 1)) ?>
             </div>
-            <div>
-                <h2 class="fs-5 fw-bold text-dark mb-0"><?= htmlspecialchars($user['full_name'] ?? 'Unknown') ?></h2>
-                <div class="text-muted small"><?= htmlspecialchars($user['email'] ?? '') ?></div>
-            </div>
-        </div>
-
-        <div class="row g-3 border-top pt-3">
-            <div class="col-sm-4">
-                <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.7rem;">Lifetime Spend</div>
-                <div class="fs-5 fw-bold text-success">$<?= number_format((float)$lifetimeSpend, 2) ?></div>
-            </div>
-            <div class="col-sm-4">
-                <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.7rem;">Orders Placed</div>
-                <div class="fs-5 fw-bold text-dark"><?= $totalOrders ?></div>
-            </div>
-            <div class="col-sm-4">
-                <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.7rem;">Average Order Value</div>
-                <div class="fs-5 fw-bold text-dark">$<?= number_format((float)$avgOrder, 2) ?></div>
+            <div class="flex-grow-1">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <div>
+                        <h2 class="fs-6 fw-bold text-dark mb-0"><?= htmlspecialchars($user['full_name'] ?? 'Unknown') ?></h2>
+                        <div class="text-muted small"><?= htmlspecialchars($user['email'] ?? '') ?></div>
+                    </div>
+                    <?php if (!empty($user['address'])): ?>
+                        <div class="text-muted small d-flex align-items-center gap-1">
+                            <i class="bi bi-geo-alt text-secondary"></i>
+                            <span><?= htmlspecialchars($user['address']) ?></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
 
-    <h2 class="admin-card-heading mb-3">Order History</h2>
+    <!-- Order History Section -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="admin-card-heading">Order History</h2>
+        <span class="text-muted small"><?= $totalOrders ?> Recorded Transactions</span>
+    </div>
+
     <?php if (!empty($userOrders)): ?>
         <div class="admin-card p-0 overflow-hidden">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light border-bottom">
                         <tr>
-                            <th class="ps-3 py-2 text-muted small text-uppercase">Order ID</th>
-                            <th class="py-2 text-muted small text-uppercase">Date</th>
-                            <th class="py-2 text-muted small text-uppercase">Total</th>
-                            <th class="py-2 text-muted small text-uppercase">Status</th>
-                            <th class="pe-3 py-2 text-end text-muted small text-uppercase">Action</th>
+                            <th class="ps-3 py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Order ID</th>
+                            <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Date Placed</th>
+                            <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Items</th>
+                            <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Total Amount</th>
+                            <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Status</th>
+                            <th class="pe-3 py-3 text-end text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($userOrders as $order): ?>
+                        <?php foreach ($userOrders as $order): 
+                            $status = $order['status'];
+                            $pillClass = 'status-pending';
+                            if ($status === 'Delivered') $pillClass = 'status-delivered';
+                            elseif ($status === 'Shipped') $pillClass = 'status-shipped';
+                            elseif ($status === 'Cancelled') $pillClass = 'status-cancelled';
+                        ?>
                             <tr class="border-bottom">
-                                <td class="ps-3 py-2 fw-semibold" style="font-family: monospace;">#<?= $order['id'] ?></td>
-                                <td class="py-2 small text-muted"><?= date('F d, Y', strtotime($order['created_at'])) ?></td>
-                                <td class="py-2 fw-semibold text-dark">$<?= number_format((float)$order['total_amount'], 2) ?></td>
-                                <td class="py-2">
-                                    <span class="badge bg-secondary-subtle text-secondary border"><?= $order['status'] ?></span>
+                                <td class="ps-3 py-3 fw-semibold" style="font-family: monospace;">
+                                    #<?= str_pad($order['id'], 4, '0', STR_PAD_LEFT) ?>
                                 </td>
-                                <td class="pe-3 py-2 text-end">
-                                    <a href="order_details.php?order_id=<?= $order['id'] ?>" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.75rem;">
-                                        View Items
+                                <td class="py-3 small text-muted">
+                                    <?= date('M d, Y &bull; h:i A', strtotime($order['created_at'])) ?>
+                                </td>
+                                <td class="py-3 small text-muted">
+                                    <?= (int)($order['item_count'] ?? 0) ?> items
+                                </td>
+                                <td class="py-3 fw-semibold text-dark" style="font-variant-numeric: tabular-nums;">
+                                    $<?= number_format((float)$order['total_amount'], 2) ?>
+                                </td>
+                                <td class="py-3">
+                                    <span class="admin-status-pill <?= $pillClass ?>">
+                                        <?= htmlspecialchars($status) ?>
+                                    </span>
+                                </td>
+                                <td class="pe-3 py-3 text-end">
+                                    <a href="order_details.php?order_id=<?= $order['id'] ?>" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" style="font-size: 0.78rem;">
+                                        <i class="bi bi-receipt"></i> <span>View Order</span>
                                     </a>
                                 </td>
                             </tr>
@@ -1148,7 +1475,11 @@ elseif ($view == 'customer_details') {
             </div>
         </div>
     <?php else: ?>
-        <p class="text-muted small">No order history found for this customer.</p>
+        <div class="admin-card text-center py-5 text-muted">
+            <i class="bi bi-bag-x text-muted opacity-50 fs-2 d-block mb-2"></i>
+            <div class="fw-semibold text-dark">No orders found</div>
+            <div class="small text-muted">This customer has not placed any orders yet.</div>
+        </div>
     <?php endif; ?>
     <?php
 }
