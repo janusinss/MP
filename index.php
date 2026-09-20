@@ -1469,6 +1469,9 @@ $firstKey = array_key_first($aisleReels);
             chips.forEach(chip => {
                 if (chip.getAttribute('data-category') === catKey) {
                     chip.classList.add('active');
+                    try {
+                        chip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    } catch (e) {}
                 } else {
                     chip.classList.remove('active');
                 }

@@ -7619,24 +7619,55 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    margin: 1rem 0 0.5rem;
+    gap: 8px;
+    margin: 1.25rem 0 0.5rem;
+    padding: 8px 0;
 }
 
 .coverflow-dot {
+    position: relative;
     width: 8px;
     height: 8px;
-    border-radius: var(--radius-full);
+    min-width: 8px;
+    max-width: 28px;
+    min-height: 8px;
+    max-height: 8px;
+    border-radius: 9999px;
     background: #d4cfc7;
     border: none;
     padding: 0;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease, box-shadow 0.25s ease;
+    flex-shrink: 0;
+    outline: none;
+}
+
+/* Invisible 44x44px touch affordance */
+.coverflow-dot::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 44px;
+    pointer-events: auto;
+}
+
+.coverflow-dot:hover {
+    background: #a8a29e;
 }
 
 .coverflow-dot.active {
-    width: 28px;
-    background: var(--color-brand);
+    width: 26px;
+    height: 8px;
+    background: var(--color-brand, #4A745B);
+    box-shadow: 0 2px 6px rgba(74, 116, 91, 0.35);
+}
+
+.coverflow-dot:focus-visible {
+    outline: 2px solid var(--color-brand, #4A745B);
+    outline-offset: 3px;
 }
 
 /* Floating Stage Navigation Chevrons */
@@ -7708,26 +7739,66 @@ html, body {
         font-size: 1.1rem;
     }
     .coverflow-dots-bar {
-        margin: 0.75rem 0 0.25rem;
+        margin: 0.85rem 0 0.25rem;
+        gap: 6px;
+        padding: 6px 0;
     }
     .coverflow-dot {
-        min-height: 44px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0 4px;
+        width: 7px;
+        height: 7px;
+        min-width: 7px;
+        min-height: 7px;
+        max-height: 7px;
+    }
+    .coverflow-dot.active {
+        width: 20px;
+        height: 7px;
     }
     .aisle-explorer-section {
-        padding: 3rem 0 3.5rem;
+        padding: 2.75rem 0 3.25rem;
+    }
+    .aisle-header {
+        margin-bottom: 1.25rem;
     }
     .aisle-heading {
         font-size: clamp(1.6rem, 5vw, 2.1rem);
+        margin-bottom: 0.4rem;
     }
     .aisle-subtitle {
-        font-size: 0.92rem;
+        font-size: 0.88rem;
+        line-height: 1.5;
     }
+    /* Redesigned Mobile-Friendly Aisle Category Rail */
     .aisle-nav-container {
-        margin-bottom: 1.75rem;
+        margin-left: -0.75rem;
+        margin-right: -0.75rem;
+        padding: 4px 0.75rem 12px;
+        gap: 0.45rem;
+        margin-bottom: 1.25rem;
+        scroll-snap-type: x proximity;
+        scroll-padding-left: 0.75rem;
+        -webkit-overflow-scrolling: touch;
+        mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+    }
+    .cat-chip,
+    .aisle-tab-chip {
+        padding: 0.38rem 0.85rem;
+        min-height: 38px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        gap: 0.32rem;
+        border-radius: var(--radius-full);
+        scroll-snap-align: start;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    .cat-chip i,
+    .aisle-tab-chip i {
+        font-size: 0.85rem;
+    }
+    .cat-chip.active,
+    .aisle-tab-chip.active {
+        box-shadow: 0 3px 12px rgba(45, 90, 61, 0.3);
     }
     .hero-overdrive {
         padding-top: calc(var(--header-height, 72px) + 16px);
