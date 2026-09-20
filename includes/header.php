@@ -178,14 +178,6 @@ if ($pos !== false) {
                                 </ul>
                             </div>
                         </li>
-                        <li class="nav-item position-relative">
-                            <a href="<?= $rootPath ?>cart" class="btn btn-outline-secondary border-0 position-relative p-2" aria-label="Shopping Cart">
-                                <i class="bi bi-bag fs-5"></i>
-                                <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light <?= ($cartCount > 0) ? '' : 'd-none' ?>" style="font-size: 0.65rem;">
-                                    <?= $cartCount ?>
-                                </span>
-                            </a>
-                        </li>
                     <?php elseif (isset($_SESSION['user_id'])): ?>
                         <li class="nav-item dropdown">
                             <button class="nav-link-custom d-flex align-items-center gap-2 dropdown-toggle bg-transparent border-0 p-0 text-decoration-none" id="globalUserDropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
