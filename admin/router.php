@@ -1198,74 +1198,349 @@ elseif ($view == 'users') {
 // VIEW 4: REVIEWS
 // =========================================================================
 elseif ($view == 'reviews') {
-    $stmt = $pdo->query("SELECT r.*, u.full_name, p.name as product_name, p.image as product_image 
-                         FROM reviews r 
-                         JOIN users u ON r.user_id = u.id 
-                         JOIN products p ON r.product_id = p.id 
-                         ORDER BY r.created_at DESC");
-    $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // 1. Overall telemetry across all reviews
+    $stmtStats = $pdo->query("
+        SELECT 
+            COUNT(*) as total_reviews,
+            COALESCE(AVG(rating), 0) as avg_rating,
+            SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END) as five_star,
+            SUM(CASE WHEN rating = 4 THEN 1 ELSE 0 END) as four_star,
+            SUM(CASE WHEN rating = 3 THEN 1 ELSE 0 END) as three_star,
+            SUM(CASE WHEN rating <= 2 THEN 1 ELSE 0 END) as low_star
+        FROM reviews
+    ");
+    $stats = $stmtStats->fetch(PDO::FETCH_ASSOC) ?: [];
+    $totalReviews = (int)($stats['total_reviews'] ?? 0);
+    $avgRating = $totalReviews > 0 ? number_format((float)$stats['avg_rating'], 1) : '5.0';
+    $fiveStarCount = (int)($stats['five_star'] ?? 0);
+    $fourStarCount = (int)($stats['four_star'] ?? 0);
+    $threeStarCount = (int)($stats['three_star'] ?? 0);
+    $lowStarCount = (int)($stats['low_star'] ?? 0);
+    $fiveStarRatio = $totalReviews > 0 ? round(($fiveStarCount / $totalReviews) * 100) : 100;
 
-    $totalReviews = count($reviews);
-    $avgRating = 0;
-    if ($totalReviews > 0) {
-        $sum = array_sum(array_column($reviews, 'rating'));
-        $avgRating = number_format($sum / $totalReviews, 1);
+    // 2. Query filters, search & view mode
+    $search = trim($_GET['search'] ?? '');
+    $ratingFilter = trim($_GET['rating'] ?? 'all'); // 'all', '5', '4', '3', 'low'
+    $mode = trim($_GET['mode'] ?? 'table'); // 'table' or 'grid'
+
+    $where = [];
+    $params = [];
+
+    if ($search !== '') {
+        $where[] = "(u.full_name LIKE ? OR p.name LIKE ? OR r.comment LIKE ? OR CAST(r.id AS CHAR) LIKE ?)";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
     }
+
+    if ($ratingFilter === '5') {
+        $where[] = "r.rating = 5";
+    } elseif ($ratingFilter === '4') {
+        $where[] = "r.rating = 4";
+    } elseif ($ratingFilter === '3') {
+        $where[] = "r.rating = 3";
+    } elseif ($ratingFilter === 'low') {
+        $where[] = "r.rating <= 2";
+    }
+
+    $sql = "
+        SELECT r.*, u.full_name, u.email as user_email, p.name as product_name, p.image as product_image 
+        FROM reviews r 
+        JOIN users u ON r.user_id = u.id 
+        JOIN products p ON r.product_id = p.id
+    ";
+
+    if (!empty($where)) {
+        $sql .= " WHERE " . implode(" AND ", $where);
+    }
+
+    $sql .= " ORDER BY r.created_at DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $filteredCount = count($reviews);
     ?>
     <div class="admin-view-header">
         <div>
-            <span class="admin-kicker">Shopper Feedback</span>
+            <span class="admin-kicker">Shopper Feedback &amp; Ratings</span>
             <h1 class="admin-view-title">Review Gallery</h1>
-            <p class="admin-view-subtitle">Customer product feedback and satisfaction ratings.</p>
+            <p class="admin-view-subtitle">Verified customer product feedback, star ratings, and sentiment records.</p>
         </div>
-        <div class="d-flex align-items-center gap-3">
-            <span class="text-muted small"><strong><?= $totalReviews ?></strong> Reviews</span>
-            <span class="text-muted small"><strong><?= $avgRating ?></strong> / 5.0 Average</span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-muted small me-2 d-none d-md-inline">
+                <i class="bi bi-star-fill text-warning me-1"></i> <?= $totalReviews ?> Total Reviews
+            </span>
+            <div class="btn-group btn-group-sm" role="group" aria-label="Display Mode">
+                <?php
+                $tableParam = "reviews&mode=table" . ($ratingFilter !== 'all' ? "&rating=$ratingFilter" : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
+                $gridParam = "reviews&mode=grid" . ($ratingFilter !== 'all' ? "&rating=$ratingFilter" : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
+                ?>
+                <button type="button" onclick="loadView('<?= $tableParam ?>')" class="btn <?= $mode === 'table' ? 'btn-dark' : 'btn-outline-secondary' ?>" title="Table View">
+                    <i class="bi bi-table me-1"></i>Table
+                </button>
+                <button type="button" onclick="loadView('<?= $gridParam ?>')" class="btn <?= $mode === 'grid' ? 'btn-dark' : 'btn-outline-secondary' ?>" title="Card Gallery View">
+                    <i class="bi bi-grid-fill me-1"></i>Cards
+                </button>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadView('reviews')" title="Refresh Reviews">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
         </div>
     </div>
 
-    <div class="row g-3">
-        <?php if ($totalReviews > 0): ?>
-            <?php foreach ($reviews as $r): ?>
-                <div class="col-md-6 col-xl-4">
-                    <div class="admin-card p-3 d-flex flex-column justify-content-between h-100">
-                        <div>
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <div class="fw-semibold text-dark small"><?= htmlspecialchars($r['full_name']) ?></div>
-                                    <div class="text-muted" style="font-size: 0.72rem;"><?= date('M d, Y', strtotime($r['created_at'])) ?></div>
-                                </div>
-                                <div class="text-warning small">
-                                    <?php for ($i = 0; $i < $r['rating']; $i++): ?>
-                                        <i class="bi bi-star-fill"></i>
-                                    <?php endfor; ?>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center gap-2 mb-2 p-2 bg-light rounded" style="font-size: 0.75rem;">
-                                <img src="../assets/images/<?= $r['product_image'] ?: 'default.jpg' ?>" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px;" alt="prod">
-                                <span class="fw-semibold text-dark text-truncate"><?= htmlspecialchars($r['product_name']) ?></span>
-                            </div>
-                            <p class="text-secondary small mb-0" style="font-style: italic; line-height: 1.4;">
-                                "<?= htmlspecialchars($r['comment']) ?>"
-                            </p>
-                        </div>
-
-                        <div class="border-top pt-2 mt-3 text-end">
-                            <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="text-muted hover-danger small text-decoration-none" onclick="return confirm('Delete this review?');" title="Delete review">
-                                <i class="bi bi-trash me-1"></i> Remove
-                            </a>
-                        </div>
-                    </div>
+    <!-- 1. Operational Telemetry Strip -->
+    <div class="admin-card p-0 mb-4 overflow-hidden">
+        <div class="row g-0">
+            <!-- Col 1: Total Reviews -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-xl-bottom-0">
+                <div class="admin-kpi-label mb-1">Total Reviews</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;"><?= number_format($totalReviews) ?> Submissions</span>
+                    <span class="text-muted small">Verified</span>
                 </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="col-12">
-                <div class="admin-card text-center py-5 text-muted">
-                    No customer product reviews submitted yet.
+                <div class="text-muted small">
+                    <span class="text-dark fw-semibold"><?= number_format($totalReviews) ?></span> customer entries
                 </div>
             </div>
-        <?php endif; ?>
+
+            <!-- Col 2: Average Score -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-xl-bottom-0">
+                <div class="admin-kpi-label mb-1">Average Rating</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">
+                        <i class="bi bi-star-fill text-warning me-1"></i><?= $avgRating ?> <span class="text-muted fs-6 fw-normal">/ 5.0</span>
+                    </span>
+                    <span class="text-muted small">Storewide</span>
+                </div>
+                <div class="text-muted small">
+                    <span class="text-success fw-semibold">Overall Sentiment</span> &bull; Verified orders
+                </div>
+            </div>
+
+            <!-- Col 3: 5-Star Reviews -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-sm-bottom-0">
+                <div class="admin-kpi-label mb-1">5-Star Feedback</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-success fs-5" style="font-variant-numeric: tabular-nums;"><?= number_format($fiveStarCount) ?> Praise</span>
+                    <span class="text-muted small"><?= $fiveStarRatio ?>% Ratio</span>
+                </div>
+                <div class="text-muted small">
+                    <span class="text-success fw-semibold"><i class="bi bi-hand-thumbs-up me-1"></i>Top Rated</span> &bull; Perfect scores
+                </div>
+            </div>
+
+            <!-- Col 4: Critical Attention -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4">
+                <div class="admin-kpi-label mb-1">Flagged / Low Stars</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold <?= $lowStarCount > 0 ? 'text-danger' : 'text-dark' ?> fs-5" style="font-variant-numeric: tabular-nums;"><?= number_format($lowStarCount) ?> Ratings</span>
+                    <span class="text-muted small">&le; 2 Stars</span>
+                </div>
+                <div class="text-muted small">
+                    <?php if ($lowStarCount > 0): ?>
+                        <span class="text-danger fw-semibold"><i class="bi bi-exclamation-circle me-1"></i>Needs follow-up</span>
+                    <?php else: ?>
+                        <span class="text-success fw-semibold"><i class="bi bi-check2-circle me-1"></i>Zero critical issues</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- 2. Search & Rating Filter Bar -->
+    <div class="admin-card p-3 mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <!-- Search Form -->
+            <form onsubmit="event.preventDefault(); loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="d-flex align-items-center gap-2" style="max-width: 320px; width: 100%;">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search customer, product, comment..." value="<?= htmlspecialchars($search) ?>" style="font-size: 0.82rem;">
+                </div>
+                <button type="submit" class="btn btn-sm btn-dark px-3 fw-semibold text-nowrap">Search</button>
+                <?php if ($search !== ''): ?>
+                    <button type="button" onclick="loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>')" class="btn btn-sm btn-outline-secondary px-2 text-nowrap">Clear</button>
+                <?php endif; ?>
+            </form>
+
+            <!-- Segmented Rating Filter (No floating reset button) -->
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Rating Filter">
+                    <?php
+                    $ratingTabs = [
+                        'all' => ['label' => 'All Reviews', 'count' => $totalReviews],
+                        '5' => ['label' => '5 Stars', 'count' => $fiveStarCount],
+                        '4' => ['label' => '4 Stars', 'count' => $fourStarCount],
+                        '3' => ['label' => '3 Stars', 'count' => $threeStarCount],
+                        'low' => ['label' => '1-2 Stars', 'count' => $lowStarCount]
+                    ];
+                    foreach ($ratingTabs as $rKey => $rData):
+                        $isActive = ($ratingFilter === $rKey);
+                        $activeClass = $isActive ? 'btn-dark' : 'btn-outline-secondary';
+                        $param = "reviews&rating=$rKey" . ($mode !== 'table' ? "&mode=$mode" : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
+                    ?>
+                        <button type="button" onclick="loadView('<?= $param ?>')" class="btn <?= $activeClass ?>">
+                            <?= $rData['label'] ?> <span class="badge <?= $isActive ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?> ms-1" style="font-size: 0.68rem;"><?= $rData['count'] ?></span>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Reviews Display: Table or Card Gallery -->
+    <?php if ($mode === 'grid'): ?>
+        <!-- Card Gallery View -->
+        <div class="row g-3">
+            <?php if (!empty($reviews)): ?>
+                <?php foreach ($reviews as $r): ?>
+                    <div class="col-md-6 col-xl-4">
+                        <div class="admin-card p-3 d-flex flex-column justify-content-between h-100">
+                            <div>
+                                <!-- Review Header: Customer & Rating -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="admin-avatar-initial" style="width: 36px; height: 36px; font-size: 0.85rem; flex-shrink: 0; background-color: #0f172a; color: #ffffff; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center;">
+                                            <?= strtoupper(substr($r['full_name'], 0, 1)) ?>
+                                        </div>
+                                        <div class="overflow-hidden">
+                                            <div class="fw-semibold text-dark text-truncate small" title="<?= htmlspecialchars($r['full_name']) ?>"><?= htmlspecialchars($r['full_name']) ?></div>
+                                            <div class="text-muted" style="font-size: 0.72rem;"><?= date('M d, Y', strtotime($r['created_at'])) ?></div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-1 text-warning" style="color: #f59e0b !important;">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <i class="bi <?= $i <= $r['rating'] ? 'bi-star-fill' : 'bi-star' ?>" style="font-size: 0.8rem; color: <?= $i <= $r['rating'] ? '#f59e0b' : '#cbd5e1' ?>;"></i>
+                                        <?php endfor; ?>
+                                    </div>
+                                </div>
+
+                                <!-- Product Info Strip (No Card-in-Card) -->
+                                <div class="d-flex align-items-center gap-2 py-2 px-2 mb-3 bg-light rounded border" style="font-size: 0.78rem;">
+                                    <img src="../assets/images/<?= htmlspecialchars($r['product_image'] ?: 'default.jpg') ?>" onerror="this.src='../assets/images/default.jpg'" style="width: 28px; height: 28px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; flex-shrink: 0;" alt="prod">
+                                    <span class="fw-semibold text-dark text-truncate"><?= htmlspecialchars($r['product_name']) ?></span>
+                                </div>
+
+                                <!-- Comment Body -->
+                                <p class="text-dark small mb-0" style="line-height: 1.5; font-size: 0.82rem;">
+                                    &ldquo;<?= htmlspecialchars($r['comment']) ?>&rdquo;
+                                </p>
+                            </div>
+
+                            <!-- Footer Actions -->
+                            <div class="border-top pt-2 mt-3 d-flex justify-content-between align-items-center">
+                                <span class="badge bg-light text-muted border" style="font-family: monospace; font-size: 0.68rem;">
+                                    #<?= str_pad($r['id'], 4, '0', STR_PAD_LEFT) ?>
+                                </span>
+                                <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size: 0.75rem;" onclick="return confirm('Delete this review by <?= htmlspecialchars(addslashes($r['full_name'])) ?>?');" title="Delete review">
+                                    <i class="bi bi-trash me-1"></i>Remove
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="col-12">
+                    <div class="admin-card text-center py-5 text-muted">
+                        <i class="bi bi-chat-square-text text-muted opacity-50 fs-2 d-block mb-2"></i>
+                        <div class="fw-semibold text-dark">No customer reviews found</div>
+                        <div class="small text-muted">No reviews match the selected filter or search criteria.</div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    <?php else: ?>
+        <!-- Default High-Density Table View -->
+        <div class="admin-card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light border-bottom">
+                        <tr>
+                            <th class="ps-3 py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Review ID</th>
+                            <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Customer</th>
+                            <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Product</th>
+                            <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Rating</th>
+                            <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em; min-width: 260px;">Feedback Comment</th>
+                            <th class="py-3 text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Date</th>
+                            <th class="pe-3 py-3 text-end text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($reviews)): ?>
+                            <?php foreach ($reviews as $r): ?>
+                                <tr class="border-bottom">
+                                    <td class="ps-3 py-3">
+                                        <span class="badge bg-light text-dark border" style="font-family: monospace; font-size: 0.75rem;">
+                                            #<?= str_pad($r['id'], 4, '0', STR_PAD_LEFT) ?>
+                                        </span>
+                                    </td>
+                                    <td class="py-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="admin-avatar-initial" style="width: 34px; height: 34px; font-size: 0.85rem; flex-shrink: 0; background-color: #0f172a; color: #ffffff; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center;">
+                                                <?= strtoupper(substr($r['full_name'], 0, 1)) ?>
+                                            </div>
+                                            <div class="overflow-hidden">
+                                                <div class="fw-semibold text-dark text-truncate small" title="<?= htmlspecialchars($r['full_name']) ?>">
+                                                    <?= htmlspecialchars($r['full_name']) ?>
+                                                </div>
+                                                <div class="text-muted text-truncate" style="font-size: 0.75rem;" title="<?= htmlspecialchars($r['user_email'] ?? '') ?>">
+                                                    <?= htmlspecialchars($r['user_email'] ?? '') ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="../assets/images/<?= htmlspecialchars($r['product_image'] ?: 'default.jpg') ?>" onerror="this.src='../assets/images/default.jpg'" style="width: 32px; height: 32px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; flex-shrink: 0;" alt="prod">
+                                            <span class="fw-semibold text-dark text-truncate small" style="max-width: 160px;" title="<?= htmlspecialchars($r['product_name']) ?>">
+                                                <?= htmlspecialchars($r['product_name']) ?>
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3">
+                                        <div class="d-inline-flex align-items-center gap-1">
+                                            <div class="d-inline-flex" style="color: #f59e0b;">
+                                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                    <i class="bi <?= $i <= $r['rating'] ? 'bi-star-fill' : 'bi-star' ?>" style="font-size: 0.78rem; color: <?= $i <= $r['rating'] ? '#f59e0b' : '#cbd5e1' ?>;"></i>
+                                                <?php endfor; ?>
+                                            </div>
+                                            <span class="badge bg-light text-dark border ms-1 fw-bold" style="font-size: 0.7rem; font-variant-numeric: tabular-nums;">
+                                                <?= number_format((float)$r['rating'], 1) ?>
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3">
+                                        <div class="text-dark small" style="line-height: 1.45; max-width: 440px;">
+                                            &ldquo;<?= htmlspecialchars($r['comment']) ?>&rdquo;
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-muted small text-nowrap">
+                                        <?= date('M d, Y', strtotime($r['created_at'])) ?>
+                                    </td>
+                                    <td class="pe-3 py-3 text-end text-nowrap">
+                                        <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger py-1 px-2 d-inline-flex align-items-center gap-1" style="font-size: 0.78rem;" onclick="return confirm('Permanently remove this review by <?= htmlspecialchars(addslashes($r['full_name'])) ?>?');" title="Remove Review">
+                                            <i class="bi bi-trash"></i> <span>Remove</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <div class="py-4">
+                                        <i class="bi bi-chat-square-text text-muted opacity-50 fs-2 d-block mb-2"></i>
+                                        <div class="fw-semibold text-dark">No customer reviews found</div>
+                                        <div class="small text-muted">No reviews match the selected filter or search criteria.</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <?php endif; ?>
     <?php
 }
 
