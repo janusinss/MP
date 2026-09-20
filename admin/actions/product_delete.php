@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../config/db.php';
 
 // Security Check: Must be admin
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header("Location: ../login.php");
+    header("Location: ../../login");
     exit;
 }
 

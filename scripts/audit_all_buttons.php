@@ -206,11 +206,11 @@ checkBtn("Customer", "Profile 'Save Changes' Button", strpos($profilePost['body'
 // -------------------------------------------------------------
 echo "\n3. AUDITING ADMIN BUTTONS & CONTROL PORTAL:\n";
 
-// 3.1 Admin Login Form & Button
-$adminLoginPage = sendReq("$baseUrl/admin/login.php", null, $adminCookie);
+// 3.1 Admin Unified Login Form & Button
+$adminLoginPage = sendReq("$baseUrl/login", null, $adminCookie);
 $adminCsrf = getCsrf($adminLoginPage['body']);
-$adminLoginPost = sendReq("$baseUrl/admin/login.php", [
-    'username' => 'admin',
+$adminLoginPost = sendReq("$baseUrl/login", [
+    'email' => 'admin',
     'password' => 'admin123',
     'csrf_token' => $adminCsrf
 ], $adminCookie);
@@ -316,9 +316,10 @@ if ($newProdId > 0) {
     checkBtn("Admin", "Product 'Delete' Button", false, "Test product not found");
 }
 
-// 3.8 Admin Logout Button
+// 3.11 Admin Logout Button (Redirect directly to storefront landing)
 $logoutRes = sendReq("$baseUrl/admin/logout.php", null, $adminCookie);
-checkBtn("Admin", "Admin Portal 'Logout' Button", $logoutRes['code'] === 302, "Logged out cleanly");
+$redirectsToLanding = $logoutRes['code'] === 302 && (str_ends_with($logoutRes['redirect'], '/grocery_app/') || str_ends_with($logoutRes['redirect'], '/'));
+checkBtn("Admin", "Admin Portal 'Logout' Button", $redirectsToLanding, "Logged out directly to landing page");
 
 
 // -------------------------------------------------------------
