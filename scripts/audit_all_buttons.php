@@ -250,8 +250,13 @@ checkBtn("Admin", "Order Details 'Update Status' Button", $updateStatus['code'] 
 $exportRes = sendReq("$baseUrl/admin/export_orders.php", null, $adminCookie);
 checkBtn("Admin", "Dashboard 'Export Report' Button", $exportRes['code'] === 200 && strpos($exportRes['body'], 'Order ID') !== false && strpos($exportRes['body'], 'Customer Name') !== false, "CSV generated");
 
-// 3.6 Create New Product Button & Form
+// 3.6 Admin Catalog Inventory: 'Add New Product' Nav Button
+$prodInventory = sendReq("$baseUrl/admin/router.php?view=products", null, $adminCookie);
+$hasAddBtn = (strpos($prodInventory['body'], 'product_add.php') !== false) && (strpos($prodInventory['body'], 'Add New Product') !== false);
 $addProdPage = sendReq("$baseUrl/admin/product_add.php", null, $adminCookie);
+checkBtn("Admin", "Inventory 'Add New Product' Nav Button", $hasAddBtn && $addProdPage['code'] === 200, "Navigates to product_add.php console");
+
+// 3.7 Add Product Form: 'Publish Product' Submit Button & DB Persistence (backend.md Stage 3 & 6)
 $addProdCsrf = getCsrf($addProdPage['body']);
 $addProdPost = sendReq("$baseUrl/admin/product_add.php", [
     'name' => 'Automated Test Kiwi',
@@ -260,14 +265,41 @@ $addProdPost = sendReq("$baseUrl/admin/product_add.php", [
     'stock_qty' => 40,
     'csrf_token' => $addProdCsrf
 ], $adminCookie);
-checkBtn("Admin", "Create Product 'Publish' Button", $addProdPost['code'] === 302, "Product published");
 
-// 3.7 Admin Delete Product with CSRF
 require_once __DIR__ . '/../config/db.php';
-$stmtNewProd = $pdo->prepare("SELECT id FROM products WHERE name = ? ORDER BY id DESC LIMIT 1");
+$stmtNewProd = $pdo->prepare("SELECT id, name, category, price, stock_qty FROM products WHERE name = ? ORDER BY id DESC LIMIT 1");
 $stmtNewProd->execute(['Automated Test Kiwi']);
-$newProdId = (int)$stmtNewProd->fetchColumn();
+$newProd = $stmtNewProd->fetch(PDO::FETCH_ASSOC);
+$newProdId = (int)($newProd['id'] ?? 0);
+$createPersisted = $newProd && (float)$newProd['price'] === 4.50 && (int)$newProd['stock_qty'] === 40 && $newProd['category'] === 'Fruits';
 
+checkBtn("Admin", "Add Product 'Publish Product' Submit Button", $addProdPost['code'] === 302 && $createPersisted, "Created SKU #$newProdId ($4.50, 40 units, Fruits)");
+
+// 3.8 Inventory Table: Product Row 'Edit Product' Nav Button
+$inventoryWithNewProd = sendReq("$baseUrl/admin/router.php?view=products", null, $adminCookie);
+$hasEditBtn = ($newProdId > 0) && (strpos($inventoryWithNewProd['body'], "product_edit.php?id=$newProdId") !== false);
+$editProdPage = sendReq("$baseUrl/admin/product_edit.php?id=$newProdId", null, $adminCookie);
+$editPageValid = $editProdPage['code'] === 200 && strpos($editProdPage['body'], 'Automated Test Kiwi') !== false && strpos($editProdPage['body'], 'Save Changes') !== false;
+
+checkBtn("Admin", "Product Row 'Edit Product' Nav Button", $hasEditBtn && $editPageValid, "Navigates to product_edit.php with SKU preloaded");
+
+// 3.9 Edit Product Form: 'Save Changes' Submit Button & DB Persistence (backend.md Stage 3 & 6)
+$editCsrf = getCsrf($editProdPage['body']);
+$editProdPost = sendReq("$baseUrl/admin/product_edit.php?id=$newProdId", [
+    'category' => 'Snacks',
+    'price' => 6.99,
+    'stock_qty' => 85,
+    'csrf_token' => $editCsrf
+], $adminCookie);
+
+$stmtCheckUpd = $pdo->prepare("SELECT price, stock_qty, category FROM products WHERE id = ?");
+$stmtCheckUpd->execute([$newProdId]);
+$updProd = $stmtCheckUpd->fetch(PDO::FETCH_ASSOC);
+$updPersisted = $updProd && (float)$updProd['price'] === 6.99 && (int)$updProd['stock_qty'] === 85 && $updProd['category'] === 'Snacks';
+
+checkBtn("Admin", "Edit Product 'Save Changes' Submit Button", $editProdPost['code'] === 302 && $updPersisted, "Mutated: Price $6.99, Stock 85, Aisle Snacks");
+
+// 3.10 Admin Delete Product with CSRF & Verification
 if ($newProdId > 0) {
     // Get fresh CSRF token from router
     $routerPage = sendReq("$baseUrl/admin/router.php?view=products", null, $adminCookie);
@@ -275,7 +307,11 @@ if ($newProdId > 0) {
     $delCsrf = $mDelCsrf[1] ?? '';
     
     $delRes = sendReq("$baseUrl/admin/actions/product_delete.php?id=$newProdId&csrf_token=$delCsrf", null, $adminCookie);
-    checkBtn("Admin", "Product 'Delete' Button (with CSRF)", $delRes['code'] === 302, "Product removed");
+    $stmtDelCheck = $pdo->prepare("SELECT COUNT(*) FROM products WHERE id = ?");
+    $stmtDelCheck->execute([$newProdId]);
+    $isPurged = ((int)$stmtDelCheck->fetchColumn()) === 0;
+
+    checkBtn("Admin", "Product 'Delete' Button & DB Purge", $delRes['code'] === 302 && $isPurged, "Test product cleanly purged");
 } else {
     checkBtn("Admin", "Product 'Delete' Button", false, "Test product not found");
 }

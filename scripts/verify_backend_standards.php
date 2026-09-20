@@ -188,6 +188,48 @@ if ($newOrderId) {
 }
 
 // ----------------------------------------------------
+// 4.1 Product Catalog Mutation & Persistence (backend.md Stage 3 & 6)
+// ----------------------------------------------------
+echo "\n4.1 PRODUCT MUTATION & PERSISTENCE LIFECYCLE:\n";
+
+$pdo->beginTransaction();
+try {
+    // 1. Zero-trust prepared INSERT of product
+    $stmtIns = $pdo->prepare("INSERT INTO products (name, category, price, stock_qty, image) VALUES (?, ?, ?, ?, ?)");
+    $stmtIns->execute(['Backend Validation Kiwi', 'Fruits', 3.99, 50, 'prod_placeholder.png']);
+    $testProdId = (int)$pdo->lastInsertId();
+    assertTest("Zero-trust prepared INSERT of new product into catalog", $testProdId > 0);
+
+    // 2. Read back state
+    $stmtRead = $pdo->prepare("SELECT price, stock_qty, category FROM products WHERE id = ?");
+    $stmtRead->execute([$testProdId]);
+    $created = $stmtRead->fetch();
+    assertTest("Persistence of newly created product verified in MySQL", (float)$created['price'] === 3.99 && (int)$created['stock_qty'] === 50 && $created['category'] === 'Fruits');
+
+    // 3. Atomic UPDATE with parameter binding
+    $stmtUpd = $pdo->prepare("UPDATE products SET price = ?, stock_qty = ?, category = ? WHERE id = ?");
+    $stmtUpd->execute([7.49, 120, 'Snacks', $testProdId]);
+    
+    // 4. Read back mutated state
+    $stmtRead->execute([$testProdId]);
+    $updated = $stmtRead->fetch();
+    assertTest("Atomic UPDATE of product price, stock, and aisle persisted correctly", (float)$updated['price'] === 7.49 && (int)$updated['stock_qty'] === 120 && $updated['category'] === 'Snacks');
+
+    // 5. Clean teardown & verification
+    $stmtDel = $pdo->prepare("DELETE FROM products WHERE id = ?");
+    $stmtDel->execute([$testProdId]);
+    
+    $stmtRead->execute([$testProdId]);
+    $deleted = $stmtRead->fetch();
+    assertTest("Zero-leakage cleanup & deletion of test product", !$deleted);
+
+    $pdo->commit();
+} catch (Exception $e) {
+    $pdo->rollBack();
+    assertTest("Product mutation lifecycle executed cleanly", false, $e->getMessage());
+}
+
+// ----------------------------------------------------
 // 5. Customer Authentication Backend
 // ----------------------------------------------------
 echo "\n5. AUTHENTICATION & PASSWORD SECURITY:\n";
