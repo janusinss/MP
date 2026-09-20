@@ -21,19 +21,22 @@ FreshCart is an organic grocery e-commerce and Advanced Database Systems (ADS) p
 - **Checkout & Order Placement**: Multi-step checkout with address validation, cash/online payment selection, and ACID transaction boundaries.
 - **Customer Order Tracking & History**: Stored-procedure-backed order timeline with real-time order cancellation and inventory rollback.
 
-### P1 (Essential Storefront Experience)
+### P1 (Essential Storefront & Admin Operations)
 - **Customer Account Settings**: Profile name, delivery address defaults, and password updates.
 - **Review Submission**: Authenticated customer ratings and review submission with average score calculation.
-- **Admin Dashboard**: Real-time business telemetry, inventory status alerts, customer audit, and order fulfillment.
+- **Admin Analytics Dashboard**: Real-time business telemetry (Revenue velocity Chart.js, 4 KPI cards without AI chip slop, unified 4-segment operational health bar, department aisle share, and reorder alerts).
+- **Enlarged View Typography Standard**: Standardized `.admin-view-title` at `2.35rem` with `.admin-kicker` across all back-office operational portals.
 
-### P2 (Administrative Operations & Reporting)
-- **Inventory Management**: Product addition with image upload, price/stock updater, and deletion protection.
-- **Customer Moderation**: User audit list, customer deletion with cascade handling, and review moderation.
-- **CSV Data Export**: One-click order history export for bookkeeping.
+### P2 (Administrative Operations & Fulfillment)
+- **Order Management Portal**: Real-time order dispatch updates (Pending, Shipped, Delivered, Cancelled) with `.admin-status-pill` tokens and order detail inspection.
+- **Inventory Management**: Product catalog with SKU tracking, stock replenishment, addition with image validation, and deletion protection with CSRF.
+- **Customer Directory & Audit**: User profile list, lifetime customer spend analytics, order history, and account moderation.
+- **Review Gallery Moderation**: Shopper feedback moderation, star rating calculations, and satisfaction tracking.
+- **CSV Data Export**: One-click transactional report export (`export_orders.php`) for bookkeeping.
 
 ### P3 (Delight & Polish)
 - **Micro-interactions**: Exponential deceleration hover transitions, subtle card lifts, and toast feedback.
-- **Responsive Layout Harmony**: Fluid grid transitions across 375px mobile, 768px tablet, and 1280px desktop viewports.
+- **Responsive Layout Harmony**: Fluid grid transitions and zero horizontal scroll overflow across 375px mobile, 768px tablet, and 1280px desktop viewports.
 
 ---
 

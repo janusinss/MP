@@ -5452,7 +5452,6 @@ html, body {
     height: 100%;
     background: var(--color-brand, #4A745B);
     border-radius: 9999px;
-    transition: width 0.8s var(--ease-smooth, ease);
 }
 
 .soil-cert-tag {
@@ -5596,7 +5595,6 @@ html, body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    transition: width 0.6s ease;
 }
 
 .bar-farmer {
@@ -7870,8 +7868,7 @@ body.modal-open-freeze {
     font-weight: 500;
     color: #1c1917;
     outline: none;
-    width: 150px;
-    transition: width 0.22s ease;
+    width: 170px;
     padding: 0;
 }
 
@@ -8379,7 +8376,6 @@ body.modal-open-freeze {
     height: 100%;
     background: linear-gradient(90deg, #15803d, #22c55e);
     border-radius: 999px;
-    transition: width 0.4s ease-out;
 }
 
 .cart-item-card-v2 {
@@ -8903,7 +8899,6 @@ body.modal-open-freeze {
 
 .admin-pipeline-seg {
     height: 100%;
-    transition: width 0.3s ease;
 }
 
 .hover-danger:hover {

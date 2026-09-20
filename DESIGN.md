@@ -9,12 +9,14 @@
 ### 2. Taste Dials
 - **`DESIGN_VARIANCE`**: `7` (Editorial rhythm, asymmetric bento discovery cards, dynamic badge offsets).
 - **`MOTION_INTENSITY`**: `4` (Subtle, purposeful deceleration using `cubic-bezier(0.16, 1, 0.3, 1)`; zero bounce easing or layout shifts).
-- **`VISUAL_DENSITY`**: `6` (Balanced grocery catalog density with disciplined whitespace and compact hero insets).
+- **`VISUAL_DENSITY`**: `6` (Storefront catalog balance with disciplined whitespace); **Admin Views Override: `8`** (High-density telemetry, unified operational metrics strip, compact tabular rows).
 
 ### 3. Typography Scale
-- **Display & Section Headers**: `'Fraunces', Georgia, serif` (Weights: 600, 700; optical size: 9..144; line-height: 1.15; warm organic food & farmstead serif).
+- **Display & Section Headers**: `'Fraunces', Georgia, serif` (Weights: 600, 700, 800; optical size: 9..144; line-height: 1.15; warm organic food & farmstead serif).
+- **Admin View Titles (`.admin-view-title`)**: `2.35rem` desktop (`font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; color: #0f172a;`), scaling to `1.85rem` on mobile. Standardized across Analytics, Order Management, Product Inventory, Registered Customers, and Review Gallery.
+- **Admin Section Kickers (`.admin-kicker`)**: `0.72rem` (`font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b;`).
 - **Interface & Body Text**: `'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif` (Weights: 400, 500, 600, 700; line-height: 1.55).
-- **Numeric & Pricing**: `'Plus Jakarta Sans', tabular-nums, sans-serif` (Weights: 700; tracking: -0.01em).
+- **Numeric & Pricing**: `'Plus Jakarta Sans', tabular-nums, sans-serif` (Weights: 700, 800; tracking: -0.02em to -0.03em).
 - **Monospace & Metadata**: `'JetBrains Mono', 'Fira Code', monospace` (Weights: 500).
 
 ### 4. Color Tokens (CSS Custom Properties)
@@ -75,6 +77,10 @@
 - **Card Hierarchy**: Flat borders (`1px solid var(--color-border)`) with subtle hover lift (`transform: translateY(-3px)`) and smooth shadow bloom.
 - **Buttons**: Minimum interactive height 44px (`padding: 10px 24px`, `--radius-full`).
 - **Photography Standards**: Real, authentic produce photography. Zero AI generation. Semi-transparent scrim gradient (`linear-gradient(to top, rgba(0,0,0,0.65), transparent)`) behind overlays.
+- **Admin Console Hygiene**:
+  - Unified operational health bar replaces fragmented quick stats.
+  - Zero floating pastel chip capsules or sticker badges in card headers.
+  - High-density `.admin-status-pill` tokens (`status-delivered`, `status-shipped`, `status-pending`, `status-cancelled`).
 - **Slop Zero-Tolerance**:
   - Removed all `[side-tab]` borders.
   - Removed all `[bounce-easing]` transitions in favor of `--ease-smooth`.
