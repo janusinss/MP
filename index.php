@@ -359,8 +359,12 @@ $firstKey = array_key_first($aisleReels);
                 </h3>
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler freshcart-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navContent" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="toggler-bars" aria-hidden="true">
+                    <span class="toggler-bar bar-top"></span>
+                    <span class="toggler-bar bar-mid"></span>
+                    <span class="toggler-bar bar-bot"></span>
+                </span>
             </button>
 
             <div class="collapse navbar-collapse" id="navContent">
@@ -438,8 +442,8 @@ $firstKey = array_key_first($aisleReels);
                             </a>
                         </li>
                     <?php else: ?>
-                        <li class="nav-item"><a href="login" class="nav-link-custom">Login</a></li>
-                        <li class="nav-item"><a href="register" class="btn btn-primary rounded-pill px-4 shadow-sm">Sign Up</a></li>
+                        <li class="nav-item"><a href="login" class="nav-link-custom nav-btn-login">Login</a></li>
+                        <li class="nav-item"><a href="register" class="btn btn-primary nav-btn-signup rounded-pill px-4 shadow-sm">Sign Up</a></li>
                     <?php endif; ?>
                 </ul>
             </div>
