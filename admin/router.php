@@ -726,37 +726,36 @@ elseif ($view == 'products') {
             </form>
 
             <!-- Aisle & Stock Filter Controls -->
-            <div class="d-flex flex-wrap align-items-center gap-3">
-                <!-- Stock Health Segmented Strip -->
-                <div class="d-inline-flex align-items-center p-1 bg-light border rounded-2" style="border-color: #e2e8f0 !important; gap: 2px;">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <!-- Stock Status Filter Tabs (Consistent btn-group) -->
+                <div class="btn-group btn-group-sm" role="group" aria-label="Stock Filter">
                     <?php
                     $stockOptions = [
-                        'All' => 'All Stock',
-                        'low' => 'Low Stock (< 5)',
-                        'out' => 'Out of Stock (0)'
+                        'All' => ['label' => 'All Stock', 'count' => $totalSkus],
+                        'low' => ['label' => 'Low Stock (< 5)', 'count' => $lowStockCount],
+                        'out' => ['label' => 'Out of Stock (0)', 'count' => $outOfStockCount]
                     ];
-                    foreach ($stockOptions as $stKey => $stLabel):
+                    foreach ($stockOptions as $stKey => $stData):
                         $isActive = ($stockFilter === $stKey);
-                        $btnCls = $isActive ? 'btn-dark shadow-sm text-white' : 'btn-light border-0 text-secondary';
+                        $activeClass = $isActive ? 'btn-dark' : 'btn-outline-secondary';
                         $param = "products&stock=$stKey" . ($categoryFilter !== 'All' ? "&category=" . urlencode($categoryFilter) : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
                     ?>
-                        <button type="button" onclick="loadView('<?= $param ?>')" class="btn btn-sm <?= $btnCls ?> px-3 py-1 fw-semibold text-nowrap" style="font-size: 0.78rem; border-radius: 5px;">
-                            <?= $stLabel ?>
+                        <button type="button" onclick="loadView('<?= $param ?>')" class="btn <?= $activeClass ?>">
+                            <?= $stData['label'] ?> <span class="badge <?= $isActive ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?> ms-1" style="font-size: 0.68rem;"><?= $stData['count'] ?></span>
                         </button>
                     <?php endforeach; ?>
                 </div>
 
                 <!-- Custom Interactive Aisle Dropdown -->
                 <div class="dropdown position-relative d-inline-block">
-                    <button class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-2 fw-semibold px-3 py-1 text-nowrap" type="button" id="aisleDropdownBtn" onclick="toggleAisleMenu(event)" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; background-color: #fff;">
-                        <span>Aisle: <strong class="text-dark"><?= htmlspecialchars($categoryFilter) ?></strong></span>
-                        <i class="bi bi-chevron-down text-muted" style="font-size: 0.7rem;"></i>
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-inline-flex align-items-center gap-1" type="button" id="aisleDropdownBtn" onclick="toggleAisleMenu(event)">
+                        <span>Aisle: <strong><?= htmlspecialchars($categoryFilter) ?></strong></span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border mt-1" id="aisleDropdownMenu" style="font-size: 0.82rem; min-width: 210px; border-radius: 8px; border-color: #e2e8f0; z-index: 1050;">
+                    <ul class="dropdown-menu dropdown-menu-end shadow" id="aisleDropdownMenu" style="font-size: 0.82rem; min-width: 220px; z-index: 1050;">
                         <li>
                             <a class="dropdown-item py-2 d-flex justify-content-between align-items-center <?= ($categoryFilter === 'All') ? 'active fw-bold' : '' ?>" href="javascript:void(0)" onclick="selectAisle('All')">
                                 <span>All Categories</span>
-                                <span class="badge <?= ($categoryFilter === 'All') ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?>"><?= $totalSkus ?></span>
+                                <span class="badge rounded-pill ms-2 <?= ($categoryFilter === 'All') ? 'bg-white text-dark' : 'bg-secondary-subtle text-secondary' ?>"><?= $totalSkus ?></span>
                             </a>
                         </li>
                         <li><hr class="dropdown-divider my-1"></li>
@@ -766,7 +765,7 @@ elseif ($view == 'products') {
                             <li>
                                 <a class="dropdown-item py-2 d-flex justify-content-between align-items-center <?= $isCatActive ? 'active fw-bold' : '' ?>" href="javascript:void(0)" onclick="selectAisle('<?= htmlspecialchars(addslashes($cName)) ?>')">
                                     <span><?= htmlspecialchars($cName) ?></span>
-                                    <span class="badge <?= $isCatActive ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?>"><?= $cCount ?></span>
+                                    <span class="badge rounded-pill ms-2 <?= $isCatActive ? 'bg-white text-dark' : 'bg-secondary-subtle text-secondary' ?>"><?= $cCount ?></span>
                                 </a>
                             </li>
                         <?php endforeach; ?>

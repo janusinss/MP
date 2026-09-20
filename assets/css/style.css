@@ -8951,6 +8951,41 @@ body.modal-open-freeze {
     }
 }
 
+/* Admin Dropdown Styling (Consistent Anti-Slop Palette) */
+.dropdown-menu {
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05) !important;
+    padding: 6px !important;
+    background-color: #ffffff !important;
+}
+
+.dropdown-item {
+    border-radius: 6px !important;
+    padding: 7px 12px !important;
+    font-size: 0.82rem !important;
+    color: #334155 !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+}
+
+.dropdown-item.active .badge {
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
+}
+
+
 
 
 
