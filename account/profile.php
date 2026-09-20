@@ -72,7 +72,7 @@ include __DIR__ . '/../includes/header.php';
                         <div class="profile-avatar-mobile shadow-sm" aria-hidden="true">
                             <?= strtoupper(substr($user['full_name'] ?: 'U', 0, 1)) ?>
                         </div>
-                        <div class="profile-mobile-info flex-grow-1 min-w-0">
+                        <div class="profile-mobile-info flex-grow-1" style="min-width: 0;">
                             <h2 class="profile-mobile-name text-truncate mb-0"><?= htmlspecialchars($user['full_name']) ?></h2>
                             <div class="profile-mobile-email text-truncate"><?= htmlspecialchars($user['email']) ?></div>
                             <div class="profile-member-pill mt-1">
@@ -81,21 +81,17 @@ include __DIR__ . '/../includes/header.php';
                             </div>
                         </div>
                     </div>
-                    <!-- Quick Horizontal Switcher Tabs -->
-                    <nav class="profile-mobile-quick-nav mt-3 pt-2 border-top border-light-subtle" aria-label="Mobile Profile Tabs">
-                        <a href="<?= $rootPath ?>profile" class="profile-quick-pill active">
+                    <!-- Quick Horizontal Switcher Tabs (3 Balanced Grid Columns: Settings, Orders, Sign Out) -->
+                    <nav class="profile-mobile-grid-nav mt-3 pt-2 border-top border-light-subtle" aria-label="Mobile Profile Tabs">
+                        <a href="<?= $rootPath ?>profile" class="profile-grid-tab active">
                             <i class="bi bi-person-gear" aria-hidden="true"></i>
                             <span>Settings</span>
                         </a>
-                        <a href="<?= $rootPath ?>orders" class="profile-quick-pill">
+                        <a href="<?= $rootPath ?>orders" class="profile-grid-tab">
                             <i class="bi bi-receipt" aria-hidden="true"></i>
-                            <span>My Orders</span>
+                            <span>Orders</span>
                         </a>
-                        <a href="<?= $rootPath ?: './' ?>#categories" class="profile-quick-pill">
-                            <i class="bi bi-basket" aria-hidden="true"></i>
-                            <span>Browse Shop</span>
-                        </a>
-                        <a href="<?= $rootPath ?>logout" class="profile-quick-pill text-danger">
+                        <a href="<?= $rootPath ?>logout" class="profile-grid-tab profile-grid-tab-danger">
                             <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
                             <span>Sign Out</span>
                         </a>
@@ -229,6 +225,13 @@ include __DIR__ . '/../includes/header.php';
                                 <span>Save Changes</span>
                             </button>
                             <span class="text-muted small"><i class="bi bi-shield-check text-success me-1" aria-hidden="true"></i> Encrypted with 256-bit SSL</span>
+                        </div>
+
+                        <div class="profile-mobile-logout-wrap d-lg-none mt-4 pt-3 border-top text-center">
+                            <a href="<?= $rootPath ?>logout" class="btn btn-outline-danger w-100 rounded-3 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2" style="min-height: 46px;">
+                                <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                                <span>Sign Out of Account</span>
+                            </a>
                         </div>
                     </form>
                 </div>

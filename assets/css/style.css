@@ -13563,31 +13563,72 @@ body.modal-open-freeze {
     display: none;
 }
 
-.profile-quick-pill {
-    display: inline-flex;
-    align-items: center;
+.profile-mobile-grid-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 6px;
-    padding: 6px 14px;
+    width: 100%;
+}
+
+.profile-grid-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 2px;
     border-radius: 999px;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 600;
     color: #475569;
     background: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.08);
     text-decoration: none;
     white-space: nowrap;
-    min-height: 38px;
+    min-height: 44px;
     transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.profile-quick-pill:active {
+.profile-grid-tab i {
+    font-size: 0.85rem;
+}
+
+.profile-grid-tab:active {
     transform: scale(0.96);
+}
+
+.profile-grid-tab.active {
+    background: rgba(21, 128, 61, 0.12);
+    color: #15803d;
+    border-color: rgba(21, 128, 61, 0.28);
+}
+
+.profile-grid-tab-danger {
+    color: #dc2626 !important;
+    background: rgba(239, 68, 68, 0.08) !important;
+    border-color: rgba(239, 68, 68, 0.22) !important;
+}
+
+.profile-grid-tab-danger:hover {
+    background: rgba(239, 68, 68, 0.16) !important;
+    color: #b91c1c !important;
 }
 
 .profile-quick-pill.active {
     background: rgba(21, 128, 61, 0.12);
     color: #15803d;
     border-color: rgba(21, 128, 61, 0.28);
+}
+
+.profile-quick-pill-danger {
+    color: #dc2626 !important;
+    background: rgba(239, 68, 68, 0.08) !important;
+    border-color: rgba(239, 68, 68, 0.22) !important;
+}
+
+.profile-quick-pill-danger:hover {
+    background: rgba(239, 68, 68, 0.16) !important;
+    color: #b91c1c !important;
 }
 
 .profile-section-legend {
