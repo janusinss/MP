@@ -714,21 +714,21 @@ elseif ($view == 'products') {
     <div class="admin-card p-3 mb-4">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
             <!-- Search Form -->
-            <form onsubmit="event.preventDefault(); loadView('products&category=<?= urlencode($categoryFilter) ?>&stock=<?= urlencode($stockFilter) ?>&search=' + encodeURIComponent(this.search.value));" class="d-flex align-items-center gap-2 flex-grow-1" style="max-width: 360px;">
+            <form onsubmit="event.preventDefault(); loadView('products&category=<?= urlencode($categoryFilter) ?>&stock=<?= urlencode($stockFilter) ?>&search=' + encodeURIComponent(this.search.value));" class="d-flex align-items-center gap-2 flex-grow-1" style="max-width: 380px;">
                 <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search catalog by name, category, SKU..." value="<?= htmlspecialchars($search) ?>">
+                    <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by name, category, or SKU..." value="<?= htmlspecialchars($search) ?>" style="font-size: 0.82rem;">
                 </div>
-                <button type="submit" class="btn btn-sm btn-outline-secondary px-3">Search</button>
+                <button type="submit" class="btn btn-sm btn-dark px-3 fw-semibold text-nowrap" style="font-size: 0.8rem;">Search</button>
                 <?php if ($search !== '' || $categoryFilter !== 'All' || $stockFilter !== 'All'): ?>
-                    <button type="button" onclick="loadView('products')" class="btn btn-sm btn-link text-muted text-decoration-none">Clear</button>
+                    <button type="button" onclick="loadView('products')" class="btn btn-sm btn-outline-secondary px-2 text-nowrap" style="font-size: 0.8rem;">Reset</button>
                 <?php endif; ?>
             </form>
 
             <!-- Aisle & Stock Filter Controls -->
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <!-- Stock Health Toggles -->
-                <div class="btn-group btn-group-sm" role="group" aria-label="Stock Status Filter">
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <!-- Stock Health Segmented Strip -->
+                <div class="d-inline-flex align-items-center p-1 bg-light border rounded-2" style="border-color: #e2e8f0 !important; gap: 2px;">
                     <?php
                     $stockOptions = [
                         'All' => 'All Stock',
@@ -736,33 +736,84 @@ elseif ($view == 'products') {
                         'out' => 'Out of Stock (0)'
                     ];
                     foreach ($stockOptions as $stKey => $stLabel):
-                        $activeCls = ($stockFilter === $stKey) ? 'btn-dark' : 'btn-outline-secondary';
+                        $isActive = ($stockFilter === $stKey);
+                        $btnCls = $isActive ? 'btn-dark shadow-sm text-white' : 'btn-light border-0 text-secondary';
                         $param = "products&stock=$stKey" . ($categoryFilter !== 'All' ? "&category=" . urlencode($categoryFilter) : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
                     ?>
-                        <button type="button" onclick="loadView('<?= $param ?>')" class="btn <?= $activeCls ?>">
+                        <button type="button" onclick="loadView('<?= $param ?>')" class="btn btn-sm <?= $btnCls ?> px-3 py-1 fw-semibold text-nowrap" style="font-size: 0.78rem; border-radius: 5px;">
                             <?= $stLabel ?>
                         </button>
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Category Dropdown -->
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Aisle: <?= htmlspecialchars($categoryFilter) ?>
+                <!-- Custom Interactive Aisle Dropdown -->
+                <div class="dropdown position-relative d-inline-block">
+                    <button class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-2 fw-semibold px-3 py-1 text-nowrap" type="button" id="aisleDropdownBtn" onclick="toggleAisleMenu(event)" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; background-color: #fff;">
+                        <span>Aisle: <strong class="text-dark"><?= htmlspecialchars($categoryFilter) ?></strong></span>
+                        <i class="bi bi-chevron-down text-muted" style="font-size: 0.7rem;"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="font-size: 0.85rem;">
-                        <li><a class="dropdown-item <?= ($categoryFilter === 'All') ? 'active' : '' ?>" href="#" onclick="loadView('products&stock=<?= urlencode($stockFilter) ?><?= $search !== '' ? '&search=' . urlencode($search) : '' ?>')">All Categories (<?= $totalSkus ?>)</a></li>
-                        <li><hr class="dropdown-divider"></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border mt-1" id="aisleDropdownMenu" style="font-size: 0.82rem; min-width: 210px; border-radius: 8px; border-color: #e2e8f0; z-index: 1050;">
+                        <li>
+                            <a class="dropdown-item py-2 d-flex justify-content-between align-items-center <?= ($categoryFilter === 'All') ? 'active fw-bold' : '' ?>" href="javascript:void(0)" onclick="selectAisle('All')">
+                                <span>All Categories</span>
+                                <span class="badge <?= ($categoryFilter === 'All') ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?>"><?= $totalSkus ?></span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
                         <?php foreach ($categoryCounts as $cName => $cCount): 
-                            $cParam = "products&category=" . urlencode($cName) . "&stock=" . urlencode($stockFilter) . ($search !== '' ? '&search=' . urlencode($search) : '');
+                            $isCatActive = ($categoryFilter === $cName);
                         ?>
-                            <li><a class="dropdown-item <?= ($categoryFilter === $cName) ? 'active' : '' ?>" href="#" onclick="loadView('<?= $cParam ?>')"><?= htmlspecialchars($cName) ?> (<?= $cCount ?>)</a></li>
+                            <li>
+                                <a class="dropdown-item py-2 d-flex justify-content-between align-items-center <?= $isCatActive ? 'active fw-bold' : '' ?>" href="javascript:void(0)" onclick="selectAisle('<?= htmlspecialchars(addslashes($cName)) ?>')">
+                                    <span><?= htmlspecialchars($cName) ?></span>
+                                    <span class="badge <?= $isCatActive ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?>"><?= $cCount ?></span>
+                                </a>
+                            </li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleAisleMenu(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            const menu = document.getElementById('aisleDropdownMenu');
+            if (menu) {
+                menu.classList.toggle('show');
+            }
+        }
+
+        function selectAisle(category) {
+            const stock = '<?= urlencode($stockFilter) ?>';
+            const search = '<?= urlencode($search) ?>';
+            let param = 'products';
+            if (category !== 'All') {
+                param += '&category=' + encodeURIComponent(category);
+            }
+            if (stock !== 'All') {
+                param += '&stock=' + stock;
+            }
+            if (search !== '') {
+                param += '&search=' + search;
+            }
+            loadView(param);
+        }
+
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('aisleDropdownMenu');
+            const btn = document.getElementById('aisleDropdownBtn');
+            if (menu && menu.classList.contains('show')) {
+                if (!btn || !btn.contains(e.target)) {
+                    menu.classList.remove('show');
+                }
+            }
+        });
+    </script>
 
     <!-- 3. Inventory Products Master Table -->
     <div class="admin-card p-0 overflow-hidden">
