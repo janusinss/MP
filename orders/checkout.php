@@ -6,9 +6,17 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+$scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+$pos = strpos($scriptName, '/grocery_app');
+if ($pos !== false) {
+    $rootPath = substr($scriptName, 0, $pos + strlen('/grocery_app')) . '/';
+} else {
+    $rootPath = '/';
+}
+
 // If cart is empty, redirect back to shop
 if (empty($_SESSION['cart'])) {
-    header("Location: ../");
+    header("Location: " . $rootPath);
     exit;
 }
 
@@ -56,119 +64,215 @@ if (isset($_SESSION['discount'])) {
     $finalTotal = $subTotal - $discountAmount;
 }
 
+$checkoutError = $_GET['error'] ?? '';
+
 include __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="checkout-page-wrapper pt-5">
+<main class="checkout-page-wrapper" id="checkout-main">
     <div class="container">
         
-        <div class="mb-4">
-            <a href="../cart" class="text-decoration-none text-muted small text-uppercase fw-bold"><i class="bi bi-arrow-left me-1"></i> Back to Cart</a>
-            <h2 class="mt-2" style="font-family: var(--font-serif);">Secure Checkout</h2>
+        <!-- Header & Breadcrumb -->
+        <div class="checkout-header-bar">
+            <a href="<?= $rootPath ?>cart" class="checkout-back-link">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                <span>Return to Basket</span>
+            </a>
+            <div class="checkout-header-content">
+                <span class="checkout-kicker">Direct Farm Fulfillment</span>
+                <h1 class="checkout-title">Secure Checkout</h1>
+                <p class="checkout-subtitle">Verify your delivery location and payment preference to schedule your fresh harvest dispatch.</p>
+            </div>
         </div>
 
-        <form action="place" method="POST">
+        <?php if ($checkoutError === 'missing_fields'): ?>
+            <div class="checkout-alert checkout-alert-danger" role="alert">
+                <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                <span>Please provide both your full name and delivery address to confirm this order.</span>
+            </div>
+        <?php endif; ?>
+
+        <form action="<?= $rootPath ?>orders/place" method="POST" id="checkoutForm" novalidate>
             <?= csrf_input() ?>
-            <div class="row g-5">
+            <div class="row g-4 g-lg-5 align-items-start">
                 
+                <!-- Left: Order Fulfillment & Payment -->
                 <div class="col-lg-7">
                     
-                    <div class="checkout-form-card mb-4">
-                        <div class="step-header">
-                            <div class="step-number">1</div>
-                            <h4 class="step-title">Shipping Details</h4>
+                    <!-- Section 1: Delivery Details -->
+                    <div class="checkout-section-card mb-4">
+                        <div class="checkout-section-heading">
+                            <span class="checkout-step-tag">Step 1</span>
+                            <div>
+                                <h2 class="checkout-section-title">Delivery Destination</h2>
+                                <p class="checkout-section-desc">Where should our courier drop off your fresh produce?</p>
+                            </div>
                         </div>
                         
-                        <div class="mb-4">
-                            <label class="auth-label">Full Name</label>
-                            <input type="text" name="customer_name" class="form-control form-control-pill" 
-                                   value="<?= htmlspecialchars($pre_name) ?>" placeholder="John Doe" required>
+                        <div class="checkout-field-group mb-3">
+                            <label for="customer_name" class="checkout-label">
+                                Full Name <span class="text-danger" aria-hidden="true">*</span>
+                            </label>
+                            <div class="checkout-input-wrap">
+                                <i class="bi bi-person checkout-input-icon" aria-hidden="true"></i>
+                                <input type="text" id="customer_name" name="customer_name" class="checkout-input" 
+                                       value="<?= htmlspecialchars($pre_name) ?>" placeholder="e.g. Eleanor Vance" 
+                                       required autocomplete="name">
+                            </div>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="auth-label">Delivery Address</label>
-                            <textarea name="address" class="form-control form-control-pill" rows="3" required 
-                                      placeholder="123 Fresh Street, Green City..."><?= htmlspecialchars($pre_address) ?></textarea>
+                        <div class="checkout-field-group mb-2">
+                            <label for="address" class="checkout-label">
+                                Delivery Address &amp; Instructions <span class="text-danger" aria-hidden="true">*</span>
+                            </label>
+                            <div class="checkout-input-wrap">
+                                <i class="bi bi-geo-alt checkout-input-icon checkout-input-icon-top" aria-hidden="true"></i>
+                                <textarea id="address" name="address" class="checkout-textarea" rows="3" required 
+                                          placeholder="Street name, house/apartment number, gate code, or delivery drop notes..." 
+                                          autocomplete="street-address"><?= htmlspecialchars($pre_address) ?></textarea>
+                            </div>
                         </div>
+
+                        <p class="checkout-hint">
+                            <i class="bi bi-shield-check" aria-hidden="true"></i>
+                            Delivered in temperature-controlled, recyclable crates to maintain crisp peak flavor.
+                        </p>
                     </div>
 
-                    <div class="checkout-form-card">
-                        <div class="step-header">
-                            <div class="step-number">2</div>
-                            <h4 class="step-title">Payment Method</h4>
+                    <!-- Section 2: Payment Method -->
+                    <div class="checkout-section-card">
+                        <div class="checkout-section-heading">
+                            <span class="checkout-step-tag">Step 2</span>
+                            <div>
+                                <h2 class="checkout-section-title">Payment Method</h2>
+                                <p class="checkout-section-desc">Choose your settlement method upon fulfillment.</p>
+                            </div>
                         </div>
 
-                        <label class="payment-option-card active">
-                            <input type="radio" name="payment_method" value="COD" checked class="payment-radio">
-                            <div class="d-flex align-items-center gap-3">
-                                <i class="bi bi-cash-stack fs-3 text-success"></i>
-                                <div>
-                                    <span class="d-block fw-bold">Cash on Delivery (COD)</span>
-                                    <small class="text-muted">Pay when your order arrives.</small>
+                        <div class="checkout-payment-methods">
+                            <!-- Option 1: COD (Active) -->
+                            <label class="checkout-payment-card is-selected" for="pay_cod">
+                                <div class="checkout-payment-radio-wrap">
+                                    <input type="radio" id="pay_cod" name="payment_method" value="COD" checked class="checkout-payment-radio">
                                 </div>
-                            </div>
-                        </label>
-                        
-                        <label class="payment-option-card mt-3 opacity-50" style="cursor: not-allowed;">
-                            <input type="radio" disabled class="payment-radio">
-                            <div class="d-flex align-items-center gap-3">
-                                <i class="bi bi-credit-card fs-3"></i>
-                                <div>
-                                    <span class="d-block fw-bold">Credit Card / Online</span>
-                                    <small class="text-muted">Coming soon to FreshCart.</small>
+                                <div class="checkout-payment-details">
+                                    <div class="checkout-payment-header">
+                                        <span class="checkout-payment-name">Cash on Delivery (COD)</span>
+                                        <span class="checkout-payment-badge badge-active">Active</span>
+                                    </div>
+                                    <p class="checkout-payment-text">Inspect your harvest at your door before paying cash or local instant QR transfer to your courier.</p>
                                 </div>
-                            </div>
-                        </label>
+                                <div class="checkout-payment-icon" aria-hidden="true">
+                                    <i class="bi bi-cash-stack"></i>
+                                </div>
+                            </label>
+                            
+                            <!-- Option 2: Card / Digital Wallet (Coming Soon) -->
+                            <label class="checkout-payment-card is-disabled" for="pay_card">
+                                <div class="checkout-payment-radio-wrap">
+                                    <input type="radio" id="pay_card" name="payment_method_disabled" value="CARD" disabled class="checkout-payment-radio">
+                                </div>
+                                <div class="checkout-payment-details">
+                                    <div class="checkout-payment-header">
+                                        <span class="checkout-payment-name">Card &amp; Digital Wallet</span>
+                                        <span class="checkout-payment-badge badge-muted">Rolling Out Soon</span>
+                                    </div>
+                                    <p class="checkout-payment-text">Visa, Mastercard, Apple Pay, and Google Pay integrations are currently undergoing security auditing.</p>
+                                </div>
+                                <div class="checkout-payment-icon" aria-hidden="true">
+                                    <i class="bi bi-credit-card-2-front"></i>
+                                </div>
+                            </label>
+                        </div>
 
                     </div>
 
                 </div>
 
+                <!-- Right: Sticky Order Summary -->
                 <div class="col-lg-5">
-                    <div class="order-summary-card">
-                        <h5 class="mb-4 font-serif">Order Summary</h5>
+                    <div class="checkout-summary-card">
+                        <div class="checkout-summary-header">
+                            <h2 class="checkout-summary-title">Harvest Basket</h2>
+                            <span class="checkout-summary-count"><?= count($cartItems) ?> <?= count($cartItems) === 1 ? 'item' : 'items' ?></span>
+                        </div>
                         
-                        <div class="mb-4" style="max-height: 300px; overflow-y: auto; padding-right: 5px;">
+                        <!-- Line Items Scroll -->
+                        <div class="checkout-items-scroll" tabindex="0" aria-label="Review items in your order">
                             <?php foreach ($cartItems as $item): ?>
                                 <div class="checkout-item-row">
-                                    <img src="../assets/images/<?= $item['image'] ?: 'default.jpg' ?>" class="checkout-item-img">
-                                    <div class="flex-grow-1">
-                                        <h6 class="m-0 small fw-bold"><?= htmlspecialchars($item['name']) ?></h6>
-                                        <small class="text-muted">Qty: <?= $item['qty'] ?></small>
+                                    <div class="checkout-item-thumb-wrap">
+                                        <img src="<?= $rootPath ?>assets/images/<?= htmlspecialchars($item['image'] ?: 'default.jpg') ?>" 
+                                             alt="<?= htmlspecialchars($item['name']) ?>" 
+                                             class="checkout-item-thumb" 
+                                             width="52" height="52" loading="lazy"
+                                             onerror="this.onerror=null; this.src='<?= $rootPath ?>assets/images/default.jpg';">
                                     </div>
-                                    <div class="fw-bold small">$<?= number_format($item['line_total'], 2) ?></div>
+                                    <div class="checkout-item-info">
+                                        <h3 class="checkout-item-name" title="<?= htmlspecialchars($item['name']) ?>"><?= htmlspecialchars($item['name']) ?></h3>
+                                        <div class="checkout-item-meta">
+                                            <span class="checkout-item-qty">Qty: <?= (int)$item['qty'] ?></span>
+                                            <span class="checkout-item-rate">&times; $<?= number_format($item['price'], 2) ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="checkout-item-total">
+                                        $<?= number_format($item['line_total'], 2) ?>
+                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
 
-                        <div class="d-flex justify-content-between mb-2 small text-muted">
-                            <span>Subtotal</span>
-                            <span>$<?= number_format($subTotal, 2) ?></span>
-                        </div>
-                        
-                        <?php if ($discountAmount > 0): ?>
-                            <div class="d-flex justify-content-between mb-2 small text-success">
-                                <span>Discount</span>
-                                <span>-$<?= number_format($discountAmount, 2) ?></span>
+                        <!-- Price Breakdown -->
+                        <div class="checkout-calc-table">
+                            <div class="checkout-calc-row">
+                                <span class="checkout-calc-label">Produce Subtotal</span>
+                                <span class="checkout-calc-val">$<?= number_format($subTotal, 2) ?></span>
                             </div>
-                        <?php endif; ?>
+                            
+                            <?php if ($discountAmount > 0): ?>
+                                <div class="checkout-calc-row is-discount">
+                                    <span class="checkout-calc-label">
+                                        <i class="bi bi-tag-fill me-1" aria-hidden="true"></i>
+                                        Coupon Discount (<?= htmlspecialchars($_SESSION['discount']['code'] ?? 'PROMO') ?>)
+                                    </span>
+                                    <span class="checkout-calc-val">-$<?= number_format($discountAmount, 2) ?></span>
+                                </div>
+                            <?php endif; ?>
 
-                        <div class="d-flex justify-content-between mb-2 small text-muted">
-                            <span>Shipping</span>
-                            <span>Free</span>
+                            <div class="checkout-calc-row">
+                                <span class="checkout-calc-label">Farm Route Delivery</span>
+                                <span class="checkout-calc-val text-success fw-semibold">Free</span>
+                            </div>
+
+                            <div class="checkout-total-divider"></div>
+
+                            <div class="checkout-total-row">
+                                <div>
+                                    <span class="checkout-total-label">Total to Pay</span>
+                                    <small class="checkout-total-subtext">Includes all seasonal produce &amp; taxes</small>
+                                </div>
+                                <div class="checkout-total-amount">
+                                    $<?= number_format($finalTotal, 2) ?>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="checkout-total-row">
-                            <span>Total to Pay</span>
-                            <span>$<?= number_format($finalTotal, 2) ?></span>
-                        </div>
-
-                        <button type="submit" class="btn-confirm-order">
-                            Confirm Order
+                        <!-- Submit Action -->
+                        <button type="submit" class="checkout-submit-btn btn-confirm-order" id="confirmOrderBtn">
+                            <span>Confirm Order &amp; Schedule Delivery</span>
+                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
                         </button>
 
-                        <div class="text-center mt-3 small text-muted">
-                            <i class="bi bi-lock-fill"></i> SSL Secure Payment
+                        <!-- Trust Guarantees -->
+                        <div class="checkout-guarantee-badges">
+                            <div class="checkout-guarantee-item">
+                                <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+                                <span>SSL Encrypted Direct Checkout</span>
+                            </div>
+                            <div class="checkout-guarantee-item">
+                                <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
+                                <span>100% Crisp Harvest Quality Guarantee</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -176,6 +280,39 @@ include __DIR__ . '/../includes/header.php';
             </div>
         </form>
     </div>
-</div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentCards = document.querySelectorAll('.checkout-payment-card:not(.is-disabled)');
+    paymentCards.forEach(function(card) {
+        card.addEventListener('click', function() {
+            paymentCards.forEach(c => c.classList.remove('is-selected'));
+            this.classList.add('is-selected');
+            const radio = this.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+            }
+        });
+    });
+
+    const form = document.getElementById('checkoutForm');
+    const submitBtn = document.getElementById('confirmOrderBtn');
+    if (form && submitBtn) {
+        form.addEventListener('submit', function(e) {
+            const nameInput = document.getElementById('customer_name');
+            const addressInput = document.getElementById('address');
+            if (!nameInput.value.trim() || !addressInput.value.trim()) {
+                e.preventDefault();
+                if (!nameInput.value.trim()) nameInput.focus();
+                else addressInput.focus();
+                return;
+            }
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Scheduling Dispatch...</span> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        });
+    }
+});
+</script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
