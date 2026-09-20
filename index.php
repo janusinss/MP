@@ -799,8 +799,8 @@ $firstKey = array_key_first($aisleReels);
                     <p class="aisle-subtitle">Connected directly to independent regional family farms. Select an aisle to filter our harvest with 3D coverflow preview and one-click cart additions.</p>
                 </div>
 
-                <!-- Aisle Navigation Rail (Clean Category Filter, No "All Aisles") -->
-                <div class="aisle-nav-container" id="categoryRail">
+                <!-- Aisle Navigation Rail (Desktop & Tablet: Clean Category Chips) -->
+                <div class="aisle-nav-container d-none d-md-flex" id="categoryRail">
                     <?php 
                     $firstKey = array_key_first($aisleReels);
                     foreach ($aisleReels as $catKey => $reelData): 
@@ -810,6 +810,22 @@ $firstKey = array_key_first($aisleReels);
                             <i class="bi <?= $reelData['meta']['icon'] ?> me-1" aria-hidden="true"></i><?= htmlspecialchars($reelData['meta']['label'] ?? $catKey) ?>
                         </button>
                     <?php endforeach; ?>
+                </div>
+
+                <!-- Aisle Navigation Dropdown (Mobile Viewport: Native Accessible Select) -->
+                <div class="aisle-mobile-dropdown-wrap d-md-none" id="aisleMobileDropdownWrap">
+                    <div class="aisle-select-pill">
+                        <label for="aisleMobileSelect" class="visually-hidden">Choose Harvest Aisle</label>
+                        <span class="aisle-select-icon"><i class="bi <?= $aisleReels[$firstKey]['meta']['icon'] ?? 'bi-apple' ?>" id="aisleSelectActiveIcon" aria-hidden="true"></i></span>
+                        <select id="aisleMobileSelect" class="aisle-mobile-select" onchange="selectAisle(this.value)" aria-label="Select harvest aisle">
+                            <?php foreach ($aisleReels as $catKey => $reelData): ?>
+                                <option value="<?= htmlspecialchars($catKey) ?>" <?= ($catKey === $firstKey) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($reelData['meta']['label'] ?? $catKey) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <i class="bi bi-chevron-down aisle-select-chevron" aria-hidden="true"></i>
+                    </div>
                 </div>
 
                 <div class="department-showcase" id="activeAisleShowcase">
@@ -1476,6 +1492,16 @@ $firstKey = array_key_first($aisleReels);
                     chip.classList.remove('active');
                 }
             });
+
+            // Sync mobile select if present
+            const mobileSelect = document.getElementById('aisleMobileSelect');
+            if (mobileSelect && mobileSelect.value !== catKey) {
+                mobileSelect.value = catKey;
+            }
+            const activeIcon = document.getElementById('aisleSelectActiveIcon');
+            if (activeIcon && aisleData[catKey] && aisleData[catKey].meta) {
+                activeIcon.className = 'bi ' + (aisleData[catKey].meta.icon || 'bi-basket2');
+            }
 
             renderCoverflow();
         }

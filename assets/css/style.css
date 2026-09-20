@@ -7350,6 +7350,92 @@ html, body {
     box-shadow: 0 4px 14px rgba(45, 90, 61, 0.28);
 }
 
+/* Mobile Aisle Dropdown Selector */
+.aisle-mobile-dropdown-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    max-width: 320px;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .aisle-mobile-dropdown-wrap {
+        display: none !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .aisle-nav-container {
+        display: none !important;
+    }
+}
+
+.aisle-select-pill {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 48px;
+    background: #ffffff;
+    border: 1.5px solid var(--color-brand, #4A745B);
+    border-radius: var(--radius-full, 9999px);
+    box-shadow: 0 4px 14px rgba(45, 90, 61, 0.12);
+    padding: 0 1rem 0 1rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.aisle-select-pill:focus-within {
+    box-shadow: 0 0 0 3px rgba(74, 116, 91, 0.22);
+    border-color: var(--color-brand-dark, #375743);
+}
+
+.aisle-select-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-brand, #4A745B);
+    color: #ffffff;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    margin-right: 0.65rem;
+}
+
+.aisle-mobile-select {
+    width: 100%;
+    min-height: 44px;
+    font-family: var(--font-sans, sans-serif);
+    font-size: 16px !important; /* Strict 16px to prevent iOS auto-zoom */
+    font-weight: 700;
+    color: var(--color-text-primary, #232620);
+    background: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 0.5rem 1.75rem 0.5rem 0;
+}
+
+.aisle-select-chevron {
+    position: absolute;
+    right: 1.15rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    color: var(--color-brand, #4A745B);
+    pointer-events: none;
+    transition: transform 0.2s ease;
+}
+
+.aisle-select-pill:focus-within .aisle-select-chevron {
+    transform: translateY(-50%) rotate(180deg);
+}
+
 /* Single Department Showcase */
 .department-showcase {
     position: relative;
