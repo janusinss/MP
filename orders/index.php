@@ -6,9 +6,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Security Check: Must be logged in
+$rootPath = function_exists('get_app_root') ? get_app_root() : '/';
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login");
+    header("Location: " . $rootPath . "login");
     exit;
 }
 

@@ -8,8 +8,9 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Security Check: Administrator role enforcement
+$rootPath = function_exists('get_app_root') ? get_app_root() : '/';
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header("Location: ../login");
+    header("Location: " . $rootPath . "login");
     exit;
 }
 
@@ -113,6 +114,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css?v=<?= time(); ?>">
+    <script>
+        // Security: Defeat Back-Forward Cache (bfcache) & History Navigation Leaks after Logout
+        (function() {
+            function enforceFreshAuth() {
+                var navEntries = window.performance && window.performance.getEntriesByType ? window.performance.getEntriesByType('navigation') : null;
+                var isBackForward = (navEntries && navEntries.length > 0 && navEntries[0].type === 'back_forward') || 
+                                    (window.performance && window.performance.navigation && window.performance.navigation.type === 2);
+                if (isBackForward) {
+                    window.location.reload();
+                }
+            }
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    window.location.reload();
+                } else {
+                    enforceFreshAuth();
+                }
+            });
+        })();
+    </script>
 </head>
 <body class="admin-body">
 

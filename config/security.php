@@ -22,7 +22,19 @@ if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
     session_start();
 }
 
-// 2. Deliver Defense-in-Depth HTTP Security Headers
+if (!function_exists('get_app_root')) {
+    function get_app_root(): string {
+        $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+        $pos = strpos($scriptName, '/grocery_app');
+        if ($pos !== false) {
+            return substr($scriptName, 0, $pos + strlen('/grocery_app')) . '/';
+        }
+        $appRoot = rtrim(str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
+        return $appRoot ? $appRoot . '/' : '/';
+    }
+}
+
+// 2. Deliver Defense-in-Depth HTTP Security Headers & Prevent Sensitive Caching (OWASP CWE-525 / security.md Phase 6)
 if (!headers_sent()) {
     header_remove('X-Powered-By');
     header('X-Content-Type-Options: nosniff');
@@ -34,6 +46,11 @@ if (!headers_sent()) {
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
     }
     header("Content-Security-Policy: default-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;");
+
+    // Enforce strict anti-caching on dynamic application responses to defeat browser back-button history inspection
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0');
+    header('Pragma: no-cache');
+    header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 }
 
 // 3. Cryptographically Secure Anti-CSRF Functions

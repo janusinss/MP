@@ -27,6 +27,26 @@ if ($pos !== false) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="<?= $rootPath ?>assets/css/style.css?v=<?php echo time(); ?>">
+    <script>
+        // Security: Defeat Back-Forward Cache (bfcache) & History Navigation Leaks after Logout
+        (function() {
+            function enforceFreshAuth() {
+                var navEntries = window.performance && window.performance.getEntriesByType ? window.performance.getEntriesByType('navigation') : null;
+                var isBackForward = (navEntries && navEntries.length > 0 && navEntries[0].type === 'back_forward') || 
+                                    (window.performance && window.performance.navigation && window.performance.navigation.type === 2);
+                if (isBackForward) {
+                    window.location.reload();
+                }
+            }
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    window.location.reload();
+                } else {
+                    enforceFreshAuth();
+                }
+            });
+        })();
+    </script>
 </head>
 <body>
 

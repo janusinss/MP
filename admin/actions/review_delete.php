@@ -2,9 +2,9 @@
 // admin/actions/review_delete.php
 require_once __DIR__ . '/../../config/db.php';
 
-// Security Check: Must be admin
+$rootPath = function_exists('get_app_root') ? get_app_root() : '/';
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header("Location: ../../login");
+    header("Location: " . $rootPath . "login");
     exit;
 }
 
