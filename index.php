@@ -359,13 +359,25 @@ $firstKey = array_key_first($aisleReels);
                 </h3>
             </a>
             
-            <button class="navbar-toggler freshcart-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navContent" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="toggler-bars" aria-hidden="true">
-                    <span class="toggler-bar bar-top"></span>
-                    <span class="toggler-bar bar-mid"></span>
-                    <span class="toggler-bar bar-bot"></span>
-                </span>
-            </button>
+            <div class="mobile-nav-actions d-flex align-items-center gap-2 d-lg-none">
+                <?php if ($isLoggedIn): ?>
+                    <a href="cart" class="mobile-header-action-btn mobile-header-cart" aria-label="Shopping Cart">
+                        <i class="bi bi-bag"></i>
+                        <span class="mobile-header-cart-badge <?= ($cartCount > 0) ? '' : 'd-none' ?>"><?= $cartCount ?></span>
+                    </a>
+                    <a href="<?= $isAdmin ? 'admin/' : 'profile' ?>" class="mobile-header-action-btn mobile-header-avatar" aria-label="Account">
+                        <span><?= $isAdmin ? '<i class="bi bi-shield-check"></i>' : strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?></span>
+                    </a>
+                <?php endif; ?>
+
+                <button class="navbar-toggler freshcart-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navContent" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="toggler-bars" aria-hidden="true">
+                        <span class="toggler-bar bar-top"></span>
+                        <span class="toggler-bar bar-mid"></span>
+                        <span class="toggler-bar bar-bot"></span>
+                    </span>
+                </button>
+            </div>
 
             <div class="collapse navbar-collapse" id="navContent">
                 <ul class="navbar-nav mx-auto align-items-center gap-1">
@@ -458,9 +470,55 @@ $firstKey = array_key_first($aisleReels);
         <main class="site-main-content food-market-main">
             <div class="food-market-wrapper">
                 
+                <!-- Mobile Shopper Welcome Banner -->
+                <div class="mobile-shopper-banner d-lg-none">
+                    <div class="container">
+                        <div class="mobile-shopper-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="shopper-pill-avatar">
+                                        <?= $isAdmin ? '<i class="bi bi-shield-lock-fill"></i>' : strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?>
+                                    </div>
+                                    <div>
+                                        <div class="shopper-greeting">
+                                            Hi, <?= htmlspecialchars($isAdmin ? 'Administrator' : explode(' ', $_SESSION['user_name'] ?? 'Shopper')[0]) ?> 👋
+                                        </div>
+                                        <div class="shopper-subtext">Direct from 42 local partner growers</div>
+                                    </div>
+                                </div>
+                                <a href="<?= $isAdmin ? 'admin/' : 'orders' ?>" class="mobile-quick-orders-btn">
+                                    <i class="bi <?= $isAdmin ? 'bi-speedometer2' : 'bi-box-seam' ?>"></i>
+                                    <span><?= $isAdmin ? 'Admin' : 'My Orders' ?></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 1. Interactive Food Aisle Departments Rail & Search -->
                 <section class="food-aisles-section" id="food-aisles">
                     <div class="container">
+                        <!-- Dedicated Mobile Search Bar -->
+                        <div class="mobile-food-search-wrap d-lg-none mb-3">
+                            <form action="./" method="GET" class="mobile-food-search-form">
+                                <div class="mobile-food-search-box">
+                                    <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                                    <input type="text" name="search" class="mobile-food-search-input" placeholder="Search fresh produce, dairy, bakery..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                                    <?php if (!empty($category)): ?>
+                                        <input type="hidden" name="category" value="<?= htmlspecialchars($category) ?>">
+                                    <?php endif; ?>
+                                    <?php if (!empty($sort)): ?>
+                                        <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
+                                    <?php endif; ?>
+                                    <?php if (!empty($search)): ?>
+                                        <a href="<?= catalog_url(1, '', $category, $sort) ?>" class="mobile-search-clear-btn" aria-label="Clear search" title="Clear search">
+                                            <i class="bi bi-x-circle-fill"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </form>
+                        </div>
+
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <div class="text-uppercase text-muted" style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;">
                                 Browse by Food Department
@@ -477,8 +535,8 @@ $firstKey = array_key_first($aisleReels);
                                 <span class="aisle-count"><?= $totalFoodCount ?></span>
                             </a>
 
-                            <!-- Search Pill beside All Departments -->
-                            <form action="./" method="GET" class="food-aisle-search-form">
+                            <!-- Desktop Search Pill beside All Departments -->
+                            <form action="./" method="GET" class="food-aisle-search-form d-none d-lg-block">
                                 <div class="food-aisle-search-pill <?= !empty($search) ? 'has-value' : '' ?>">
                                     <i class="bi bi-search search-icon" aria-hidden="true"></i>
                                     <input type="text" name="search" class="food-aisle-search-input" placeholder="Search foods..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
@@ -597,7 +655,7 @@ $firstKey = array_key_first($aisleReels);
                             </div>
 
                             <!-- Quick Sort Toolbar -->
-                            <div class="d-flex align-items-center gap-2">
+                            <div class="market-catalog-sort-wrap d-flex align-items-center gap-2">
                                 <span class="text-muted small fw-semibold">Sort:</span>
                                 <div class="btn-group btn-group-sm rounded-pill p-1 bg-white border">
                                     <a href="<?= catalog_url(1, $search, $category, '') ?>" class="btn btn-sm <?= empty($sort) ? 'btn-success text-white' : 'btn-light border-0' ?> rounded-pill px-3">Featured</a>
@@ -2034,8 +2092,8 @@ $firstKey = array_key_first($aisleReels);
                 return;
             }
 
-            // Search Clear Pill Button
-            const clearBtn = e.target.closest('.search-clear-pill-btn');
+            // Search Clear Pill Button (desktop & mobile)
+            const clearBtn = e.target.closest('.search-clear-pill-btn, .mobile-search-clear-btn');
             if (clearBtn) {
                 e.preventDefault();
                 const href = clearBtn.getAttribute('href') || './';
@@ -2055,12 +2113,12 @@ $firstKey = array_key_first($aisleReels);
             }
         });
 
-        // Search Form Submit in Pill Rail
+        // Search Form Submit in Pill Rail or Mobile Search Box
         document.addEventListener('submit', function(e) {
-            const form = e.target.closest('.food-aisle-search-form');
+            const form = e.target.closest('.food-aisle-search-form, .mobile-food-search-form');
             if (form) {
                 e.preventDefault();
-                const searchInput = form.querySelector('.food-aisle-search-input');
+                const searchInput = form.querySelector('.food-aisle-search-input, .mobile-food-search-input');
                 const catInput = form.querySelector('input[name="category"]');
                 const sortInput = form.querySelector('input[name="sort"]');
 

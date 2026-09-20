@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // User & Admin Role Status
 $isAdmin = !empty($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true;
+$isLoggedIn = isset($_SESSION['user_id']) || $isAdmin;
 
 // Calculate Cart Count safely
 $cartCount = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
@@ -147,13 +148,25 @@ if ($pos !== false) {
                 </h3>
             </a>
             
-            <button class="navbar-toggler freshcart-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navContent" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="toggler-bars" aria-hidden="true">
-                    <span class="toggler-bar bar-top"></span>
-                    <span class="toggler-bar bar-mid"></span>
-                    <span class="toggler-bar bar-bot"></span>
-                </span>
-            </button>
+            <div class="mobile-nav-actions d-flex align-items-center gap-2 d-lg-none">
+                <?php if ($isLoggedIn): ?>
+                    <a href="<?= $rootPath ?>cart" class="mobile-header-action-btn mobile-header-cart" aria-label="Shopping Cart">
+                        <i class="bi bi-bag"></i>
+                        <span class="mobile-header-cart-badge <?= ($cartCount > 0) ? '' : 'd-none' ?>"><?= $cartCount ?></span>
+                    </a>
+                    <a href="<?= $isAdmin ? $rootPath . 'admin/' : $rootPath . 'profile' ?>" class="mobile-header-action-btn mobile-header-avatar" aria-label="Account">
+                        <span><?= $isAdmin ? '<i class="bi bi-shield-check"></i>' : strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?></span>
+                    </a>
+                <?php endif; ?>
+
+                <button class="navbar-toggler freshcart-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navContent" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="toggler-bars" aria-hidden="true">
+                        <span class="toggler-bar bar-top"></span>
+                        <span class="toggler-bar bar-mid"></span>
+                        <span class="toggler-bar bar-bot"></span>
+                    </span>
+                </button>
+            </div>
 
             <div class="collapse navbar-collapse" id="navContent">
                 <ul class="navbar-nav ms-auto align-items-center gap-3">
