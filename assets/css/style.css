@@ -8932,5 +8932,25 @@ body.modal-open-freeze {
     }
 }
 
+@media print {
+    .admin-sidebar,
+    .btn,
+    .no-print,
+    .admin-header-actions {
+        display: none !important;
+    }
+    .admin-main,
+    .order-details-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+    .admin-card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+    }
+}
+
+
 
 

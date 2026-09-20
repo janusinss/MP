@@ -1,7 +1,10 @@
 <?php
 // admin/order_details.php
 require_once __DIR__ . '/../config/db.php';
-session_start();
+require_once __DIR__ . '/../config/security.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Security Check
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -51,112 +54,185 @@ try {
 } catch (Exception $e) {
     die("Error: " . htmlspecialchars($e->getMessage()));
 }
+
+$s = $order['status'];
+$pillClass = match($s) {
+    'Delivered' => 'status-delivered',
+    'Shipped' => 'status-shipped',
+    'Pending' => 'status-pending',
+    default => 'status-cancelled'
+};
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order #<?= $order_id ?> | Admin Portal</title>
+    <title>Order #<?= str_pad($order['id'], 5, '0', STR_PAD_LEFT) ?> | Admin Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../assets/css/style.css?v=<?= time(); ?>">
 </head>
-<body style="background-color: var(--bg-color);">
+<body style="background-color: var(--color-canvas, #F7F6F2); color: #0f172a; min-height: 100vh;">
 
-    <div class="container mt-5 order-details-wrapper">
+    <div class="container py-4 order-details-wrapper" style="max-width: 960px;">
 
-        <div class="page-nav-header animate-fade-in">
-            <a href="index.php?view=orders" class="btn-back-glass">
+        <!-- Navigation & Actions Bar -->
+        <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+            <a href="index.php?view=orders" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
                 <i class="bi bi-arrow-left"></i> Back to Orders
             </a>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" onclick="window.print()" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
+                    <i class="bi bi-printer"></i> Print Invoice
+                </button>
+            </div>
         </div>
 
-        <div class="invoice-card animate-fade-in">
-            
-            <div class="invoice-header-modern">
-                <div>
-                    <h1 class="invoice-title">Order #<?= str_pad($order['id'], 5, '0', STR_PAD_LEFT) ?></h1>
-                    <div class="invoice-meta">
-                        <span><i class="bi bi-calendar3"></i> <?= date('M d, Y', strtotime($order['created_at'])) ?></span>
-                        <span><i class="bi bi-clock"></i> <?= date('h:i A', strtotime($order['created_at'])) ?></span>
-                    </div>
-                </div>
-                
-                <?php 
-                    $s = $order['status'];
-                    $badgeStyle = 'background: #eee; color: #555;';
-                    if ($s == 'Pending') $badgeStyle = 'background: #fff3cd; color: #856404; border: 1px solid #ffeeba;';
-                    if ($s == 'Shipped') $badgeStyle = 'background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;';
-                    if ($s == 'Delivered') $badgeStyle = 'background: #d4edda; color: #155724; border: 1px solid #c3e6cb;';
-                    if ($s == 'Cancelled') $badgeStyle = 'background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;';
-                ?>
-                <div class="invoice-status-badge" style="<?= $badgeStyle ?>">
+        <!-- View Header -->
+        <div class="admin-view-header mb-4">
+            <div>
+                <span class="admin-kicker">Fulfillment &amp; Order Logistics</span>
+                <h1 class="admin-view-title mb-1">Order #<?= str_pad($order['id'], 5, '0', STR_PAD_LEFT) ?></h1>
+                <p class="admin-view-subtitle mb-0">
+                    Placed on <?= date('F d, Y \a\t h:i A', strtotime($order['created_at'])) ?>
+                </p>
+            </div>
+            <div class="text-end">
+                <span class="admin-status-pill <?= $pillClass ?> px-3 py-1" style="font-size: 0.85rem;">
                     <?= $s ?>
+                </span>
+            </div>
+        </div>
+
+        <!-- Two-Column Operational Details -->
+        <div class="row g-4 mb-4">
+            <!-- Col 1: Customer & Delivery Address -->
+            <div class="col-md-6">
+                <div class="admin-card h-100">
+                    <h2 class="admin-card-heading mb-3">Customer &amp; Delivery Destination</h2>
+                    <div class="mb-3">
+                        <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.7rem;">Recipient Name</div>
+                        <div class="fw-bold text-dark fs-6"><?= htmlspecialchars($order['customer_name']) ?></div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.7rem;">Shipping Address</div>
+                        <div class="text-dark small d-flex align-items-start gap-2 mt-1">
+                            <i class="bi bi-geo-alt text-muted mt-1"></i>
+                            <div><?= nl2br(htmlspecialchars($order['address'])) ?></div>
+                        </div>
+                    </div>
+                    <div class="border-top pt-2 mt-auto">
+                        <div class="text-muted small">
+                            Payment Method: <span class="fw-semibold text-dark">Cash on Delivery</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="invoice-info-grid">
-                <div>
-                    <span class="info-box-title">Billed To</span>
-                    <h5 class="fw-bold mb-1"><?= htmlspecialchars($order['customer_name']) ?></h5>
-                    <address class="customer-address mb-0">
-                        <?= nl2br(htmlspecialchars($order['address'])) ?>
-                    </address>
-                </div>
+            <!-- Col 2: Status Management -->
+            <div class="col-md-6">
+                <div class="admin-card h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <h2 class="admin-card-heading mb-3">Fulfillment Status Control</h2>
+                        <div class="mb-3">
+                            <div class="text-muted small text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">Current Operational State</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="admin-status-pill <?= $pillClass ?>"><?= $s ?></span>
+                                <span class="text-muted small">&bull; Updated in real-time</span>
+                            </div>
+                        </div>
 
-                <div>
-                    <span class="info-box-title">Manage Order Status</span>
-                    <div class="status-update-container">
-                        <form method="POST" class="d-flex gap-2">
+                        <form method="POST" class="no-print">
                             <?= csrf_input() ?>
-                            <select name="status" class="form-select status-select-custom">
-                                <option value="Pending" <?= $s == 'Pending' ? 'selected' : '' ?>>Pending</option>
-                                <option value="Shipped" <?= $s == 'Shipped' ? 'selected' : '' ?>>Shipped</option>
-                                <option value="Delivered" <?= $s == 'Delivered' ? 'selected' : '' ?>>Delivered</option>
-                                <option value="Cancelled" <?= $s == 'Cancelled' ? 'selected' : '' ?>>Cancelled</option>
-                            </select>
-                            <button type="submit" name="update_status" class="btn btn-primary btn-sm px-3 rounded-pill">Update</button>
+                            <label for="statusSelect" class="form-label text-muted small text-uppercase fw-bold" style="font-size: 0.7rem;">Change Status</label>
+                            <div class="d-flex gap-2">
+                                <select id="statusSelect" name="status" class="form-select form-select-sm">
+                                    <option value="Pending" <?= $s == 'Pending' ? 'selected' : '' ?>>Pending</option>
+                                    <option value="Shipped" <?= $s == 'Shipped' ? 'selected' : '' ?>>Shipped</option>
+                                    <option value="Delivered" <?= $s == 'Delivered' ? 'selected' : '' ?>>Delivered</option>
+                                    <option value="Cancelled" <?= $s == 'Cancelled' ? 'selected' : '' ?>>Cancelled</option>
+                                </select>
+                                <button type="submit" name="update_status" class="btn btn-sm btn-dark px-3 fw-semibold text-nowrap">
+                                    Update Status
+                                </button>
+                            </div>
                         </form>
                     </div>
+
+                    <div class="border-top pt-2 mt-3 text-muted small">
+                        Status mutations automatically trigger inventory adjustments and notify order tracking.
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="invoice-table-container">
-                <table class="invoice-table">
-                    <thead>
+        <!-- Purchased Items Breakdown -->
+        <div class="admin-card p-0 overflow-hidden mb-4">
+            <div class="p-3 px-4 border-bottom bg-light">
+                <h2 class="admin-card-heading mb-0">Purchased Order Items</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="bg-white border-bottom">
                         <tr>
-                            <th width="50%">Item Description</th>
-                            <th width="15%" class="text-center">Unit Price</th>
-                            <th width="15%" class="text-center">Quantity</th>
-                            <th width="20%" class="text-end">Amount</th>
+                            <th class="ps-4 py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Item Description</th>
+                            <th class="py-3 text-center text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Unit Price</th>
+                            <th class="py-3 text-center text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Quantity</th>
+                            <th class="pe-4 py-3 text-end text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Line Total</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($items as $item): ?>
-                        <tr>
-                            <td>
-                                <div class="item-preview">
-                                    <img src="../assets/images/<?= $item['image'] ?: 'default.jpg' ?>" class="item-thumb" alt="img">
-                                    <span class="item-name"><?= htmlspecialchars($item['name']) ?></span>
-                                </div>
-                            </td>
-                            <td class="text-center text-muted">$<?= number_format($item['price'], 2) ?></td>
-                            <td class="text-center fw-bold">x <?= $item['quantity'] ?></td>
-                            <td class="text-end fw-bold">$<?= number_format($item['price'] * $item['quantity'], 2) ?></td>
-                        </tr>
+                        <?php 
+                        $itemsSubtotal = 0.0;
+                        foreach ($items as $item): 
+                            $lineTotal = (float)$item['price'] * (int)$item['quantity'];
+                            $itemsSubtotal += $lineTotal;
+                        ?>
+                            <tr class="border-bottom">
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="../assets/images/<?= $item['image'] ?: 'default.jpg' ?>" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;" alt="item">
+                                        <div>
+                                            <div class="fw-semibold text-dark small"><?= htmlspecialchars($item['name']) ?></div>
+                                            <div class="text-muted" style="font-size: 0.7rem; font-family: monospace;">SKU: #<?= str_pad($item['product_id'], 4, '0', STR_PAD_LEFT) ?></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 text-center text-secondary small" style="font-variant-numeric: tabular-nums;">
+                                    $<?= number_format((float)$item['price'], 2) ?>
+                                </td>
+                                <td class="py-3 text-center fw-semibold text-dark small">
+                                    &times; <?= (int)$item['quantity'] ?>
+                                </td>
+                                <td class="pe-4 py-3 text-end fw-bold text-dark small" style="font-variant-numeric: tabular-nums;">
+                                    $<?= number_format($lineTotal, 2) ?>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
 
-            <div class="invoice-footer">
-                <div class="total-group">
-                    <span class="total-label">Grand Total</span>
-                    <span class="total-value-lg">$<?= number_format($order['total_amount'], 2) ?></span>
+            <!-- Financial Reconciliation Footer -->
+            <div class="p-3 px-4 bg-light border-top">
+                <div class="row justify-content-end">
+                    <div class="col-sm-6 col-md-4">
+                        <div class="d-flex justify-content-between text-muted small mb-1">
+                            <span>Items Subtotal:</span>
+                            <span class="fw-semibold text-dark" style="font-variant-numeric: tabular-nums;">$<?= number_format($itemsSubtotal, 2) ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small mb-2">
+                            <span>Delivery &amp; Handling:</span>
+                            <span class="text-success fw-semibold">Free</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-baseline border-top pt-2">
+                            <span class="fw-bold text-dark">Grand Total:</span>
+                            <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format((float)$order['total_amount'], 2) ?></span>
+                        </div>
+                    </div>
                 </div>
             </div>
-
         </div>
 
     </div>

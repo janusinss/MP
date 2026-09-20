@@ -914,15 +914,60 @@ elseif ($view == 'customer_details') {
 // VIEW 6: ORDERS
 // =========================================================================
 elseif ($view == 'orders') {
+    // 1. Gather status metrics and financial totals
+    $statusCounts = [
+        'All' => 0,
+        'Pending' => 0,
+        'Shipped' => 0,
+        'Delivered' => 0,
+        'Cancelled' => 0
+    ];
+    $totalOrderRevenue = 0.0;
+    
+    $stmtStats = $pdo->query("SELECT status, COUNT(*) as cnt, SUM(total_amount) as sum_amt FROM orders GROUP BY status");
+    while ($row = $stmtStats->fetch(PDO::FETCH_ASSOC)) {
+        $st = $row['status'];
+        $cnt = (int)$row['cnt'];
+        $sum = (float)($row['sum_amt'] ?? 0);
+        $statusCounts['All'] += $cnt;
+        if (isset($statusCounts[$st])) {
+            $statusCounts[$st] = $cnt;
+        }
+        if ($st !== 'Cancelled') {
+            $totalOrderRevenue += $sum;
+        }
+    }
+    
+    $deliveredCount = $statusCounts['Delivered'] ?? 0;
+    $pendingCount = $statusCounts['Pending'] ?? 0;
+    $shippedCount = $statusCounts['Shipped'] ?? 0;
+    $completionRate = ($statusCounts['All'] > 0) ? round(($deliveredCount / $statusCounts['All']) * 100) : 0;
+
+    // 2. Query filtered orders with item counts
     $statusFilter = $_GET['status'] ?? 'All';
-    $sql = "SELECT * FROM orders";
+    $search = trim($_GET['search'] ?? '');
+    
+    $sql = "SELECT o.*, (SELECT COUNT(*) FROM order_items oi WHERE oi.order_id = o.id) AS item_count FROM orders o";
+    $where = [];
     $params = [];
 
-    if ($statusFilter != 'All') {
-        $sql .= " WHERE status = ?";
+    if ($statusFilter != 'All' && in_array($statusFilter, ['Pending', 'Shipped', 'Delivered', 'Cancelled'], true)) {
+        $where[] = "o.status = ?";
         $params[] = $statusFilter;
     }
-    $sql .= " ORDER BY created_at DESC";
+
+    if ($search !== '') {
+        $where[] = "(o.customer_name LIKE ? OR o.address LIKE ? OR CAST(o.id AS CHAR) LIKE ?)";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+    }
+
+    if (!empty($where)) {
+        $sql .= " WHERE " . implode(" AND ", $where);
+    }
+
+    $sql .= " ORDER BY o.created_at DESC";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -932,30 +977,113 @@ elseif ($view == 'orders') {
         <div>
             <span class="admin-kicker">Fulfillment &amp; Logistics</span>
             <h1 class="admin-view-title">Order Management</h1>
-            <p class="admin-view-subtitle">Track fulfillment, delivery logistics, and update order records.</p>
+            <p class="admin-view-subtitle">Track customer orders, fulfillment pipelines, and delivery records.</p>
         </div>
-        <div class="btn-group btn-group-sm" role="group" aria-label="Order Status Filter">
-            <?php
-            $statuses = ['All', 'Pending', 'Shipped', 'Delivered', 'Cancelled'];
-            foreach ($statuses as $s):
-                $activeClass = ($statusFilter == $s) ? 'btn-dark' : 'btn-outline-secondary';
-                $param = ($s == 'All') ? 'orders' : "orders&status=$s";
-            ?>
-                <button type="button" onclick="loadView('<?= $param ?>')" class="btn <?= $activeClass ?>"><?= $s ?></button>
-            <?php endforeach; ?>
+        <div class="d-flex align-items-center gap-2">
+            <a href="export_orders.php" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-download me-1"></i> Export Orders (CSV)
+            </a>
         </div>
     </div>
 
+    <!-- 1. Operational Telemetry Strip -->
+    <div class="admin-card p-0 mb-4 overflow-hidden">
+        <div class="row g-0">
+            <!-- Col 1: Total Orders -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-xl-bottom-0">
+                <div class="admin-kpi-label mb-1">Total Orders</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;"><?= number_format($statusCounts['All']) ?> Orders</span>
+                    <span class="text-muted small">Recorded</span>
+                </div>
+                <div class="text-muted small">
+                    All lifetime transactions
+                </div>
+            </div>
+
+            <!-- Col 2: Gross Realized Volume -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-xl-bottom-0">
+                <div class="admin-kpi-label mb-1">Gross Order Volume</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format($totalOrderRevenue, 2) ?></span>
+                    <span class="text-success small fw-semibold">Net Active</span>
+                </div>
+                <div class="text-muted small">
+                    Excludes cancelled orders
+                </div>
+            </div>
+
+            <!-- Col 3: Pending Dispatch -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-sm-bottom-0">
+                <div class="admin-kpi-label mb-1">Pending Fulfillment</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold fs-5 <?= $pendingCount > 0 ? 'text-warning-emphasis' : 'text-dark' ?>" style="font-variant-numeric: tabular-nums;"><?= $pendingCount ?> Orders</span>
+                    <span class="text-muted small">In Queue</span>
+                </div>
+                <div class="small">
+                    <?= $pendingCount > 0 ? '<span class="text-warning-emphasis fw-semibold"><i class="bi bi-clock-history me-1"></i>Requires dispatch</span>' : '<span class="text-success fw-semibold"><i class="bi bi-check2 me-1"></i>Queue clear</span>' ?>
+                </div>
+            </div>
+
+            <!-- Col 4: Fulfillment Rate -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4">
+                <div class="admin-kpi-label mb-1">Fulfillment Rate</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;"><?= $completionRate ?>%</span>
+                    <span class="text-success small fw-semibold"><?= $deliveredCount ?> Delivered</span>
+                </div>
+                <div class="text-muted small">
+                    <?= $shippedCount ?> in transit &bull; <?= $statusCounts['Cancelled'] ?> cancelled
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Search & Status Filter Bar -->
+    <div class="admin-card p-3 mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <!-- Search Form -->
+            <form onsubmit="event.preventDefault(); loadView('orders&status=<?= urlencode($statusFilter) ?>&search=' + encodeURIComponent(this.search.value));" class="d-flex align-items-center gap-2 flex-grow-1" style="max-width: 380px;">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by customer, address, or ID..." value="<?= htmlspecialchars($search) ?>">
+                </div>
+                <button type="submit" class="btn btn-sm btn-outline-secondary px-3">Search</button>
+                <?php if ($search !== ''): ?>
+                    <button type="button" onclick="loadView('orders&status=<?= urlencode($statusFilter) ?>')" class="btn btn-sm btn-link text-muted text-decoration-none">Clear</button>
+                <?php endif; ?>
+            </form>
+
+            <!-- Status Tabs -->
+            <div class="btn-group btn-group-sm" role="group" aria-label="Order Status Filter">
+                <?php
+                $statuses = ['All', 'Pending', 'Shipped', 'Delivered', 'Cancelled'];
+                foreach ($statuses as $s):
+                    $activeClass = ($statusFilter == $s) ? 'btn-dark' : 'btn-outline-secondary';
+                    $countLabel = $statusCounts[$s] ?? 0;
+                    $searchParam = ($search !== '') ? '&search=' . urlencode($search) : '';
+                    $param = ($s == 'All') ? 'orders' . $searchParam : "orders&status=$s" . $searchParam;
+                ?>
+                    <button type="button" onclick="loadView('<?= $param ?>')" class="btn <?= $activeClass ?>">
+                        <?= $s ?> <span class="badge <?= ($statusFilter == $s) ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?> ms-1" style="font-size: 0.68rem;"><?= $countLabel ?></span>
+                    </button>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Orders Master Table -->
     <div class="admin-card p-0 overflow-hidden">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light border-bottom">
                     <tr>
                         <th class="ps-3 py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Order ID</th>
-                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Customer</th>
+                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Customer &amp; Delivery Destination</th>
                         <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Date Placed</th>
-                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Total</th>
-                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Status</th>
+                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Items</th>
+                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Total Amount</th>
+                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Fulfillment Status</th>
                         <th class="pe-3 py-3 text-end text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Action</th>
                     </tr>
                 </thead>
@@ -969,40 +1097,55 @@ elseif ($view == 'orders') {
                                 'Pending' => 'status-pending',
                                 default => 'status-cancelled'
                             };
+                            $itemCount = (int)($order['item_count'] ?? 0);
                         ?>
                             <tr class="border-bottom">
-                                <td class="ps-3 py-2 fw-semibold" style="font-family: monospace; font-size: 0.82rem;">
+                                <td class="ps-3 py-3 fw-semibold" style="font-family: monospace; font-size: 0.82rem;">
                                     #<?= str_pad($order['id'], 5, '0', STR_PAD_LEFT) ?>
                                 </td>
-                                <td class="py-2">
+                                <td class="py-3">
                                     <div class="fw-semibold text-dark small"><?= htmlspecialchars($order['customer_name']) ?></div>
-                                    <div class="text-muted text-truncate" style="font-size: 0.72rem; max-width: 220px;">
-                                        <?= htmlspecialchars($order['address']) ?>
+                                    <div class="text-muted d-flex align-items-center gap-1" style="font-size: 0.72rem; max-width: 260px;">
+                                        <i class="bi bi-geo-alt text-secondary" style="font-size: 0.7rem;"></i>
+                                        <span class="text-truncate"><?= htmlspecialchars($order['address']) ?></span>
                                     </div>
                                 </td>
-                                <td class="py-2">
+                                <td class="py-3">
                                     <div class="text-dark small"><?= date('M d, Y', strtotime($order['created_at'])) ?></div>
                                     <div class="text-muted" style="font-size: 0.72rem;"><?= date('h:i A', strtotime($order['created_at'])) ?></div>
                                 </td>
-                                <td class="py-2 fw-semibold text-dark small">
+                                <td class="py-3">
+                                    <span class="text-secondary small fw-medium">
+                                        <?= $itemCount ?> <?= $itemCount === 1 ? 'item' : 'items' ?>
+                                    </span>
+                                </td>
+                                <td class="py-3 fw-bold text-dark small" style="font-variant-numeric: tabular-nums;">
                                     $<?= number_format((float)$order['total_amount'], 2) ?>
                                 </td>
-                                <td class="py-2">
+                                <td class="py-3">
                                     <span class="admin-status-pill <?= $pillClass ?>">
                                         <?= $s ?>
                                     </span>
                                 </td>
-                                <td class="pe-3 py-2 text-end">
+                                <td class="pe-3 py-3 text-end">
                                     <a href="order_details.php?order_id=<?= $order['id'] ?>" class="btn btn-sm btn-outline-secondary py-1 px-3 fw-semibold" style="font-size: 0.78rem;">
-                                        Manage
+                                        Manage <i class="bi bi-arrow-right ms-1"></i>
                                     </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">
-                                No <?= $statusFilter == 'All' ? '' : htmlspecialchars($statusFilter) ?> orders found.
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <div class="py-3">
+                                    <i class="bi bi-inbox text-muted opacity-50 fs-2 d-block mb-2"></i>
+                                    <div>No orders found matching the filter criteria.</div>
+                                    <?php if ($statusFilter !== 'All' || $search !== ''): ?>
+                                        <button type="button" onclick="loadView('orders')" class="btn btn-sm btn-link text-decoration-none mt-2">
+                                            Reset Filters
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endif; ?>
