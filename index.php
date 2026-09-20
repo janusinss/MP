@@ -238,13 +238,6 @@ $firstKey = array_key_first($aisleReels);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
-
-    <!-- Overdrive Creative Engineering Suite Dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
-    <script defer src="assets/js/overdrive.js?v=<?php echo time(); ?>"></script>
 </head>
 <body>
 
@@ -705,7 +698,6 @@ $firstKey = array_key_first($aisleReels);
 
     <?php else: ?>
     <header class="hero-overdrive" id="hero-overdrive">
-        <canvas id="ambient-canvas" class="hero-webgl-canvas"></canvas>
         <div class="hero-scrim"></div>
 
         <div class="container hero-content-overdrive">

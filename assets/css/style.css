@@ -5611,11 +5611,9 @@ html, body {
 }
 
 /* =============================================================
-   ⚡ OVERDRIVE CREATIVE ENGINEERING SUITE
-   - Ambient WebGL Canvas Hero
-   - 21st.dev Bento Grid Matrix & Spotlight Physics
-   - Lenis Scroll Physics Integration
-   - Anti-AI Typography & Calibrated Design Tokens
+   HERO EDITORIAL SECTION
+   - Calibrated Organic Design Tokens
+   - Clean Responsive Layout & Zero Scroll Hijacking
    ============================================================= */
 
 .hero-overdrive {
@@ -5627,16 +5625,6 @@ html, body {
     background-color: var(--color-canvas);
     display: flex;
     align-items: center;
-}
-
-.hero-webgl-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
 }
 
 .hero-scrim {
