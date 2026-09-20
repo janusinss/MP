@@ -206,6 +206,99 @@ h5{
     color: var(--color-brand);
 }
 
+/* --- STOREFRONT ADMIN TOPNAV PILL (ANTI-SLOP REDESIGN) --- */
+.storefront-admin-pill {
+    display: inline-flex;
+    align-items: center;
+    background: var(--color-surface, #ffffff);
+    border: 1px solid var(--color-border, #e5e0d5);
+    border-radius: var(--radius-full, 9999px);
+    box-shadow: 0 1px 3px rgba(35, 38, 32, 0.05);
+    height: 38px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    user-select: none;
+}
+
+.storefront-admin-pill:hover {
+    border-color: rgba(74, 116, 91, 0.4);
+    box-shadow: 0 3px 10px rgba(74, 116, 91, 0.1);
+    transform: translateY(-1px);
+}
+
+.storefront-admin-pill-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px 0 13px;
+    height: 100%;
+    text-decoration: none;
+    color: var(--color-text-primary, #232620);
+    font-family: var(--font-sans);
+    font-size: 0.84rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    transition: color 0.15s ease;
+}
+
+.storefront-admin-pill-link:hover {
+    color: var(--color-brand, #4a745b);
+}
+
+.storefront-admin-pill-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--color-brand, #4a745b);
+    box-shadow: 0 0 0 3px rgba(74, 116, 91, 0.18);
+    flex-shrink: 0;
+}
+
+.storefront-admin-pill-icon {
+    font-size: 0.85rem;
+    color: var(--color-brand, #4a745b);
+    transition: transform 0.2s ease;
+}
+
+.storefront-admin-pill-link:hover .storefront-admin-pill-icon {
+    transform: translateX(-2px);
+}
+
+.storefront-admin-pill-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 100%;
+    background: transparent;
+    border: none;
+    border-left: 1px solid var(--color-border-subtle, #edeae1);
+    color: var(--color-text-secondary, #6e7368);
+    font-size: 0.72rem;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s ease, color 0.15s ease;
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px;
+}
+
+.storefront-admin-pill-toggle::after {
+    display: none !important;
+}
+
+.storefront-admin-pill-toggle:hover {
+    background: var(--color-surface-subtle, #f0eee6);
+    color: var(--color-text-primary, #232620);
+}
+
+.storefront-admin-dropdown {
+    border-radius: 14px;
+    min-width: 230px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+
 
 
 .hero-blob {
@@ -5917,7 +6010,7 @@ html, body {
     align-items: center;
     justify-content: center;
     margin: 1.5rem 0 1.25rem;
-    overflow: visible;
+    overflow: hidden;
     user-select: none;
     touch-action: pan-y;
 }

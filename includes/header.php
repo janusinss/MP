@@ -154,32 +154,29 @@ if ($pos !== false) {
             <div class="collapse navbar-collapse" id="navContent">
                 <ul class="navbar-nav ms-auto align-items-center gap-3">
                     <?php if ($isAdmin): ?>
-                        <li class="nav-item">
-                            <a href="<?= $rootPath ?>admin/" class="btn btn-dark rounded-pill px-3 py-1 d-inline-flex align-items-center gap-2 shadow-sm" style="font-size: 0.85rem; font-weight: 600;">
-                                <i class="bi bi-arrow-left-circle-fill text-success fs-6"></i>
-                                <span>Return to Admin</span>
-                            </a>
-                        </li>
                         <li class="nav-item dropdown">
-                            <button class="nav-link-custom d-flex align-items-center gap-2 dropdown-toggle bg-transparent border-0 p-0 text-decoration-none" id="globalAdminDropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <div class="text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 34px; height: 34px; font-size: 0.85rem; background: #0f172a;">
-                                    A
-                                </div>
-                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1" style="font-size: 0.72rem; font-weight: 700;">ADMIN</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border py-2 mt-2" aria-labelledby="globalAdminDropdown" style="border-radius: 14px; min-width: 230px; border-color: rgba(0,0,0,0.08);">
-                                <li class="px-3 py-2 border-bottom mb-1" style="background-color: #fafbf9;">
-                                    <div class="text-uppercase text-muted" style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">Signed in as</div>
-                                    <div class="fw-bold text-dark text-truncate" style="font-size: 0.9rem;">System Administrator</div>
-                                </li>
-                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/"><i class="bi bi-speedometer2 text-success"></i> <span>Operations Console</span></a></li>
-                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/index.php?view=products"><i class="bi bi-box-seam text-success"></i> <span>Manage Inventory</span></a></li>
-                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/index.php?view=orders"><i class="bi bi-receipt text-success"></i> <span>Manage Orders</span></a></li>
-                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/index.php?view=users"><i class="bi bi-people text-success"></i> <span>Manage Customers</span></a></li>
-                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/index.php?view=reviews"><i class="bi bi-star text-success"></i> <span>Manage Reviews</span></a></li>
-                                <li><hr class="dropdown-divider my-1"></li>
-                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 text-danger" href="<?= $rootPath ?>admin/logout.php"><i class="bi bi-box-arrow-right"></i> <span>Sign Out Admin</span></a></li>
-                            </ul>
+                            <div class="storefront-admin-pill">
+                                <a href="<?= $rootPath ?>admin/" class="storefront-admin-pill-link" title="Return to Admin Console">
+                                    <i class="bi bi-arrow-left storefront-admin-pill-icon"></i>
+                                    <span>Return to Admin</span>
+                                </a>
+                                <button class="storefront-admin-pill-toggle dropdown-toggle" type="button" id="globalAdminDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Admin options">
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border py-2 mt-2 storefront-admin-dropdown" aria-labelledby="globalAdminDropdown">
+                                    <li class="px-3 py-2 border-bottom mb-1" style="background-color: #fafbf9;">
+                                        <div class="text-uppercase text-muted" style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">Signed in as</div>
+                                        <div class="fw-bold text-dark text-truncate" style="font-size: 0.88rem;"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Administrator') ?></div>
+                                    </li>
+                                    <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/"><i class="bi bi-speedometer2 text-success"></i> <span>Operations Console</span></a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/index.php?view=products"><i class="bi bi-box-seam text-success"></i> <span>Manage Inventory</span></a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/index.php?view=orders"><i class="bi bi-receipt text-success"></i> <span>Manage Orders</span></a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/index.php?view=users"><i class="bi bi-people text-success"></i> <span>Manage Customers</span></a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/index.php?view=reviews"><i class="bi bi-star text-success"></i> <span>Manage Reviews</span></a></li>
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 text-danger" href="<?= $rootPath ?>admin/logout.php"><i class="bi bi-box-arrow-right"></i> <span>Sign Out</span></a></li>
+                                </ul>
+                            </div>
                         </li>
                         <li class="nav-item position-relative">
                             <a href="<?= $rootPath ?>cart" class="btn btn-outline-secondary border-0 position-relative p-2" aria-label="Shopping Cart">
