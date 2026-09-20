@@ -106,7 +106,7 @@ $categoryIcons = [
     'Dairy' => 'bi-egg-fried',
     'Bakery' => 'bi-cake2',
     'Meat' => 'bi-egg',
-    'Pantry' => 'bi-jar',
+    'Pantry' => 'bi-box-seam',
     'Snacks' => 'bi-cup-hot',
     'Beverages' => 'bi-cup-straw'
 ];
@@ -210,7 +210,7 @@ $aisleDepartments = [
         'desc' => 'Wildflower honey, whole-fruit conserves, and unrefined cold-pressed oils.',
         'farm' => 'Valley Apiaries & Provisions',
         'telemetry' => 'Pure Raw Sourced',
-        'icon' => 'bi-jar'
+        'icon' => 'bi-box-seam'
     ]
 ];
 
@@ -812,19 +812,38 @@ $firstKey = array_key_first($aisleReels);
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Aisle Navigation Dropdown (Mobile Viewport: Native Accessible Select) -->
+                <!-- Aisle Navigation Dropdown (Mobile Viewport: Custom Tactile Menu) -->
                 <div class="aisle-mobile-dropdown-wrap d-md-none" id="aisleMobileDropdownWrap">
-                    <div class="aisle-select-pill">
-                        <label for="aisleMobileSelect" class="visually-hidden">Choose Harvest Aisle</label>
-                        <span class="aisle-select-icon"><i class="bi <?= $aisleReels[$firstKey]['meta']['icon'] ?? 'bi-apple' ?>" id="aisleSelectActiveIcon" aria-hidden="true"></i></span>
-                        <select id="aisleMobileSelect" class="aisle-mobile-select" onchange="selectAisle(this.value)" aria-label="Select harvest aisle">
-                            <?php foreach ($aisleReels as $catKey => $reelData): ?>
-                                <option value="<?= htmlspecialchars($catKey) ?>" <?= ($catKey === $firstKey) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($reelData['meta']['label'] ?? $catKey) ?>
-                                </option>
+                    <div class="aisle-custom-dropdown" id="aisleCustomDropdown">
+                        <button type="button" 
+                                class="aisle-select-pill" 
+                                id="aisleDropdownTrigger" 
+                                aria-haspopup="listbox" 
+                                aria-expanded="false" 
+                                aria-controls="aisleDropdownMenu"
+                                onclick="toggleAisleDropdown()" 
+                                aria-label="Select harvest aisle">
+                            <span class="aisle-select-icon"><i class="bi <?= $aisleReels[$firstKey]['meta']['icon'] ?? 'bi-apple' ?>" id="aisleSelectActiveIcon" aria-hidden="true"></i></span>
+                            <span class="aisle-select-label" id="aisleSelectActiveLabel"><?= htmlspecialchars($aisleReels[$firstKey]['meta']['label'] ?? $firstKey) ?></span>
+                            <i class="bi bi-chevron-down aisle-select-chevron" aria-hidden="true"></i>
+                        </button>
+
+                        <div class="aisle-dropdown-menu" id="aisleDropdownMenu" role="listbox" aria-label="Harvest aisles">
+                            <?php foreach ($aisleReels as $catKey => $reelData): 
+                                $isSelected = ($catKey === $firstKey);
+                            ?>
+                                <button type="button" 
+                                        role="option" 
+                                        aria-selected="<?= $isSelected ? 'true' : 'false' ?>" 
+                                        class="aisle-dropdown-item <?= $isSelected ? 'selected' : '' ?>" 
+                                        data-category="<?= htmlspecialchars($catKey) ?>" 
+                                        onclick="chooseAisleMobile('<?= htmlspecialchars($catKey) ?>')">
+                                    <span class="aisle-item-icon"><i class="bi <?= $reelData['meta']['icon'] ?? 'bi-basket2' ?>" aria-hidden="true"></i></span>
+                                    <span class="aisle-item-text"><?= htmlspecialchars($reelData['meta']['label'] ?? $catKey) ?></span>
+                                    <i class="bi bi-check2 aisle-item-check" aria-hidden="true"></i>
+                                </button>
                             <?php endforeach; ?>
-                        </select>
-                        <i class="bi bi-chevron-down aisle-select-chevron" aria-hidden="true"></i>
+                        </div>
                     </div>
                 </div>
 
@@ -1473,6 +1492,29 @@ $firstKey = array_key_first($aisleReels);
             nudge(1);
         }
 
+        function toggleAisleDropdown(forceState) {
+            const trigger = document.getElementById('aisleDropdownTrigger');
+            const menu = document.getElementById('aisleDropdownMenu');
+            if (!trigger || !menu) return;
+
+            const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+            const nextState = typeof forceState === 'boolean' ? forceState : !isExpanded;
+
+            trigger.setAttribute('aria-expanded', nextState ? 'true' : 'false');
+            if (nextState) {
+                menu.classList.add('open');
+            } else {
+                menu.classList.remove('open');
+            }
+        }
+
+        function chooseAisleMobile(catKey) {
+            toggleAisleDropdown(false);
+            selectAisle(catKey);
+            const trigger = document.getElementById('aisleDropdownTrigger');
+            if (trigger) trigger.focus();
+        }
+
         function selectAisle(catKey) {
             if (!aisleData[catKey]) return;
             currentAisleKey = catKey;
@@ -1493,15 +1535,21 @@ $firstKey = array_key_first($aisleReels);
                 }
             });
 
-            // Sync mobile select if present
-            const mobileSelect = document.getElementById('aisleMobileSelect');
-            if (mobileSelect && mobileSelect.value !== catKey) {
-                mobileSelect.value = catKey;
-            }
+            // Sync custom mobile dropdown UI
             const activeIcon = document.getElementById('aisleSelectActiveIcon');
-            if (activeIcon && aisleData[catKey] && aisleData[catKey].meta) {
-                activeIcon.className = 'bi ' + (aisleData[catKey].meta.icon || 'bi-basket2');
+            const activeLabel = document.getElementById('aisleSelectActiveLabel');
+            if (aisleData[catKey] && aisleData[catKey].meta) {
+                if (activeIcon) activeIcon.className = 'bi ' + (aisleData[catKey].meta.icon || 'bi-basket2');
+                if (activeLabel) activeLabel.textContent = aisleData[catKey].meta.label || catKey;
             }
+
+            // Sync menu item selected state
+            const menuItems = document.querySelectorAll('#aisleDropdownMenu .aisle-dropdown-item');
+            menuItems.forEach(item => {
+                const isThis = item.getAttribute('data-category') === catKey;
+                item.classList.toggle('selected', isThis);
+                item.setAttribute('aria-selected', isThis ? 'true' : 'false');
+            });
 
             renderCoverflow();
         }
@@ -1667,6 +1715,48 @@ $firstKey = array_key_first($aisleReels);
                     } else if (event.key === 'ArrowRight') {
                         event.preventDefault();
                         nudge(1);
+                    }
+                });
+            }
+
+            // Mobile Aisle Custom Dropdown Outside Click & Keyboard Listeners
+            const customDropdown = document.getElementById('aisleCustomDropdown');
+            if (customDropdown) {
+                document.addEventListener('click', (e) => {
+                    if (!customDropdown.contains(e.target)) {
+                        toggleAisleDropdown(false);
+                    }
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        toggleAisleDropdown(false);
+                    }
+                });
+
+                customDropdown.addEventListener('keydown', (e) => {
+                    const menu = document.getElementById('aisleDropdownMenu');
+                    const isMenuOpen = menu && menu.classList.contains('open');
+                    const items = Array.from(document.querySelectorAll('#aisleDropdownMenu .aisle-dropdown-item'));
+                    if (items.length === 0) return;
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (!isMenuOpen) {
+                            toggleAisleDropdown(true);
+                            items[0].focus();
+                        } else {
+                            const currentIndex = items.indexOf(document.activeElement);
+                            const nextIndex = (currentIndex + 1) % items.length;
+                            items[nextIndex].focus();
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (isMenuOpen) {
+                            const currentIndex = items.indexOf(document.activeElement);
+                            const prevIndex = (currentIndex - 1 + items.length) % items.length;
+                            items[prevIndex].focus();
+                        }
                     }
                 });
             }
