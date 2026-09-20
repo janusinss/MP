@@ -12,7 +12,7 @@
 - **`VISUAL_DENSITY`**: `6` (Balanced grocery catalog density with disciplined whitespace and compact hero insets).
 
 ### 3. Typography Scale
-- **Display & Section Headers**: `'Playfair Display', Georgia, serif` (Weights: 600, 700; tracking: -0.025em; line-height: 1.15).
+- **Display & Section Headers**: `'Fraunces', Georgia, serif` (Weights: 600, 700; optical size: 9..144; line-height: 1.15; warm organic food & farmstead serif).
 - **Interface & Body Text**: `'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif` (Weights: 400, 500, 600, 700; line-height: 1.55).
 - **Numeric & Pricing**: `'Plus Jakarta Sans', tabular-nums, sans-serif` (Weights: 700; tracking: -0.01em).
 - **Monospace & Metadata**: `'JetBrains Mono', 'Fira Code', monospace` (Weights: 500).

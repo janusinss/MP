@@ -29,9 +29,9 @@ Options -Indexes -MultiViews
     # Block direct HTTP access to internal backend directories
     RewriteRule ^(database|config|scripts|\.agents|\.git) - [F,L,NC]
 
-    # Canonical Redirect: Hide index.php from URL (NE prevents double-escaping spaces)
+    # Canonical Redirect: Hide index.php from URL (NE prevents double-escaping spaces, QSA preserves query parameters)
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/index\.php([^\ ]*)\ +HTTP/ [NC]
-    RewriteRule ^index\.php$ %1/ [R=301,L,NE]
+    RewriteRule ^index\.php$ %1/ [R=301,L,NE,QSA]
 
     # Canonical 301 Redirects: Strip internal folders & .php from browser address bar
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/auth/login\.php([^\ ]*)\ +HTTP/ [NC]

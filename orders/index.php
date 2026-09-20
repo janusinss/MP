@@ -2,7 +2,9 @@
 // orders/index.php
 // Customer Order History using Stored Procedure sp_get_user_order_history
 require_once __DIR__ . '/../config/db.php';
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Security Check: Must be logged in
 if (!isset($_SESSION['user_id'])) {
@@ -23,136 +25,137 @@ try {
     $stmt->execute([$user_id]);
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+include __DIR__ . '/../includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
+<main class="orders-page-wrapper">
+    <div class="container">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Orders | FreshCart</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
-</head>
+        <nav class="profile-breadcrumb" aria-label="Breadcrumb">
+            <a href="<?= $rootPath ?: './' ?>"><i class="bi bi-house-door"></i> Home</a>
+            <i class="bi bi-chevron-right" style="font-size: 0.75rem;"></i>
+            <span class="text-dark fw-medium">Order History</span>
+        </nav>
 
-<body class="container mt-5 mb-5">
-
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h2 class="m-0" style="font-family: var(--font-serif); font-weight: 700;">My Orders</h2>
-            <p class="text-muted m-0">Track your past purchases and returns.</p>
+        <div class="orders-page-header">
+            <div>
+                <h1 class="orders-title">My Orders</h1>
+                <p class="orders-subtitle">Track your farm-to-table deliveries and past seasonal purchases.</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-white text-dark border px-3 py-2 rounded-pill shadow-sm fw-medium">
+                    <i class="bi bi-box-seam text-success me-1"></i> <?= count($orders) ?> <?= count($orders) === 1 ? 'Order' : 'Orders' ?> Placed
+                </span>
+                <a href="<?= $rootPath ?>profile" class="btn btn-outline-secondary rounded-pill px-3 py-2 btn-sm fw-medium">
+                    <i class="bi bi-person-gear me-1"></i> Account Settings
+                </a>
+            </div>
         </div>
-        <a href="../" class="btn btn-outline-secondary rounded-pill px-4">
-            <i class="bi bi-arrow-left me-2"></i> Back to Shop
-        </a>
-    </div>
 
-    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'cancelled'): ?>
-        <div class="alert alert-warning border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center">
-            <i class="bi bi-check-circle-fill me-2 fs-5"></i>
-            <div>Order successfully cancelled.</div>
-        </div>
-    <?php endif; ?>
+        <?php if (isset($_GET['msg']) && $_GET['msg'] === 'cancelled'): ?>
+            <div class="alert alert-warning border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-check-circle-fill text-warning fs-5"></i>
+                <div>Your order has been successfully cancelled and inventory restocked.</div>
+            </div>
+        <?php endif; ?>
 
-    <?php if (count($orders) > 0): ?>
-        <div class="row">
-            <?php foreach ($orders as $order): ?>
-                <div class="col-md-12">
-
-                    <div class="order-card">
-                        <div class="order-header">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-white border rounded-circle d-flex align-items-center justify-content-center"
-                                    style="width: 45px; height: 45px;">
-                                    <i class="bi bi-box-seam text-secondary fs-5"></i>
-                                </div>
-                                <div>
-                                    <span class="order-id">#<?= str_pad($order['id'], 6, "0", STR_PAD_LEFT) ?></span>
-                                    <div class="order-date">
-                                        <i class="bi bi-calendar3"></i>
-                                        <?= date('M d, Y • h:i A', strtotime($order['created_at'])) ?>
+        <?php if (count($orders) > 0): ?>
+            <div class="row g-4">
+                <?php foreach ($orders as $order): ?>
+                    <div class="col-12">
+                        <div class="order-card shadow-sm">
+                            <div class="order-header">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-white border rounded-circle d-flex align-items-center justify-content-center shadow-xs" style="width: 44px; height: 44px;">
+                                        <i class="bi bi-box-seam text-success fs-5"></i>
                                     </div>
-                                </div>
-                            </div>
-
-                            <?php
-                            $status = $order['status'] ?: 'Pending';
-                            $badgeClass = 'status-pending';
-                            $icon = 'bi-hourglass-split';
-
-                            if ($status == 'Shipped') {
-                                $badgeClass = 'status-shipped';
-                                $icon = 'bi-truck';
-                            }
-                            if ($status == 'Delivered') {
-                                $badgeClass = 'status-delivered';
-                                $icon = 'bi-check-circle-fill';
-                            }
-                            if ($status == 'Cancelled') {
-                                $badgeClass = 'status-cancelled';
-                                $icon = 'bi-x-circle-fill';
-                            }
-                            ?>
-                            <div class="status-pill <?= $badgeClass ?>">
-                                <i class="bi <?= $icon ?>"></i> <?= $status ?>
-                            </div>
-                        </div>
-
-                        <div class="order-body">
-                            <div class="row align-items-center">
-
-                                <div class="col-md-3 mb-3 mb-md-0">
-                                    <span class="order-info-label">Total Amount</span>
-                                    <div class="order-total-price">$<?= number_format($order['total_amount'], 2) ?></div>
-                                </div>
-
-                                <div class="col-md-5 mb-3 mb-md-0">
-                                    <span class="order-info-label">Delivery Address</span>
-                                    <div class="order-address text-truncate">
-                                        <i class="bi bi-geo-alt-fill text-muted me-1"></i>
-                                        <?= htmlspecialchars($order['address']) ?>
+                                    <div>
+                                        <span class="order-id">#<?= str_pad($order['id'], 6, "0", STR_PAD_LEFT) ?></span>
+                                        <div class="order-date">
+                                            <i class="bi bi-calendar3 me-1"></i>
+                                            <?= date('M d, Y • h:i A', strtotime($order['created_at'])) ?>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="col-md-4 text-md-end d-flex flex-column align-items-end gap-2">
+                                <?php
+                                $status = $order['status'] ?: 'Pending';
+                                $badgeClass = 'status-pending';
+                                $icon = 'bi-hourglass-split';
 
-                                    <a href="../order/<?= $order['id'] ?>"
-                                        class="btn btn-light rounded-circle border" title="View Details">
-                                        <i class="bi bi-chevron-right"></i>
-                                    </a>
+                                if ($status == 'Shipped') {
+                                    $badgeClass = 'status-shipped';
+                                    $icon = 'bi-truck';
+                                }
+                                if ($status == 'Delivered') {
+                                    $badgeClass = 'status-delivered';
+                                    $icon = 'bi-check-circle-fill';
+                                }
+                                if ($status == 'Cancelled') {
+                                    $badgeClass = 'status-cancelled';
+                                    $icon = 'bi-x-circle-fill';
+                                }
+                                ?>
+                                <div class="status-pill <?= $badgeClass ?>">
+                                    <i class="bi <?= $icon ?>"></i> <?= $status ?>
+                                </div>
+                            </div>
 
-                                    <?php if ($status == 'Pending'): ?>
-                                        <form action="cancel" method="POST"
-                                            onsubmit="return confirm('Are you sure you want to cancel this order?');">
-                                            <?= csrf_input() ?>
-                                            <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
-                                            <button type="submit" class="btn btn-outline-danger rounded-pill px-4 btn-sm">
-                                                Cancel Order
-                                            </button>
-                                        </form>
-                                    <?php endif; ?>
+                            <div class="order-body">
+                                <div class="row align-items-center g-3">
+                                    <div class="col-md-3 col-6">
+                                        <span class="order-info-label">Order Total</span>
+                                        <div class="order-total-price">$<?= number_format($order['total_amount'], 2) ?></div>
+                                    </div>
+
+                                    <div class="col-md-5 col-12">
+                                        <span class="order-info-label">Delivery Destination</span>
+                                        <div class="order-address text-truncate">
+                                            <i class="bi bi-geo-alt-fill text-muted me-1"></i>
+                                            <?= htmlspecialchars($order['address'] ?: 'Customer address on file') ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4 col-12 d-flex justify-content-md-end align-items-center gap-2 flex-wrap">
+                                        <a href="<?= $rootPath ?>order/<?= $order['id'] ?>" class="btn btn-outline-dark rounded-pill px-3 py-2 btn-sm fw-medium d-inline-flex align-items-center gap-2">
+                                            <i class="bi bi-receipt"></i>
+                                            <span>View Details</span>
+                                        </a>
+
+                                        <?php if ($status == 'Pending'): ?>
+                                            <form action="<?= $rootPath ?>orders/cancel" method="POST" onsubmit="return confirm('Are you sure you want to cancel order #<?= $order['id'] ?>?');" class="m-0">
+                                                <?= csrf_input() ?>
+                                                <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+                                                <button type="submit" class="btn btn-outline-danger rounded-pill px-3 py-2 btn-sm fw-medium">
+                                                    Cancel Order
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                <?php endforeach; ?>
+            </div>
 
-                </div>
-            <?php endforeach; ?>
-        </div>
+        <?php else: ?>
 
-    <?php else: ?>
+            <div class="empty-orders-container animate-fade-in shadow-xs">
+                <i class="bi bi-basket3 empty-orders-icon" style="color: var(--color-primary, #15803d); opacity: 0.4;"></i>
+                <h3 style="font-family: var(--font-serif); font-weight: 700;">No orders yet</h3>
+                <p class="text-muted mb-4" style="max-width: 480px; margin-left: auto; margin-right: auto;">
+                    You haven't placed any seasonal orders yet. Discover today's fresh morning harvest from local family farms!
+                </p>
+                <a href="<?= $rootPath ?: './' ?>#catalog" class="btn btn-primary rounded-pill px-5 py-2 fw-semibold shadow-sm">
+                    Start Shopping Fresh
+                </a>
+            </div>
 
-        <div class="empty-orders-container animate-fade-in">
-            <i class="bi bi-cart-x empty-orders-icon"></i>
-            <h3 style="font-family: var(--font-serif);">No orders yet</h3>
-            <p class="text-muted mb-4">You haven't placed any orders yet. Fill your pantry with fresh goodness!</p>
-            <a href="../" class="btn btn-primary rounded-pill px-5 py-3 shadow-sm">Start Shopping</a>
-        </div>
+        <?php endif; ?>
 
-    <?php endif; ?>
+    </div>
+</main>
 
-</body>
-
-</html>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

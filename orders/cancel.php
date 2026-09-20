@@ -2,7 +2,9 @@
 // orders/cancel.php
 // Atomic Order Cancellation & Inventory Restocking
 require_once __DIR__ . '/../config/db.php';
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // 1. Security Check: Must be logged in
 if (!isset($_SESSION['user_id'])) {

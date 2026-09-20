@@ -2,7 +2,9 @@
 // orders/details.php
 // Customer Detailed Order Receipt
 require_once __DIR__ . '/../config/db.php';
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // 1. Security Check
 if (!isset($_SESSION['user_id'])) {

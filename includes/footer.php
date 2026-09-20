@@ -1,5 +1,11 @@
 <?php
-$rootPath = (basename(dirname($_SERVER['SCRIPT_FILENAME'])) === 'grocery_app') ? '' : '../';
+$scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+$pos = strpos($scriptName, '/grocery_app');
+if ($pos !== false) {
+    $rootPath = substr($scriptName, 0, $pos + strlen('/grocery_app')) . '/';
+} else {
+    $rootPath = '/';
+}
 ?>
     <footer class="site-footer">
         <div class="container">

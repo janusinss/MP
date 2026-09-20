@@ -49,93 +49,148 @@ $appRoot = $appRoot ? $appRoot . '/' : '/';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - FreshCart</title>
+    <title>Create Account - FreshCart Market</title>
+    <meta name="description" content="Create a FreshCart account to receive fresh farm-to-door organic deliveries and support independent growers.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="<?= $appRoot ?>assets/css/style.css?v=<?= time() ?>">
 </head>
 <body>
 
-    <div class="auth-wrapper">
-        <div class="row g-0 h-100">
+    <main class="auth-split-wrapper">
+        <!-- Left: Farmstead Showcase Panel -->
+        <section class="auth-showcase-panel" style="background-image: url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1200&auto=format&fit=crop&q=80');" aria-label="Farmstead Storytelling">
+            <div class="auth-showcase-top">
+                <a href="<?= $appRoot ?>" class="auth-brand-logo" title="Return to FreshCart Home">
+                    <span>FreshCart</span><span class="auth-brand-dot"></span>
+                </a>
+            </div>
             
-            <div class="col-lg-6 d-none d-lg-block">
-                <div class="auth-banner-side register-bg" style="background-image: url('<?= $appRoot ?>assets/images/register1.jpg');">
-                    <div class="auth-banner-content">
-                        <h1 style="font-family: var(--font-serif);font-size: 3rem;margin-bottom: 1.5rem;line-height: 1.1; color: #fff; opacity: 0.9;">Join the community of clean, fresh food lovers.</h1>
-                        <p class="fs-5 opacity-75">Track orders, save favorites, and get exclusive organic deals.</p>
+            <div class="auth-showcase-bottom">
+                <div class="auth-showcase-kicker">
+                    <i class="bi bi-patch-check-fill text-success" aria-hidden="true"></i>
+                    <span>Regenerative Agriculture Network</span>
+                </div>
+                <h1 class="auth-showcase-title">Direct from the growers who cultivate the soil.</h1>
+                <p class="auth-showcase-desc">Join our transparent food network to enjoy peak-season produce, pasture-raised eggs, and farmstead cheeses harvested within 24 hours of delivery.</p>
+                
+                <div class="auth-proof-card">
+                    <img src="https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=120&auto=format&fit=crop&q=80" alt="Alvarez Organic Groves" class="auth-proof-avatar" width="48" height="48" loading="lazy">
+                    <div class="auth-proof-content">
+                        <p class="auth-proof-quote">&ldquo;78% of every customer purchase returns directly to our farm, preserving organic heritage seeds for tomorrow.&rdquo;</p>
+                        <span class="auth-proof-author">Clara Alvarez &bull; Alvarez Organic Groves</span>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <div class="col-lg-6">
-                <div class="auth-form-side">
-                    <div class="hero-blob blob-1" style="width: 250px; height: 250px; bottom: -50px; left: -50px; opacity: 0.4;"></div>
+        <!-- Right: Auth Form Panel -->
+        <section class="auth-form-panel" aria-label="Registration Form">
+            <div class="auth-card">
+                <div class="auth-mobile-brand">
+                    <a href="<?= $appRoot ?>" class="auth-brand-logo text-dark">
+                        <span>FreshCart</span><span class="auth-brand-dot"></span>
+                    </a>
+                </div>
 
-                    <div class="auth-form-container">
-                        <div class="text-center mb-4">
-                            <h2 class="mb-2" style="font-family: var(--font-serif); font-size: 2.5rem;">Create Account</h2>
-                            <p class="text-muted">It only takes a minute to join.</p>
+                <div class="auth-card-header">
+                    <h2 class="auth-card-title">Create Account</h2>
+                    <p class="auth-card-subtitle">Start receiving farm-fresh harvests at your door</p>
+                </div>
+
+                <?php if ($error): ?>
+                    <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2 py-2 px-3 small" role="alert">
+                        <i class="bi bi-exclamation-circle-fill text-danger flex-shrink-0" aria-hidden="true"></i>
+                        <div><?= htmlspecialchars($error) ?></div>
+                    </div>
+                <?php endif; ?>
+                <?php if ($success): ?>
+                    <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2 py-2 px-3 small" role="alert">
+                        <i class="bi bi-check-circle-fill text-success flex-shrink-0" aria-hidden="true"></i>
+                        <div><?= htmlspecialchars($success) ?></div>
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST" autocomplete="on">
+                    <?= csrf_input() ?>
+                    
+                    <div class="auth-field-group">
+                        <label for="regFullName" class="auth-field-label">Full Name</label>
+                        <div class="auth-input-wrapper">
+                            <span class="auth-input-icon"><i class="bi bi-person" aria-hidden="true"></i></span>
+                            <input type="text" id="regFullName" name="full_name" class="auth-input" placeholder="e.g. John Doe" value="<?= htmlspecialchars($name ?? '') ?>" required autofocus autocomplete="name">
                         </div>
-
-                        <?php if ($error): ?>
-                            <div class="alert alert-danger border-0 shadow-sm rounded-4 mb-4 text-center">
-                                <?= htmlspecialchars($error) ?>
-                            </div>
-                        <?php endif; ?>
-                        <?php if ($success): ?>
-                            <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4 text-center">
-                                <i class="bi bi-check-circle-fill me-2"></i> <?= htmlspecialchars($success) ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <form method="POST">
-                            <?= csrf_input() ?>
-                            <div class="mb-2">
-                                <label class="auth-label">Full Name</label>
-                                <div class="auth-input-group">
-                                    <i class="bi bi-person"></i>
-                                    <input type="text" name="full_name" placeholder="John Doe" required>
-                                </div>
-                            </div>
-
-                            <div class="mb-2">
-                                <label class="auth-label">Email Address</label>
-                                <div class="auth-input-group">
-                                    <i class="bi bi-envelope"></i>
-                                    <input type="email" name="email" placeholder="you@example.com" required>
-                                </div>
-                            </div>
-
-                            <div class="mb-2">
-                                <label class="auth-label">Password</label>
-                                <div class="auth-input-group">
-                                    <i class="bi bi-lock"></i>
-                                    <input type="password" name="password" placeholder="Create a strong password" required>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="auth-label">Delivery Address (Optional)</label>
-                                <div class="auth-input-group">
-                                    <i class="bi bi-geo-alt"></i>
-                                    <input type="text" name="address" placeholder="123 Main St, City">
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn btn-auth w-100 py-3 mb-4 shadow">Register Now</button>
-
-                            <div class="text-center d-flex flex-column gap-2">
-                                <span class="text-muted">Already have an account? <a href="login" class="text-dark fw-bold text-decoration-underline">Login</a></span>
-                                <a href="../" class="text-muted small text-decoration-none mt-2">← Back to Shop</a>
-                            </div>
-                        </form>
                     </div>
-                </div>
+
+                    <div class="auth-field-group">
+                        <label for="regEmail" class="auth-field-label">Email Address</label>
+                        <div class="auth-input-wrapper">
+                            <span class="auth-input-icon"><i class="bi bi-envelope" aria-hidden="true"></i></span>
+                            <input type="email" id="regEmail" name="email" class="auth-input" placeholder="you@example.com" value="<?= htmlspecialchars($email ?? '') ?>" required autocomplete="email">
+                        </div>
+                    </div>
+
+                    <div class="auth-field-group">
+                        <div class="auth-field-label">
+                            <label for="regPassword" class="m-0">Password</label>
+                            <span class="text-muted fw-normal text-none">Min 6 characters</span>
+                        </div>
+                        <div class="auth-input-wrapper">
+                            <span class="auth-input-icon"><i class="bi bi-lock" aria-hidden="true"></i></span>
+                            <input type="password" id="regPassword" name="password" class="auth-input" placeholder="Create a secure password" minlength="6" required autocomplete="new-password">
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('regPassword', this)" aria-label="Show password" title="Toggle password visibility">
+                                <i class="bi bi-eye" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="auth-field-group">
+                        <label for="regAddress" class="auth-field-label">
+                            <span>Delivery Address</span>
+                            <span class="text-muted fw-normal text-none">Optional</span>
+                        </label>
+                        <div class="auth-input-wrapper">
+                            <span class="auth-input-icon"><i class="bi bi-geo-alt" aria-hidden="true"></i></span>
+                            <input type="text" id="regAddress" name="address" class="auth-input" placeholder="Street Address, City, Postal Code" value="<?= htmlspecialchars($address ?? '') ?>" autocomplete="street-address">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-auth-submit">
+                        <span>Register Now</span>
+                        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </button>
+
+                    <div class="auth-footer-nav">
+                        <div>Already have an account? <a href="login" class="auth-nav-link">Sign In</a></div>
+                        <div>
+                            <a href="<?= $appRoot ?>" class="auth-back-link">
+                                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                                <span>Back to Market</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="auth-trust-strip">
+                        <span class="auth-trust-item"><i class="bi bi-shield-check" aria-hidden="true"></i> SSL 256-Bit</span>
+                        <span class="auth-trust-item"><i class="bi bi-patch-check" aria-hidden="true"></i> 100% Guaranteed</span>
+                    </div>
+                </form>
             </div>
+        </section>
+    </main>
 
-        </div>
-    </div>
-
+    <script>
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        const icon = btn.querySelector('i');
+        if (icon) {
+            icon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+        }
+        btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+    }
+    </script>
 </body>
 </html>

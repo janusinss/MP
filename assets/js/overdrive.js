@@ -262,18 +262,26 @@
             });
 
             // Bento Cards reveal
-            if (typeof ScrollTrigger !== 'undefined') {
-                gsap.from('.bento-card', {
-                    scrollTrigger: {
-                        trigger: '.bento-matrix',
-                        start: 'top 85%'
-                    },
-                    opacity: 0,
-                    y: 30,
-                    duration: 0.7,
-                    stagger: 0.12,
-                    ease: 'power3.out'
-                });
+            if (typeof ScrollTrigger !== 'undefined' && !prefersReducedMotion) {
+                const bentoCards = document.querySelectorAll('.bento-card');
+                if (bentoCards.length > 0) {
+                    gsap.fromTo(bentoCards, 
+                        { opacity: 0.2, y: 25 },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.7,
+                            stagger: 0.12,
+                            ease: 'power3.out',
+                            scrollTrigger: {
+                                trigger: '.bento-matrix',
+                                start: 'top 92%',
+                                toggleActions: 'play none none none'
+                            }
+                        }
+                    );
+                    setTimeout(() => ScrollTrigger.refresh(), 100);
+                }
             }
         }
     }

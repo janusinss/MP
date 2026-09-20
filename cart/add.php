@@ -2,7 +2,9 @@
 // cart/add.php
 // AJAX Cart Addition Handler
 error_reporting(0); // Suppress warnings for clean JSON output
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once __DIR__ . '/../config/db.php';
 
 $response = ['status' => 'error', 'message' => 'Invalid request'];
@@ -15,11 +17,11 @@ if (!isset($_SESSION['user_id'])) {
 
 if (isset($_POST['product_id'])) {
     $productId = (int)$_POST['product_id'];
-    $qtyRequested = 1; // Default add quantity
+    $qtyRequested = isset($_POST['quantity']) ? max(1, (int)$_POST['quantity']) : 1;
 
     try {
         // 2. STOCK CHECK
-        $stmt = $pdo->prepare("SELECT stock_qty, name FROM products WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT stock_qty, name, price FROM products WHERE id = ?");
         $stmt->execute([$productId]);
         $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -39,19 +41,31 @@ if (isset($_POST['product_id'])) {
 
         // 3. VALIDATE QUANTITY
         if ($newTotalQty <= $product['stock_qty']) {
-            if (isset($_SESSION['cart'][$productId])) {
-                $_SESSION['cart'][$productId]++;
-            } else {
-                $_SESSION['cart'][$productId] = 1;
-            }
+            $_SESSION['cart'][$productId] = $newTotalQty;
 
             // Calculate total items for badge
             $totalItems = array_sum($_SESSION['cart']);
 
+            // Calculate live subtotal
+            $subtotal = 0;
+            if (!empty($_SESSION['cart'])) {
+                $cartKeys = array_map('intval', array_keys($_SESSION['cart']));
+                $inList = implode(',', array_fill(0, count($cartKeys), '?'));
+                $stmtPrices = $pdo->prepare("SELECT id, price FROM products WHERE id IN ($inList)");
+                $stmtPrices->execute($cartKeys);
+                $prices = $stmtPrices->fetchAll(PDO::FETCH_KEY_PAIR);
+                foreach ($_SESSION['cart'] as $id => $qty) {
+                    if (isset($prices[$id])) {
+                        $subtotal += $prices[$id] * $qty;
+                    }
+                }
+            }
+
             $response = [
                 'status' => 'success',
                 'cart_count' => $totalItems,
-                'message' => 'Item added to cart!'
+                'cart_subtotal' => number_format($subtotal, 2),
+                'message' => htmlspecialchars($product['name']) . ' added to basket!'
             ];
         } else {
             $response = [
@@ -60,8 +74,8 @@ if (isset($_POST['product_id'])) {
             ];
         }
 
-    } catch (Exception $e) {
-        $response = ['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()];
+    } catch (PDOException $e) {
+        $response = ['status' => 'error', 'message' => 'Database error occurred.'];
     }
 }
 

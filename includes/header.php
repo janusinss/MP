@@ -6,7 +6,13 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Calculate Cart Count safely
 $cartCount = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
-$rootPath = file_exists(__DIR__ . '/../assets/css/style.css') && file_exists('assets/css/style.css') ? '' : '../';
+$scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+$pos = strpos($scriptName, '/grocery_app');
+if ($pos !== false) {
+    $rootPath = substr($scriptName, 0, $pos + strlen('/grocery_app')) . '/';
+} else {
+    $rootPath = '/';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,24 +26,115 @@ $rootPath = file_exists(__DIR__ . '/../assets/css/style.css') && file_exists('as
 </head>
 <body>
 
-    <div id="flash-promo" class="bg-dark text-white text-center py-2 small fw-bold" 
-         style="letter-spacing: 0.05em; transition: opacity 1s ease-out, height 1s ease-out; overflow: hidden;">
-        ⚡ FLASH SALE: Use code <span class="text-warning border-bottom border-warning" style="cursor:pointer;" onclick="navigator.clipboard.writeText('FRESH50'); alert('Code FRESH50 copied!');">FRESH50</span> for 50% OFF your first order!
+    <!-- Welcome Offer Lightbox Pop-up Modal (Guest Only) -->
+    <?php if (!isset($_SESSION['user_id'])): ?>
+    <div id="welcomePromoModal" class="promo-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="promoModalTitle" aria-describedby="promoModalDesc">
+        <div class="promo-modal-dialog">
+            <button type="button" class="promo-modal-close-btn" onclick="dismissPromoModal()" aria-label="Close welcome offer" title="Close (Esc)">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+
+            <div class="promo-modal-leaf-icon" aria-hidden="true">
+                <i class="bi bi-gift"></i>
+            </div>
+
+            <div class="promo-modal-kicker">
+                <span>Welcome Offer</span>
+            </div>
+
+            <h3 class="promo-modal-heading" id="promoModalTitle">
+                Enjoy <strong>50% off</strong> your first seasonal order
+            </h3>
+
+            <p class="promo-modal-desc" id="promoModalDesc">
+                Taste the crisp difference of farm-fresh harvests, sustainably grown by local producers and delivered directly to your kitchen table.
+            </p>
+
+            <div class="promo-modal-code-wrapper">
+                <span class="promo-code-label">Code:</span>
+                <span class="promo-code-val" id="promoCodeVal">FRESH50</span>
+                <button type="button" class="promo-code-copy-btn" id="promoModalCopyBtn" onclick="copyPromoCode(this, 'FRESH50')" aria-label="Copy promo code FRESH50" title="Click to copy code FRESH50">
+                    <i class="bi bi-copy promo-icon-copy" aria-hidden="true"></i>
+                    <i class="bi bi-check2 promo-icon-check" aria-hidden="true"></i>
+                    <span class="promo-copy-text">Copy</span>
+                </button>
+                <span class="promo-copied-feedback" role="status" aria-live="polite">Copied!</span>
+            </div>
+
+            <div class="promo-modal-actions">
+                <a href="<?= $rootPath ?: './' ?>#harvest-catalog" class="btn btn-primary promo-claim-btn" onclick="dismissPromoModal()">
+                    Claim Offer &amp; Start Shopping
+                </a>
+                <button type="button" class="promo-modal-dismiss-link" onclick="dismissPromoModal()">
+                    No thanks, continue browsing
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Auto-hide promo bar after 6 seconds
-        setTimeout(() => {
-            const promo = document.getElementById('flash-promo');
-            if (promo) {
-                promo.style.opacity = '0'; // Fade out
-                setTimeout(() => {
-                    promo.style.height = '0';
-                    promo.style.padding = '0';
-                }, 1000); 
+        function openPromoModal() {
+            const modal = document.getElementById('welcomePromoModal');
+            if (modal) {
+                modal.classList.add('is-open');
+                document.body.classList.add('modal-open-freeze');
             }
-        }, 1000);
+        }
+
+        function dismissPromoModal() {
+            const modal = document.getElementById('welcomePromoModal');
+            if (modal) {
+                modal.classList.remove('is-open');
+                document.body.classList.remove('modal-open-freeze');
+                try {
+                    sessionStorage.setItem('promo_popup_dismissed', '1');
+                } catch (e) {}
+            }
+        }
+
+        function copyPromoCode(btn, code) {
+            if (!code) code = 'FRESH50';
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).catch(() => {});
+            }
+            if (btn) {
+                btn.classList.add('is-copied');
+                const textSpan = btn.querySelector('.promo-copy-text');
+                if (textSpan) textSpan.textContent = 'Copied';
+                setTimeout(() => {
+                    btn.classList.remove('is-copied');
+                    if (textSpan) textSpan.textContent = 'Copy';
+                }, 2000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            let isDismissed = false;
+            try {
+                isDismissed = sessionStorage.getItem('promo_popup_dismissed') === '1';
+            } catch (e) {}
+
+            if (!isDismissed) {
+                setTimeout(openPromoModal, 600);
+            }
+
+            const modal = document.getElementById('welcomePromoModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        dismissPromoModal();
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' || e.key === 'Esc') {
+                    dismissPromoModal();
+                }
+            });
+        });
     </script>
+    <?php endif; ?>
 
     <nav class="navbar navbar-expand-lg navbar-glass sticky-top">
         <div class="container">
@@ -54,29 +151,38 @@ $rootPath = file_exists(__DIR__ . '/../assets/css/style.css') && file_exists('as
             <div class="collapse navbar-collapse" id="navContent">
                 <ul class="navbar-nav ms-auto align-items-center gap-3">
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <li class="nav-item">
-                            <a class="nav-link-custom d-flex align-items-center gap-2" href="<?= $rootPath ?>profile">
-                                <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                        <li class="nav-item dropdown">
+                            <button class="nav-link-custom d-flex align-items-center gap-2 dropdown-toggle bg-transparent border-0 p-0 text-decoration-none" id="globalUserDropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 34px; height: 34px; font-size: 0.85rem; background: var(--color-primary, #15803d);">
                                     <?= strtoupper(substr($_SESSION['user_name'], 0, 1)) ?>
                                 </div>
-                                <span><?= htmlspecialchars($_SESSION['user_name']) ?></span>
+                                <span class="fw-semibold text-dark"><?= htmlspecialchars($_SESSION['user_name']) ?></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border py-2 mt-2" aria-labelledby="globalUserDropdown" style="border-radius: 14px; min-width: 220px; border-color: rgba(0,0,0,0.08);">
+                                <li class="px-3 py-2 border-bottom mb-1" style="background-color: #fafbf9;">
+                                    <div class="text-uppercase text-muted" style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">Signed in as</div>
+                                    <div class="fw-bold text-dark text-truncate" style="font-size: 0.9rem;"><?= htmlspecialchars($_SESSION['user_name']) ?></div>
+                                </li>
+                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>profile"><i class="bi bi-person-gear text-success"></i> <span>Account Settings</span></a></li>
+                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>orders"><i class="bi bi-receipt text-success"></i> <span>My Orders</span></a></li>
+                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>cart"><i class="bi bi-bag-check text-success"></i> <span>View Cart (<?= $cartCount ?>)</span></a></li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 text-danger" href="<?= $rootPath ?>logout"><i class="bi bi-box-arrow-right"></i> <span>Sign Out</span></a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item position-relative">
+                            <a href="<?= $rootPath ?>cart" class="btn btn-outline-secondary border-0 position-relative p-2" aria-label="Shopping Cart">
+                                <i class="bi bi-bag fs-5"></i>
+                                <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light <?= ($cartCount > 0) ? '' : 'd-none' ?>" style="font-size: 0.65rem;">
+                                    <?= $cartCount ?>
+                                </span>
                             </a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item"><a href="<?= $rootPath ?>login" class="nav-link-custom">Login</a></li>
                         <li class="nav-item"><a href="<?= $rootPath ?>register" class="btn btn-primary rounded-pill px-4 shadow-sm">Sign Up</a></li>
                     <?php endif; ?>
-
-                    <li class="nav-item position-relative">
-                        <a href="<?= $rootPath ?>cart" class="btn btn-outline-secondary border-0 position-relative">
-                            <i class="bi bi-bag" style="font-size: 1.3rem;"></i>
-                            <?php if($cartCount > 0): ?>
-                                <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.65rem;">
-                                    <?= $cartCount ?>
-                                </span>
-                            <?php endif; ?>
-                        </a>
-                    </li>
                 </ul>
             </div>
         </div>

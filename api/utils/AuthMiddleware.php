@@ -5,8 +5,19 @@ class AuthMiddleware
 {
     public static function authenticate($pdo)
     {
-        $headers = apache_request_headers();
-        $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : '';
+        $authHeader = '';
+        if (function_exists('apache_request_headers')) {
+            $headers = apache_request_headers();
+            foreach ($headers as $key => $val) {
+                if (strcasecmp($key, 'Authorization') === 0) {
+                    $authHeader = $val;
+                    break;
+                }
+            }
+        }
+        if (!$authHeader) {
+            $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+        }
 
         // Support "Bearer <token>"
         if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {

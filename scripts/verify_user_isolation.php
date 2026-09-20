@@ -57,16 +57,35 @@ $pdo->commit();
 $cookieFileB = __DIR__ . '/test_cookie_b.txt';
 if (file_exists($cookieFileB)) unlink($cookieFileB);
 
-$ch = curl_init("http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app/auth/login.php");
+// Fetch CSRF token for User B login
+$ch = curl_init("http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app/login");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFileB);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFileB);
+$loginHtml = curl_exec($ch);
+curl_close($ch);
+
+$tokenB = '';
+if (preg_match('/name=["\']csrf_token["\']\s+value=["\']([^"\']+)["\']/', $loginHtml, $m)) {
+    $tokenB = $m[1];
+}
+
+// Log in User B
+$ch = curl_init("http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app/login");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, ['email' => 'customer2@example.com', 'password' => 'password']);
+curl_setopt($ch, CURLOPT_POSTFIELDS, [
+    'email' => 'customer2@example.com',
+    'password' => 'password',
+    'csrf_token' => $tokenB
+]);
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFileB);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFileB);
 curl_exec($ch);
 curl_close($ch);
 
-$ch = curl_init("http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app/orders/details.php?order_id=$orderA_Id");
+// Attempt to access User A's order details
+$ch = curl_init("http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app/order/$orderA_Id");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFileB);
 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
@@ -79,7 +98,10 @@ assertIsolation("User B cannot access User A's order details (Redirected: HTTP $
 $ch = curl_init("http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app/orders/cancel.php");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, ['order_id' => $orderA_Id]);
+curl_setopt($ch, CURLOPT_POSTFIELDS, [
+    'order_id' => $orderA_Id,
+    'csrf_token' => $tokenB
+]);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFileB);
 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
 curl_exec($ch);

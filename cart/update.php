@@ -1,8 +1,10 @@
 <?php
 // cart/update.php
 // Modifies item quantity or removes item if count drops below 1
-session_start();
 require_once __DIR__ . '/../config/db.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'], $_POST['action'])) {
     $id = (int)$_POST['product_id'];

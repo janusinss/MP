@@ -1,8 +1,10 @@
 <?php
 // orders/place.php
 // Atomic Order Processor with Transaction Boundaries & Rollback Safety
-session_start();
 require_once __DIR__ . '/../config/db.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SESSION['cart'])) {
 

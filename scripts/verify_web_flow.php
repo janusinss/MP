@@ -122,6 +122,46 @@ $ok = $res['code'] === 200 && strpos($res['body'], 'My Orders') !== false;
 echo "10. Orders History (/orders/): HTTP {$res['code']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
 if (!$ok) $allPass = false;
 
+// 11. Category Pill Async Route (Without #all-foods hash jump)
+$res = makeReq("$baseUrl/?category=Bakery");
+$ok = $res['code'] === 200 
+    && strpos($res['body'], 'Bakery Aisle') !== false 
+    && strpos($res['body'], 'href="?category=Bakery#all-foods"') === false;
+echo "11. Category Pill Route (?category=Bakery, in-place no-hash): HTTP {$res['code']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
+
+// 12. Unified Admin Login (/login -> /admin/)
+$adminCookie = __DIR__ . '/test_admin_unified.txt';
+if (file_exists($adminCookie)) unlink($adminCookie);
+$ch = curl_init("$baseUrl/login");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $adminCookie);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $adminCookie);
+$loginHtml = curl_exec($ch);
+curl_close($ch);
+$adminCsrf = extractCsrfToken($loginHtml);
+
+$ch = curl_init("$baseUrl/login");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, [
+    'email' => 'admin',
+    'password' => 'admin123',
+    'csrf_token' => $adminCsrf
+]);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $adminCookie);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $adminCookie);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+curl_exec($ch);
+$adminRedirect = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+$adminCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+if (file_exists($adminCookie)) unlink($adminCookie);
+
+$ok = $adminCode === 302 && str_contains($adminRedirect, '/admin');
+echo "12. Unified Admin Login (/login -> /admin/): HTTP $adminCode -> Redirect: $adminRedirect" . ($ok ? " [PASS]\n" : " [FAIL]\n");
+if (!$ok) $allPass = false;
+
 if (file_exists($cookieFile)) unlink($cookieFile);
 echo "=== All Tests Complete ===\n";
 exit($allPass ? 0 : 1);
