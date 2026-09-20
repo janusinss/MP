@@ -79,11 +79,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SESSION['cart'])) {
         // Commit transaction
         $pdo->commit();
 
-        // 4. Clear Session Cart & Coupon
+        // 4. Clear Session Cart & Coupon & Record Last Order ID for Guest View
         unset($_SESSION['cart']);
         unset($_SESSION['discount']);
+        $_SESSION['last_order_id'] = $orderId;
 
-        header("Location: success.php?orderid=$orderId");
+        $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+        $pos = strpos($scriptName, '/grocery_app');
+        if ($pos !== false) {
+            $rootPath = substr($scriptName, 0, $pos + strlen('/grocery_app')) . '/';
+        } else {
+            $rootPath = '/';
+        }
+
+        header("Location: " . $rootPath . "orders/success.php?orderid=$orderId");
         exit;
 
     } catch (Exception $e) {
@@ -93,7 +102,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SESSION['cart'])) {
         die("Order failed: " . htmlspecialchars($e->getMessage()));
     }
 } else {
-    header("Location: ../");
+    $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+    $pos = strpos($scriptName, '/grocery_app');
+    $rootPath = ($pos !== false) ? substr($scriptName, 0, $pos + strlen('/grocery_app')) . '/' : '/';
+    header("Location: " . $rootPath);
     exit;
 }
 ?>

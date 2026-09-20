@@ -93,6 +93,10 @@ Options -Indexes -MultiViews
     RewriteRule ^terms/?$ pages/terms_of_service.php [L,QSA]
     RewriteRule ^product/([a-zA-Z0-9_-]+)/?$ products/view.php?slug=$1 [L,QSA]
     RewriteRule ^order/([0-9]+)/?$ orders/details.php?order_id=$1 [L,QSA]
+    RewriteRule ^orders/place/?$ orders/place.php [L,QSA]
+    RewriteRule ^place/?$ orders/place.php [L,QSA]
+    RewriteRule ^orders/success/?$ orders/success.php [L,QSA]
+    RewriteRule ^order-success/?$ orders/success.php [L,QSA]
 
     # Support extensionless PHP files
     RewriteCond %{REQUEST_FILENAME} !-d

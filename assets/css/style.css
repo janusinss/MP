@@ -3240,163 +3240,386 @@ h5{
     }
 }
 
-/* --- SUCCESS PAGE REDESIGN --- */
+/* --- SUCCESS ORDER PAGE (ORGANIC FARMSTEAD EDITORIAL) --- */
 
 .success-page-wrapper {
-    background: radial-gradient(circle at center, #f8fcf9, #e9ecea);
-    min-height: 85vh; /* Takes up most of the screen */
+    background-color: var(--color-canvas, #F7F6F2);
+    min-height: calc(100vh - 70px);
+    padding: 3.5rem 1rem 5rem;
+    scrollbar-gutter: stable;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4rem 1rem;
 }
 
-/* The Main Receipt Card */
-.receipt-card {
-    background: #fff;
+.success-container {
     width: 100%;
-    max-width: 480px;
-    border-radius: 24px;
-    box-shadow: 0 30px 60px -15px rgba(93, 134, 108, 0.25); /* Deep green shadow */
+    max-width: 680px;
+}
+
+/* Main Artisan Receipt Card */
+.receipt-card {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border, #E5E0D5);
+    border-radius: var(--radius-lg, 20px);
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(35, 38, 32, 0.06));
     overflow: hidden;
     position: relative;
-    animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(50px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Green Top Section */
-.success-header-bg {
-    background: var(--accent-color);
-    color: #fff;
-    padding: 3rem 2rem 4rem; /* Extra bottom padding for overlap */
+/* Clean Header Section */
+.success-card-header {
+    padding: 2.25rem 2.5rem 1.5rem;
     text-align: center;
-    position: relative;
+    border-bottom: 1px solid var(--color-border-subtle, #EDEAE1);
+    background: linear-gradient(180deg, rgba(74, 116, 91, 0.04) 0%, transparent 100%);
 }
 
-/* Floating Check Icon */
-.success-icon-box {
-    width: 90px;
-    height: 90px;
-    background: #fff;
+.success-status-icon {
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
-    display: flex;
+    background-color: var(--color-brand-tint, rgba(74, 116, 91, 0.1));
+    color: var(--color-brand, #4A745B);
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1.5rem;
-    color: var(--accent-color);
-    font-size: 3rem;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(74, 116, 91, 0.2);
 }
 
-/* Receipt Details Section */
+.success-kicker {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-brand, #4A745B);
+    margin-bottom: 0.35rem;
+}
+
+.success-title {
+    font-family: var(--font-serif, 'Fraunces', Georgia, serif);
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    font-weight: 700;
+    color: var(--color-text-primary, #232620);
+    letter-spacing: -0.02em;
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+}
+
+.success-subtitle {
+    font-size: 0.92rem;
+    color: var(--color-text-secondary, #6E7368);
+    margin: 0 auto;
+    max-width: 54ch;
+    line-height: 1.5;
+}
+
+/* Telemetry Details Strip */
+.receipt-meta-strip {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 1.25rem 2.5rem;
+    background-color: var(--color-surface-subtle, #F0EEE6);
+    border-bottom: 1px solid var(--color-border, #E5E0D5);
+}
+
+.receipt-meta-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.receipt-meta-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-tertiary, #989E92);
+}
+
+.receipt-meta-val {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--color-text-primary, #232620);
+}
+
+.receipt-order-ref {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--color-brand-dark, #375743);
+    font-weight: 700;
+}
+
+/* Receipt Body */
 .receipt-body {
-    background: #fff;
-    padding: 0 2.5rem 2.5rem;
-    margin-top: -2rem; /* Overlaps the green header */
-    border-radius: 24px 24px 0 0;
-    position: relative;
+    padding: 2rem 2.5rem;
 }
 
-.receipt-meta {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: var(--text-muted);
+.receipt-section-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary, #6E7368);
+    margin-bottom: 0.85rem;
+}
+
+/* Shipping & Recipient Block */
+.receipt-fulfillment-block {
+    background-color: #FFFFFF;
+    border: 1px solid var(--color-border-subtle, #EDEAE1);
+    border-radius: var(--radius-md, 12px);
+    padding: 1.15rem 1.25rem;
+    margin-bottom: 1.75rem;
+}
+
+.receipt-recipient-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text-primary, #232620);
+    margin-bottom: 0.25rem;
+}
+
+.receipt-recipient-address {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary, #6E7368);
+    margin: 0;
+    line-height: 1.45;
+}
+
+/* Itemized Table */
+.receipt-items-table {
+    margin-bottom: 1.5rem;
+}
+
+.receipt-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 0;
+    border-bottom: 1px dashed var(--color-border, #E5E0D5);
     font-size: 0.9rem;
 }
 
-.receipt-divider {
-    border-top: 2px dashed #eee;
-    margin: 1.5rem 0;
+.receipt-item-desc {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
 }
 
-/* Item List */
-.receipt-item-row {
+.receipt-item-qty-tag {
+    display: inline-block;
+    padding: 0.15rem 0.45rem;
+    background-color: var(--color-surface-subtle, #F0EEE6);
+    border-radius: var(--radius-sm, 6px);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-text-secondary, #6E7368);
+}
+
+.receipt-item-name {
+    font-weight: 600;
+    color: var(--color-text-primary, #232620);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.receipt-item-price {
+    font-weight: 700;
+    color: var(--color-text-primary, #232620);
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* Calculations */
+.receipt-calc-table {
+    padding-top: 0.5rem;
+    margin-bottom: 1.75rem;
+}
+
+.receipt-calc-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.8rem;
-    font-size: 0.95rem;
-    color: var(--text-main);
+    font-size: 0.88rem;
+    color: var(--color-text-secondary, #6E7368);
+    margin-bottom: 0.5rem;
 }
 
-.receipt-item-qty {
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    margin-right: 5px;
+.receipt-calc-val {
+    font-weight: 600;
+    color: var(--color-text-primary, #232620);
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
 }
 
-/* Total Section */
 .receipt-total-row {
     display: flex;
+    align-items: flex-end;
     justify-content: space-between;
+    padding-top: 1rem;
+    margin-top: 0.75rem;
+    border-top: 1px solid var(--color-border, #E5E0D5);
+}
+
+.receipt-total-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text-primary, #232620);
+}
+
+.receipt-total-amount {
+    font-family: var(--font-serif, 'Fraunces', Georgia, serif);
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--color-brand-dark, #375743);
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+/* Actions */
+.receipt-actions {
+    display: flex;
+    gap: 0.85rem;
+    margin-top: 2rem;
+}
+
+.btn-print,
+.btn-print-receipt {
+    flex: 1;
+    display: inline-flex;
     align-items: center;
-    margin-top: 1.5rem;
-}
-
-.total-label {
-    font-size: 1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-muted);
-}
-
-.total-amount {
-    font-family: var(--font-mono);
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--accent-color);
-}
-
-/* Buttons */
-.btn-print {
-    border: 1px solid #ddd;
-    background: transparent;
-    color: var(--text-muted);
-    width: 100%;
-    padding: 12px;
-    border-radius: 50px;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.75rem 1.25rem;
+    background-color: transparent;
+    color: var(--color-text-primary, #232620);
+    border: 1px solid var(--color-border, #E5E0D5);
+    border-radius: var(--radius-md, 12px);
+    font-size: 0.9rem;
     font-weight: 600;
-    transition: all 0.2s;
-    margin-bottom: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color var(--duration-fast, 150ms) ease, border-color var(--duration-fast, 150ms) ease;
 }
 
-.btn-print:hover {
-    border-color: var(--text-main);
-    color: var(--text-main);
-    background: #f9f9f9;
+.btn-print:hover,
+.btn-print-receipt:hover {
+    background-color: var(--color-surface-subtle, #F0EEE6);
+    border-color: var(--color-border-focus, #4A745B);
+    color: var(--color-brand-dark, #375743);
 }
 
-.btn-continue {
-    background: var(--text-main);
-    color: #fff;
-    width: 100%;
-    padding: 15px;
-    border-radius: 50px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+.btn-continue,
+.btn-continue-shopping {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.75rem 1.25rem;
+    background-color: var(--color-brand, #4A745B);
+    color: #FFFFFF;
     border: none;
-    transition: all 0.3s;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-radius: var(--radius-md, 12px);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(74, 116, 91, 0.25);
+    transition: background-color var(--duration-fast, 150ms) ease, transform var(--duration-fast, 150ms) ease;
 }
 
-.btn-continue:hover {
-    background: var(--accent-color);
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(93, 134, 108, 0.3);
+.btn-continue:hover,
+.btn-continue-shopping:hover {
+    background-color: var(--color-brand-dark, #375743);
+    color: #FFFFFF;
+    transform: translateY(-2px);
+}
+
+.receipt-history-link-wrap {
+    text-align: center;
+    margin-top: 1.25rem;
+}
+
+.receipt-history-link {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-secondary, #6E7368);
+    text-decoration: none;
+    transition: color var(--duration-fast, 150ms) ease;
+}
+
+.receipt-history-link:hover {
+    color: var(--color-brand, #4A745B);
+}
+
+.receipt-guarantee-note {
+    font-size: 0.78rem;
+    color: var(--color-text-tertiary, #989E92);
+    text-align: center;
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+    line-height: 1.45;
 }
 
 /* Print Styles */
 @media print {
-    .no-print, .navbar-glass, footer { display: none !important; }
-    .success-page-wrapper { background: white; padding: 0; }
-    .receipt-card { box-shadow: none; border: 1px solid #000; max-width: 100%; }
-    .success-header-bg { color: black; background: white; border-bottom: 1px solid #000; padding: 20px; }
-    .success-icon-box { display: none; }
+    .no-print, .navbar-glass, footer, .receipt-actions, .receipt-history-link-wrap {
+        display: none !important;
+    }
+    .success-page-wrapper {
+        background: #FFFFFF !important;
+        padding: 0 !important;
+        min-height: auto !important;
+    }
+    .receipt-card {
+        box-shadow: none !important;
+        border: 1px solid #111111 !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+    }
+    .success-card-header {
+        background: #FFFFFF !important;
+        border-bottom: 1px solid #111111 !important;
+        padding: 1.5rem !important;
+    }
+    .receipt-meta-strip {
+        background: #FAFAFA !important;
+        border-bottom: 1px solid #111111 !important;
+    }
+    .receipt-body {
+        padding: 1.5rem !important;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 575.98px) {
+    .success-page-wrapper {
+        padding: 1.5rem 0.75rem 3.5rem;
+    }
+    .success-card-header {
+        padding: 1.75rem 1.25rem 1.25rem;
+    }
+    .receipt-meta-strip {
+        grid-template-columns: 1fr;
+        padding: 1rem 1.25rem;
+        gap: 0.75rem;
+    }
+    .receipt-body {
+        padding: 1.5rem 1.25rem;
+    }
+    .receipt-actions {
+        flex-direction: column;
+    }
 }
 
 /* --- LEGAL PAGE STYLES (Privacy & Terms) --- */
