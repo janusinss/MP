@@ -859,42 +859,9 @@ h5{
     margin-bottom: 1.25rem;
 }
 
-/* Segmented Tab Switcher (Sign In vs Create Account) */
+/* Segmented Tab Switcher - Mobile Only (Hidden on Web) */
 .auth-segmented-switch {
-    display: flex;
-    background: var(--color-surface-subtle, #F0EEE6);
-    padding: 4px;
-    border-radius: var(--radius-full, 9999px);
-    margin-bottom: 1.35rem;
-    border: 1px solid var(--color-border, #E5E0D5);
-    gap: 4px;
-}
-
-.auth-switch-tab {
-    flex: 1 1 0;
-    text-align: center;
-    padding: 0.55rem 0.75rem;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--color-text-secondary, #6E7368);
-    text-decoration: none;
-    border-radius: var(--radius-full, 9999px);
-    transition: all 0.18s var(--ease-smooth);
-}
-
-.auth-switch-tab.active {
-    background: #FFFFFF;
-    color: var(--color-brand-dark, #375743);
-    box-shadow: 0 2px 8px rgba(35, 38, 32, 0.08);
-    font-weight: 700;
-}
-
-.auth-switch-tab:hover:not(.active) {
-    color: var(--color-brand, #4A745B);
+    display: none !important;
 }
 
 .auth-card-header {
@@ -1208,6 +1175,42 @@ h5{
     }
     .auth-mobile-brand {
         display: none;
+    }
+    /* Segmented Tab Switcher - Mobile Redesign */
+    .auth-segmented-switch {
+        display: flex !important;
+        background: #ECEAE2;
+        padding: 4px;
+        border-radius: 14px;
+        border: 1px solid rgba(35, 38, 32, 0.08);
+        margin-bottom: 1.25rem;
+        gap: 4px;
+        box-shadow: inset 0 1px 2px rgba(35, 38, 32, 0.04);
+    }
+    .auth-switch-tab {
+        flex: 1 1 50%;
+        text-align: center;
+        padding: 0.55rem 0.5rem;
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #6C7265;
+        text-decoration: none;
+        border-radius: 10px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .auth-switch-tab.active {
+        background: #FFFFFF;
+        color: var(--color-brand-dark, #234230);
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(35, 38, 32, 0.12), 0 1px 2px rgba(35, 38, 32, 0.04);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+    .auth-switch-tab:active {
+        transform: scale(0.98);
     }
 }
 
