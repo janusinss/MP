@@ -574,13 +574,18 @@ elseif ($view == 'products') {
     $categoryFilter = trim($_GET['category'] ?? 'All');
     $stockFilter = trim($_GET['stock'] ?? 'All');
 
-    // 1. Inventory telemetry stats
+    // 1. Inventory telemetry stats across full catalog
     $totalSkus = 0;
     $totalUnits = 0;
     $totalValuation = 0.0;
     $outOfStockCount = 0;
     $lowStockCount = 0;
     $categoryCounts = [];
+
+    // Scoped counts for active Aisle category filter
+    $scopedTotal = 0;
+    $scopedLowStock = 0;
+    $scopedOutOfStock = 0;
 
     $stmtAllProd = $pdo->query("SELECT category, price, stock_qty FROM products");
     while ($r = $stmtAllProd->fetch(PDO::FETCH_ASSOC)) {
@@ -599,6 +604,16 @@ elseif ($view == 'products') {
         }
 
         $categoryCounts[$cat] = ($categoryCounts[$cat] ?? 0) + 1;
+
+        // Scoped check for current category filter
+        if ($categoryFilter === 'All' || $categoryFilter === $cat) {
+            $scopedTotal++;
+            if ($qty === 0) {
+                $scopedOutOfStock++;
+            } elseif ($qty < 5) {
+                $scopedLowStock++;
+            }
+        }
     }
     ksort($categoryCounts);
     $alertsCount = $outOfStockCount + $lowStockCount;
@@ -714,14 +729,14 @@ elseif ($view == 'products') {
     <div class="admin-card p-3 mb-4">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
             <!-- Search Form -->
-            <form onsubmit="event.preventDefault(); loadView('products&category=<?= urlencode($categoryFilter) ?>&stock=<?= urlencode($stockFilter) ?>&search=' + encodeURIComponent(this.search.value));" class="d-flex align-items-center gap-2 flex-grow-1" style="max-width: 380px;">
+            <form onsubmit="event.preventDefault(); loadView('products<?= ($categoryFilter !== 'All') ? '&category=' . urlencode($categoryFilter) : '' ?><?= ($stockFilter !== 'All') ? '&stock=' . urlencode($stockFilter) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="d-flex align-items-center gap-2" style="max-width: 320px; width: 100%;">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by name, category, or SKU..." value="<?= htmlspecialchars($search) ?>" style="font-size: 0.82rem;">
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by name, SKU..." value="<?= htmlspecialchars($search) ?>" style="font-size: 0.82rem;">
                 </div>
-                <button type="submit" class="btn btn-sm btn-dark px-3 fw-semibold text-nowrap" style="font-size: 0.8rem;">Search</button>
-                <?php if ($search !== '' || $categoryFilter !== 'All' || $stockFilter !== 'All'): ?>
-                    <button type="button" onclick="loadView('products')" class="btn btn-sm btn-outline-secondary px-2 text-nowrap" style="font-size: 0.8rem;">Reset</button>
+                <button type="submit" class="btn btn-sm btn-dark px-3 fw-semibold text-nowrap">Search</button>
+                <?php if ($search !== ''): ?>
+                    <button type="button" onclick="loadView('products<?= ($categoryFilter !== 'All') ? '&category=' . urlencode($categoryFilter) : '' ?><?= ($stockFilter !== 'All') ? '&stock=' . urlencode($stockFilter) : '' ?>')" class="btn btn-sm btn-outline-secondary px-2 text-nowrap">Clear</button>
                 <?php endif; ?>
             </form>
 
@@ -731,9 +746,9 @@ elseif ($view == 'products') {
                 <div class="btn-group btn-group-sm" role="group" aria-label="Stock Filter">
                     <?php
                     $stockOptions = [
-                        'All' => ['label' => 'All Stock', 'count' => $totalSkus],
-                        'low' => ['label' => 'Low Stock (< 5)', 'count' => $lowStockCount],
-                        'out' => ['label' => 'Out of Stock (0)', 'count' => $outOfStockCount]
+                        'All' => ['label' => 'All Stock', 'count' => $scopedTotal],
+                        'low' => ['label' => 'Low Stock (< 5)', 'count' => $scopedLowStock],
+                        'out' => ['label' => 'Out of Stock (0)', 'count' => $scopedOutOfStock]
                     ];
                     foreach ($stockOptions as $stKey => $stData):
                         $isActive = ($stockFilter === $stKey);
@@ -771,6 +786,12 @@ elseif ($view == 'products') {
                         <?php endforeach; ?>
                     </ul>
                 </div>
+
+                <?php if ($categoryFilter !== 'All' || $stockFilter !== 'All'): ?>
+                    <button type="button" onclick="loadView('products')" class="btn btn-sm btn-link text-muted text-decoration-none small py-1 px-2" title="Reset all category and stock filters">
+                        <i class="bi bi-x-circle me-1"></i>Reset
+                    </button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
