@@ -182,17 +182,18 @@ require_once __DIR__ . '/../includes/header.php';
                                             <a href="<?= $rootPath ?>product/<?= $productSlug ?>" class="cart-product-title" title="<?= htmlspecialchars($item['name']) ?>">
                                                 <?= htmlspecialchars($item['name']) ?>
                                             </a>
+                                            <div class="cart-unit-rate-mobile d-md-none text-muted small">$<?= number_format($item['price'], 2) ?> / unit</div>
                                             <?php if ($item['stock_qty'] <= 5): ?>
                                                 <span class="cart-stock-hint">Only <?= $item['stock_qty'] ?> remaining in harvest</span>
                                             <?php endif; ?>
                                         </div>
                                     </div>
 
-                                    <div class="cart-price-cell">
+                                    <div class="cart-price-cell d-none d-md-block">
                                         $<?= number_format($item['price'], 2) ?>
                                     </div>
 
-                                    <div class="d-flex justify-content-center">
+                                    <div class="cart-row-controls">
                                         <div class="cart-stepper-control">
                                             <form action="<?= $rootPath ?>cart/update" method="POST" class="m-0 p-0">
                                                 <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
@@ -212,10 +213,11 @@ require_once __DIR__ . '/../includes/header.php';
                                                 </button>
                                             </form>
                                         </div>
-                                    </div>
 
-                                    <div class="cart-subtotal-cell text-end">
-                                        $<?= number_format($item['subtotal'], 2) ?>
+                                        <div class="cart-subtotal-cell text-end">
+                                            <span class="cart-subtotal-label d-md-none text-muted small me-1">Subtotal:</span>
+                                            <span class="cart-subtotal-val font-monospace fw-bold">$<?= number_format($item['subtotal'], 2) ?></span>
+                                        </div>
                                     </div>
 
                                     <div class="cart-remove-cell text-end">

@@ -65,8 +65,46 @@ include __DIR__ . '/../includes/header.php';
         </nav>
 
         <div class="row g-4">
-            <!-- Left Sidebar Profile Overview -->
-            <div class="col-lg-4 col-md-5">
+            <!-- Mobile Compact Identity Header & Quick Actions (<lg) -->
+            <div class="col-12 d-lg-none">
+                <div class="profile-mobile-identity-card shadow-sm">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="profile-avatar-mobile shadow-sm" aria-hidden="true">
+                            <?= strtoupper(substr($user['full_name'] ?: 'U', 0, 1)) ?>
+                        </div>
+                        <div class="profile-mobile-info flex-grow-1 min-w-0">
+                            <h2 class="profile-mobile-name text-truncate mb-0"><?= htmlspecialchars($user['full_name']) ?></h2>
+                            <div class="profile-mobile-email text-truncate"><?= htmlspecialchars($user['email']) ?></div>
+                            <div class="profile-member-pill mt-1">
+                                <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
+                                <span>Farmstead Member</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Quick Horizontal Switcher Tabs -->
+                    <nav class="profile-mobile-quick-nav mt-3 pt-2 border-top border-light-subtle" aria-label="Mobile Profile Tabs">
+                        <a href="<?= $rootPath ?>profile" class="profile-quick-pill active">
+                            <i class="bi bi-person-gear" aria-hidden="true"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="<?= $rootPath ?>orders" class="profile-quick-pill">
+                            <i class="bi bi-receipt" aria-hidden="true"></i>
+                            <span>My Orders</span>
+                        </a>
+                        <a href="<?= $rootPath ?: './' ?>#categories" class="profile-quick-pill">
+                            <i class="bi bi-basket" aria-hidden="true"></i>
+                            <span>Browse Shop</span>
+                        </a>
+                        <a href="<?= $rootPath ?>logout" class="profile-quick-pill text-danger">
+                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                            <span>Sign Out</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Left Sidebar Profile Overview (Desktop >=lg) -->
+            <div class="col-lg-4 d-none d-lg-block">
                 <aside class="profile-sidebar-card">
                     <div class="profile-avatar-large shadow-sm">
                         <?= strtoupper(substr($user['full_name'] ?: 'U', 0, 1)) ?>
@@ -101,83 +139,96 @@ include __DIR__ . '/../includes/header.php';
             </div>
 
             <!-- Right Content: Profile Form -->
-            <div class="col-lg-8 col-md-7">
-                <div class="profile-content-card">
+            <div class="col-lg-8 col-12">
+                <div class="profile-content-card shadow-sm">
                     <div class="profile-content-header">
                         <h1 class="profile-heading">Account Settings</h1>
                         <p class="profile-subheading">Update your delivery address, personal details, and account security.</p>
                     </div>
 
                     <?php if ($msg): ?>
-                        <div class="alert alert-success d-flex align-items-center gap-2 border-0 shadow-sm rounded-3 mb-4" role="alert">
+                        <div class="alert alert-success d-flex align-items-center gap-2 border-0 shadow-sm rounded-3 mb-4 py-2 px-3" role="alert">
                             <i class="bi bi-check-circle-fill fs-5 text-success"></i>
                             <div><?= htmlspecialchars($msg) ?></div>
                         </div>
                     <?php endif; ?>
 
                     <?php if ($error): ?>
-                        <div class="alert alert-danger d-flex align-items-center gap-2 border-0 shadow-sm rounded-3 mb-4" role="alert">
+                        <div class="alert alert-danger d-flex align-items-center gap-2 border-0 shadow-sm rounded-3 mb-4 py-2 px-3" role="alert">
                             <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
                             <div><?= htmlspecialchars($error) ?></div>
                         </div>
                     <?php endif; ?>
 
-                    <form method="POST" action="profile">
+                    <form method="POST" action="profile" class="profile-edit-form">
                         <?= csrf_input() ?>
 
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="profile-field-label" for="profileFullName">Full Name</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0 text-muted" style="border-radius: 10px 0 0 10px; border-color: rgba(0,0,0,0.12);">
-                                        <i class="bi bi-person"></i>
-                                    </span>
-                                    <input type="text" id="profileFullName" name="full_name" class="form-control profile-field-input border-start-0 ps-0" style="border-radius: 0 10px 10px 0;" value="<?= htmlspecialchars($user['full_name']) ?>" required>
+                        <div class="profile-form-section mb-4">
+                            <h2 class="profile-section-legend">
+                                <i class="bi bi-person text-success me-1" aria-hidden="true"></i>
+                                <span>Personal Details</span>
+                            </h2>
+                            <div class="row g-3">
+                                <div class="col-md-6 col-12">
+                                    <label class="profile-field-label" for="profileFullName">Full Name</label>
+                                    <div class="input-group profile-input-group">
+                                        <span class="input-group-text bg-white text-muted">
+                                            <i class="bi bi-person" aria-hidden="true"></i>
+                                        </span>
+                                        <input type="text" id="profileFullName" name="full_name" class="form-control profile-field-input" value="<?= htmlspecialchars($user['full_name']) ?>" required autocomplete="name">
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="col-md-6">
-                                <label class="profile-field-label">Account Email <span class="badge bg-light text-muted border ms-1 fw-normal"><i class="bi bi-lock-fill"></i> Locked</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 10px 0 0 10px; border-color: rgba(0,0,0,0.08);">
-                                        <i class="bi bi-envelope"></i>
-                                    </span>
-                                    <input type="email" class="form-control profile-field-input border-start-0 ps-0" style="border-radius: 0 10px 10px 0;" value="<?= htmlspecialchars($user['email']) ?>" disabled>
+                                <div class="col-md-6 col-12">
+                                    <label class="profile-field-label">Account Email <span class="badge bg-light text-muted border ms-1 fw-normal"><i class="bi bi-lock-fill"></i> Locked</span></label>
+                                    <div class="input-group profile-input-group is-locked">
+                                        <span class="input-group-text bg-light text-muted">
+                                            <i class="bi bi-envelope" aria-hidden="true"></i>
+                                        </span>
+                                        <input type="email" class="form-control profile-field-input bg-light" value="<?= htmlspecialchars($user['email']) ?>" disabled aria-label="Account email locked">
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="profile-field-label" for="profileAddress">Default Delivery Address</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0 text-muted align-self-start pt-3" style="border-radius: 10px 0 0 10px; border-color: rgba(0,0,0,0.12);">
-                                    <i class="bi bi-geo-alt"></i>
+                        <div class="profile-form-section mb-4">
+                            <h2 class="profile-section-legend">
+                                <i class="bi bi-geo-alt text-success me-1" aria-hidden="true"></i>
+                                <span>Default Delivery Address</span>
+                            </h2>
+                            <div class="input-group profile-input-group">
+                                <span class="input-group-text bg-white text-muted align-self-stretch pt-2">
+                                    <i class="bi bi-geo-alt" aria-hidden="true"></i>
                                 </span>
-                                <textarea id="profileAddress" name="address" class="form-control profile-field-input border-start-0 ps-0" style="border-radius: 0 10px 10px 0;" rows="3" placeholder="Street, apartment, city, state, postal code"><?= htmlspecialchars($user['address'] ?? '') ?></textarea>
+                                <textarea id="profileAddress" name="address" class="form-control profile-field-input" rows="3" placeholder="Street name, apartment, unit, city, state, postal code" autocomplete="street-address"><?= htmlspecialchars($user['address'] ?? '') ?></textarea>
                             </div>
                         </div>
 
-                        <div class="mb-4">
+                        <div class="profile-form-section mb-4">
+                            <h2 class="profile-section-legend">
+                                <i class="bi bi-shield-lock text-success me-1" aria-hidden="true"></i>
+                                <span>Security Credentials</span>
+                            </h2>
                             <label class="profile-field-label" for="profilePassword">
                                 New Password <span class="text-muted fw-normal" style="text-transform: none;">(Leave blank to keep current)</span>
                             </label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0 text-muted" style="border-radius: 10px 0 0 10px; border-color: rgba(0,0,0,0.12);">
-                                    <i class="bi bi-shield-lock"></i>
+                            <div class="input-group profile-input-group">
+                                <span class="input-group-text bg-white text-muted">
+                                    <i class="bi bi-shield-lock" aria-hidden="true"></i>
                                 </span>
-                                <input type="password" id="profilePassword" name="password" class="form-control profile-field-input border-start-0 border-end-0 px-0" placeholder="Minimum 6 characters">
-                                <button type="button" class="btn btn-white border border-start-0 text-muted" style="border-radius: 0 10px 10px 0; border-color: rgba(0,0,0,0.12); background: #fff;" onclick="togglePasswordVisibility('profilePassword', this)" aria-label="Toggle password visibility">
-                                    <i class="bi bi-eye"></i>
+                                <input type="password" id="profilePassword" name="password" class="form-control profile-field-input" placeholder="Minimum 6 characters" autocomplete="new-password">
+                                <button type="button" class="btn btn-password-toggle text-muted" onclick="togglePasswordVisibility('profilePassword', this)" aria-label="Toggle password visibility">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pt-2">
+                        <div class="profile-form-actions d-flex justify-content-between align-items-center flex-wrap gap-3 pt-2">
                             <button type="submit" class="profile-save-btn">
-                                <i class="bi bi-check2"></i>
+                                <i class="bi bi-check2" aria-hidden="true"></i>
                                 <span>Save Changes</span>
                             </button>
-                            <span class="text-muted small"><i class="bi bi-shield-check text-success me-1"></i> Data encrypted with 256-bit SSL</span>
+                            <span class="text-muted small"><i class="bi bi-shield-check text-success me-1" aria-hidden="true"></i> Encrypted with 256-bit SSL</span>
                         </div>
                     </form>
                 </div>

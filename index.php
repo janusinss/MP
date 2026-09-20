@@ -370,6 +370,7 @@ $firstKey = array_key_first($aisleReels);
                     </a>
                 <?php endif; ?>
 
+                <?php if (!$isLoggedIn): ?>
                 <button class="navbar-toggler freshcart-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navContent" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="toggler-bars" aria-hidden="true">
                         <span class="toggler-bar bar-top"></span>
@@ -377,6 +378,7 @@ $firstKey = array_key_first($aisleReels);
                         <span class="toggler-bar bar-bot"></span>
                     </span>
                 </button>
+                <?php endif; ?>
             </div>
 
             <div class="collapse navbar-collapse" id="navContent">
@@ -461,6 +463,35 @@ $firstKey = array_key_first($aisleReels);
             </div>
         </div>
     </nav>
+
+    <?php if ($isLoggedIn): ?>
+    <!-- Sleek Mobile Bottom Navigation Bar for Logged-In Shoppers -->
+    <nav class="fc-mobile-bottom-bar d-lg-none" aria-label="Quick Mobile Navigation">
+        <a href="./" class="fc-bottom-tab active">
+            <i class="bi bi-shop" aria-hidden="true"></i>
+            <span>Market</span>
+        </a>
+        <a href="#food-aisles" class="fc-bottom-tab">
+            <i class="bi bi-grid" aria-hidden="true"></i>
+            <span>Aisles</span>
+        </a>
+        <a href="orders" class="fc-bottom-tab">
+            <i class="bi bi-receipt" aria-hidden="true"></i>
+            <span>Orders</span>
+        </a>
+        <a href="cart" class="fc-bottom-tab fc-bottom-tab-cart">
+            <div class="position-relative d-inline-block">
+                <i class="bi bi-bag" aria-hidden="true"></i>
+                <span class="fc-bottom-badge <?= ($cartCount > 0) ? '' : 'd-none' ?>"><?= $cartCount ?></span>
+            </div>
+            <span>Harvest Bag</span>
+        </a>
+        <a href="<?= $isAdmin ? 'admin/' : 'profile' ?>" class="fc-bottom-tab">
+            <i class="bi bi-person-circle" aria-hidden="true"></i>
+            <span>Account</span>
+        </a>
+    </nav>
+    <?php endif; ?>
 
     <?php if ($isLoggedIn): ?>
         <!-- =========================================================

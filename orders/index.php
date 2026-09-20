@@ -36,8 +36,8 @@ include __DIR__ . '/../includes/header.php';
         <div class="orders-header-row">
             <div>
                 <nav class="orders-breadcrumb" aria-label="Breadcrumb">
-                    <a href="<?= $rootPath ?: './' ?>"><i class="bi bi-house-door"></i> Marketplace</a>
-                    <i class="bi bi-chevron-right" style="font-size: 0.72rem;"></i>
+                    <a href="<?= $rootPath ?: './' ?>"><i class="bi bi-house-door" aria-hidden="true"></i> Marketplace</a>
+                    <i class="bi bi-chevron-right" style="font-size: 0.72rem;" aria-hidden="true"></i>
                     <span class="text-dark fw-medium">Order History</span>
                 </nav>
                 <h1 class="orders-header-title">My Orders</h1>
@@ -46,7 +46,7 @@ include __DIR__ . '/../includes/header.php';
             <div class="orders-header-actions">
                 <span class="orders-count-indicator">
                     <i class="bi bi-box-seam text-success" aria-hidden="true"></i>
-                    <span><?= count($orders) ?> <?= count($orders) === 1 ? 'Order' : 'Orders' ?> Placed</span>
+                    <span id="ordersTotalCount"><?= count($orders) ?> <?= count($orders) === 1 ? 'Order' : 'Orders' ?> Placed</span>
                 </span>
                 <a href="<?= $rootPath ?>profile" class="btn-continue-browsing">
                     <i class="bi bi-person-gear" aria-hidden="true"></i>
@@ -63,7 +63,33 @@ include __DIR__ . '/../includes/header.php';
         <?php endif; ?>
 
         <?php if (count($orders) > 0): ?>
-            <div class="orders-list">
+            <!-- Mobile Quick Status Filter Chips -->
+            <div class="orders-filter-bar mb-3" aria-label="Filter Orders by Status">
+                <div class="orders-filter-chips">
+                    <button type="button" class="orders-chip-btn active" data-filter="all">
+                        <span>All</span>
+                        <span class="chip-count"><?= count($orders) ?></span>
+                    </button>
+                    <button type="button" class="orders-chip-btn" data-filter="pending">
+                        <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+                        <span>Pending</span>
+                    </button>
+                    <button type="button" class="orders-chip-btn" data-filter="shipped">
+                        <i class="bi bi-truck" aria-hidden="true"></i>
+                        <span>Shipped</span>
+                    </button>
+                    <button type="button" class="orders-chip-btn" data-filter="delivered">
+                        <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                        <span>Delivered</span>
+                    </button>
+                    <button type="button" class="orders-chip-btn" data-filter="cancelled">
+                        <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+                        <span>Cancelled</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="orders-list" id="ordersList">
                 <?php foreach ($orders as $order): 
                     $status = $order['status'] ?: 'Pending';
                     $statusLower = strtolower($status);
@@ -77,7 +103,7 @@ include __DIR__ . '/../includes/header.php';
                         $icon = 'bi-x-circle-fill';
                     }
                 ?>
-                    <div class="order-history-card">
+                    <div class="order-history-card shadow-sm" data-status="<?= $statusLower ?>">
                         <div class="order-card-top">
                             <div class="order-meta-lead">
                                 <span class="order-card-ref">#<?= str_pad($order['id'], 6, "0", STR_PAD_LEFT) ?></span>
@@ -94,30 +120,31 @@ include __DIR__ . '/../includes/header.php';
                         </div>
 
                         <div class="order-card-main">
-                            <div>
-                                <span class="order-col-label">Total Paid / Due</span>
+                            <div class="order-card-detail-group">
+                                <span class="order-col-label">Total Amount</span>
                                 <div class="order-total-val">$<?= number_format($order['total_amount'], 2) ?></div>
                             </div>
 
-                            <div>
+                            <div class="order-card-dest-group">
                                 <span class="order-col-label">Delivery Destination</span>
-                                <p class="order-dest-val text-truncate">
+                                <p class="order-dest-val text-truncate mb-0">
                                     <i class="bi bi-geo-alt-fill text-muted me-1" aria-hidden="true"></i>
-                                    <?= htmlspecialchars($order['address'] ?: 'Customer address on file') ?>
+                                    <span><?= htmlspecialchars($order['address'] ?: 'Customer address on file') ?></span>
                                 </p>
                             </div>
 
                             <div class="order-card-actions">
-                                <a href="<?= $rootPath ?>order/<?= $order['id'] ?>" class="btn-order-view">
+                                <a href="<?= $rootPath ?>order/<?= $order['id'] ?>" class="btn-order-view" aria-label="View details for order #<?= $order['id'] ?>">
                                     <i class="bi bi-receipt" aria-hidden="true"></i>
                                     <span>View Details</span>
+                                    <i class="bi bi-chevron-right ms-auto d-md-none" aria-hidden="true"></i>
                                 </a>
 
                                 <?php if ($status == 'Pending'): ?>
                                     <form action="<?= $rootPath ?>orders/cancel" method="POST" onsubmit="return confirm('Are you sure you want to cancel order #<?= $order['id'] ?>?');" class="m-0">
                                         <?= csrf_input() ?>
                                         <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
-                                        <button type="submit" class="btn-order-cancel">
+                                        <button type="submit" class="btn-order-cancel" aria-label="Cancel order #<?= $order['id'] ?>">
                                             <i class="bi bi-x-circle" aria-hidden="true"></i>
                                             <span>Cancel Order</span>
                                         </button>
@@ -128,6 +155,26 @@ include __DIR__ . '/../includes/header.php';
                     </div>
                 <?php endforeach; ?>
             </div>
+
+            <script>
+            document.querySelectorAll('.orders-chip-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.orders-chip-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const filter = this.getAttribute('data-filter');
+                    const cards = document.querySelectorAll('.order-history-card');
+                    let visibleCount = 0;
+                    cards.forEach(card => {
+                        if (filter === 'all' || card.getAttribute('data-status') === filter) {
+                            card.style.display = '';
+                            visibleCount++;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            </script>
 
         <?php else: ?>
 

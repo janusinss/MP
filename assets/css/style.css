@@ -13421,3 +13421,508 @@ body.modal-open-freeze {
     color: #ffffff !important;
     border-color: #0f172a !important;
 }
+
+/* ==========================================================================
+   MOBILE-FIRST LOGGED-IN REDESIGN & TACTILE NAVIGATION
+   Standards: UI_Always.md & frontend.md
+   ========================================================================== */
+
+/* 1. Sleek Docked Mobile Bottom Navigation Bar */
+.fc-mobile-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1040;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 6px 4px max(8px, env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.fc-bottom-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 600;
+    min-height: 48px;
+    padding: 4px 2px;
+    border-radius: 12px;
+    transition: color 0.15s ease, transform 0.15s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.fc-bottom-tab i {
+    font-size: 1.22rem;
+    line-height: 1;
+    margin-bottom: 3px;
+    transition: transform 0.15s ease;
+}
+
+.fc-bottom-tab:hover {
+    color: #15803d;
+}
+
+.fc-bottom-tab:active {
+    transform: scale(0.94);
+}
+
+.fc-bottom-tab.active {
+    color: #15803d;
+}
+
+.fc-bottom-tab.active i {
+    transform: translateY(-1px);
+    font-weight: bold;
+}
+
+.fc-bottom-badge {
+    position: absolute;
+    top: -4px;
+    right: -10px;
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 0.62rem;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 1px 5px;
+    line-height: 1.2;
+    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.35);
+}
+
+/* Ensure mobile content clears the docked bottom nav */
+@media (max-width: 991.98px) {
+    .profile-page-wrapper,
+    .orders-page-wrapper,
+    .details-page-wrapper,
+    .cart-page-section,
+    .food-market-main {
+        padding-bottom: 96px !important;
+    }
+}
+
+/* 2. Account Settings: Mobile Identity Card & Quick Tabs */
+.profile-mobile-identity-card {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 18px;
+    padding: 1.15rem 1.25rem;
+    background: linear-gradient(180deg, #ffffff 0%, #fafbf9 100%);
+}
+
+.profile-avatar-mobile {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+    color: #ffffff;
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 1.45rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 6px 16px rgba(21, 128, 61, 0.22);
+}
+
+.profile-mobile-name {
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #1c1917;
+    line-height: 1.25;
+}
+
+.profile-mobile-email {
+    font-size: 0.82rem;
+    color: #78716c;
+    margin-top: 2px;
+}
+
+.profile-mobile-quick-nav {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.profile-mobile-quick-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.profile-quick-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+    white-space: nowrap;
+    min-height: 38px;
+    transition: all 0.15s ease;
+}
+
+.profile-quick-pill:active {
+    transform: scale(0.96);
+}
+
+.profile-quick-pill.active {
+    background: rgba(21, 128, 61, 0.12);
+    color: #15803d;
+    border-color: rgba(21, 128, 61, 0.28);
+}
+
+.profile-section-legend {
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.profile-input-group {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.profile-input-group:focus-within {
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
+}
+
+.profile-input-group .form-control {
+    border: none !important;
+    box-shadow: none !important;
+    font-size: 16px !important;
+    padding: 0.65rem 0.85rem;
+    min-height: 46px;
+    background: transparent;
+}
+
+.profile-input-group .input-group-text {
+    border: none !important;
+    background: transparent !important;
+    font-size: 1.05rem;
+    padding-left: 0.85rem;
+    padding-right: 0.5rem;
+}
+
+.btn-password-toggle {
+    border: none !important;
+    background: transparent !important;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.btn-password-toggle:focus-visible {
+    outline: 2px solid #15803d;
+    outline-offset: 2px;
+}
+
+@media (max-width: 767.98px) {
+    .profile-save-btn {
+        width: 100% !important;
+        justify-content: center;
+        min-height: 48px;
+        font-size: 1rem;
+        font-weight: 700;
+        border-radius: 12px;
+    }
+    .profile-content-card {
+        padding: 1.25rem 1.15rem;
+        border-radius: 18px;
+    }
+}
+
+/* 3. Order History: Quick Filter Chips & Mobile Cards */
+.orders-filter-chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.orders-filter-chips::-webkit-scrollbar {
+    display: none;
+}
+
+.orders-chip-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #475569;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    white-space: nowrap;
+    min-height: 38px;
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.orders-chip-btn:hover {
+    border-color: #15803d;
+    color: #15803d;
+}
+
+.orders-chip-btn:active {
+    transform: scale(0.96);
+}
+
+.orders-chip-btn.active {
+    background: #15803d;
+    color: #ffffff;
+    border-color: #15803d;
+    box-shadow: 0 2px 8px rgba(21, 128, 61, 0.25);
+}
+
+.orders-chip-btn .chip-count {
+    background: rgba(0, 0, 0, 0.08);
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.orders-chip-btn.active .chip-count {
+    background: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+}
+
+@media (max-width: 767.98px) {
+    .order-history-card {
+        border-radius: 18px;
+        padding: 1.15rem;
+    }
+    .order-card-main {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .order-card-detail-group {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+    }
+    .order-card-dest-group {
+        padding-bottom: 0.25rem;
+    }
+    .order-card-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+        margin-top: 0.4rem;
+    }
+    .btn-order-view {
+        width: 100% !important;
+        min-height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+    .btn-order-cancel {
+        width: 100% !important;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+    }
+}
+
+/* 4. Order Details Mobile Improvements */
+@media (max-width: 767.98px) {
+    .details-page-wrapper {
+        padding: 1.25rem 0 3rem;
+    }
+    .details-header-card {
+        padding: 1.25rem;
+        border-radius: 18px;
+    }
+    .details-header-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    .btn-details-action {
+        width: 100% !important;
+        justify-content: center;
+        min-height: 46px;
+        border-radius: 12px;
+    }
+    .fulfillment-track {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem 0.75rem;
+    }
+    .fulfillment-track::before {
+        display: none !important;
+    }
+    .fulfillment-step {
+        display: flex !important;
+        align-items: center;
+        gap: 10px;
+        text-align: left !important;
+    }
+    .step-node {
+        margin: 0 !important;
+        width: 38px !important;
+        height: 38px !important;
+        flex-shrink: 0;
+    }
+    .details-item-row {
+        padding: 0.95rem 0;
+    }
+}
+
+/* 5. Harvest Bag Mobile Card Alignment */
+@media (min-width: 768px) {
+    .cart-row-controls {
+        display: contents;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .cart-row {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+        padding: 1.15rem !important;
+        border-radius: 16px;
+        border: 1px solid rgba(0, 0, 0, 0.07);
+        margin-bottom: 0.85rem;
+        background: #ffffff;
+    }
+    .cart-product-cell {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.85rem;
+        padding-right: 48px;
+    }
+    .cart-thumb-img {
+        width: 68px !important;
+        height: 68px !important;
+        border-radius: 12px !important;
+    }
+    .cart-product-title {
+        font-size: 1rem !important;
+        line-height: 1.35;
+        font-weight: 700;
+    }
+    .cart-unit-rate-mobile {
+        font-size: 0.82rem;
+        color: #78716c;
+        margin-top: 3px;
+    }
+    .cart-remove-cell {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+    .cart-remove-btn {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(239, 68, 68, 0.08);
+        color: #dc2626;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s ease;
+    }
+    .cart-remove-btn:active {
+        background: rgba(239, 68, 68, 0.18);
+    }
+    .cart-row-controls {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding-top: 0.65rem !important;
+        border-top: 1px dashed rgba(0, 0, 0, 0.08) !important;
+        margin-top: 0.25rem;
+    }
+    .cart-stepper-control {
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        padding: 2px;
+        background: #f8fafc;
+    }
+    .cart-step-btn {
+        width: 38px !important;
+        height: 38px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 1.15rem;
+        cursor: pointer;
+    }
+    .cart-step-count {
+        min-width: 34px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+    .cart-subtotal-val {
+        font-size: 1.18rem !important;
+        color: #15803d !important;
+    }
+    .btn-cart-checkout {
+        min-height: 52px !important;
+        border-radius: 14px !important;
+        font-size: 1.05rem !important;
+        font-weight: 700 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .cart-promo-hint-row {
+        min-height: 44px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
