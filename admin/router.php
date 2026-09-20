@@ -571,13 +571,65 @@ if ($view == 'dashboard') {
 // =========================================================================
 elseif ($view == 'products') {
     $search = trim($_GET['search'] ?? '');
+    $categoryFilter = trim($_GET['category'] ?? 'All');
+    $stockFilter = trim($_GET['stock'] ?? 'All');
+
+    // 1. Inventory telemetry stats
+    $totalSkus = 0;
+    $totalUnits = 0;
+    $totalValuation = 0.0;
+    $outOfStockCount = 0;
+    $lowStockCount = 0;
+    $categoryCounts = [];
+
+    $stmtAllProd = $pdo->query("SELECT category, price, stock_qty FROM products");
+    while ($r = $stmtAllProd->fetch(PDO::FETCH_ASSOC)) {
+        $totalSkus++;
+        $qty = (int)$r['stock_qty'];
+        $pr = (float)$r['price'];
+        $cat = $r['category'] ?: 'General';
+
+        $totalUnits += $qty;
+        $totalValuation += ($qty * $pr);
+
+        if ($qty === 0) {
+            $outOfStockCount++;
+        } elseif ($qty < 5) {
+            $lowStockCount++;
+        }
+
+        $categoryCounts[$cat] = ($categoryCounts[$cat] ?? 0) + 1;
+    }
+    ksort($categoryCounts);
+    $alertsCount = $outOfStockCount + $lowStockCount;
+
+    // 2. Query filtered products
     $sql = "SELECT * FROM products";
+    $where = [];
     $params = [];
 
-    if ($search) {
-        $sql .= " WHERE name LIKE ?";
+    if ($search !== '') {
+        $where[] = "(name LIKE ? OR category LIKE ? OR CAST(id AS CHAR) LIKE ?)";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
         $params[] = "%$search%";
     }
+
+    if ($categoryFilter !== 'All' && $categoryFilter !== '') {
+        $where[] = "category = ?";
+        $params[] = $categoryFilter;
+    }
+
+    if ($stockFilter === 'low') {
+        $where[] = "stock_qty > 0 AND stock_qty < 5";
+    } elseif ($stockFilter === 'out') {
+        $where[] = "stock_qty = 0";
+    }
+
+    if (!empty($where)) {
+        $sql .= " WHERE " . implode(" AND ", $where);
+    }
+
     $sql .= " ORDER BY id DESC";
 
     $stmt = $pdo->prepare($sql);
@@ -590,42 +642,158 @@ elseif ($view == 'products') {
             <h1 class="admin-view-title">Product Inventory</h1>
             <p class="admin-view-subtitle">Live catalog stock tracking, pricing, and product records.</p>
         </div>
-        <div>
-            <a href="product_add.php" class="btn btn-sm btn-success">
-                <i class="bi bi-plus-circle me-1"></i> Add New Product
+        <div class="d-flex align-items-center gap-2">
+            <a href="product_add.php" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1">
+                <i class="bi bi-plus-circle"></i> Add New Product
             </a>
         </div>
     </div>
 
-    <div class="admin-card p-3 mb-4">
-        <form onsubmit="event.preventDefault(); loadView('products&search=' + encodeURIComponent(this.search.value));" class="d-flex gap-2">
-            <input type="text" name="search" class="form-control form-control-sm" placeholder="Search catalog by name..." value="<?= htmlspecialchars($search) ?>" style="max-width: 320px;">
-            <button type="submit" class="btn btn-sm btn-outline-secondary">Search</button>
-            <?php if ($search): ?>
-                <button type="button" onclick="loadView('products')" class="btn btn-sm btn-link text-muted text-decoration-none">Clear</button>
-            <?php endif; ?>
-        </form>
+    <!-- 1. Inventory Operational Telemetry Strip -->
+    <div class="admin-card p-0 mb-4 overflow-hidden">
+        <div class="row g-0">
+            <!-- Col 1: Total SKUs -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-xl-bottom-0">
+                <div class="admin-kpi-label mb-1">Catalog SKUs</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;"><?= number_format($totalSkus) ?> Products</span>
+                    <span class="text-muted small"><?= count($categoryCounts) ?> Aisles</span>
+                </div>
+                <div class="text-muted small">
+                    Active grocery inventory
+                </div>
+            </div>
+
+            <!-- Col 2: On-Hand Units -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-xl-bottom-0">
+                <div class="admin-kpi-label mb-1">Total On-Hand Units</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;"><?= number_format($totalUnits) ?> Units</span>
+                    <span class="text-muted small">In Warehouse</span>
+                </div>
+                <div class="text-muted small">
+                    Physical shelf inventory
+                </div>
+            </div>
+
+            <!-- Col 3: Inventory Valuation -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-sm-bottom-0">
+                <div class="admin-kpi-label mb-1">Catalog Asset Value</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format($totalValuation, 2) ?></span>
+                    <span class="text-success small fw-semibold">Retail Total</span>
+                </div>
+                <div class="text-muted small">
+                    Gross inventory evaluation
+                </div>
+            </div>
+
+            <!-- Col 4: Reorder Health -->
+            <div class="col-sm-6 col-xl-3 p-3 px-4">
+                <div class="admin-kpi-label mb-1">Inventory Health</div>
+                <div class="d-flex align-items-baseline justify-content-between mb-1">
+                    <span class="fw-bold fs-5 <?= $outOfStockCount > 0 ? 'text-danger' : ($lowStockCount > 0 ? 'text-warning-emphasis' : 'text-success') ?>" style="font-variant-numeric: tabular-nums;">
+                        <?= $alertsCount > 0 ? $alertsCount . ' Alerts' : '100% Stocked' ?>
+                    </span>
+                    <span class="text-muted small">Threshold: 5</span>
+                </div>
+                <div class="small">
+                    <?php if ($outOfStockCount > 0): ?>
+                        <span class="text-danger fw-semibold"><?= $outOfStockCount ?> out of stock</span> &bull; Reorder needed
+                    <?php elseif ($lowStockCount > 0): ?>
+                        <span class="text-warning-emphasis fw-semibold"><?= $lowStockCount ?> low stock</span> &bull; Monitor aisles
+                    <?php else: ?>
+                        <span class="text-success fw-semibold"><i class="bi bi-check2 me-1"></i>All shelves healthy</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- 2. Search & Category Filters -->
+    <div class="admin-card p-3 mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <!-- Search Form -->
+            <form onsubmit="event.preventDefault(); loadView('products&category=<?= urlencode($categoryFilter) ?>&stock=<?= urlencode($stockFilter) ?>&search=' + encodeURIComponent(this.search.value));" class="d-flex align-items-center gap-2 flex-grow-1" style="max-width: 360px;">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search catalog by name, category, SKU..." value="<?= htmlspecialchars($search) ?>">
+                </div>
+                <button type="submit" class="btn btn-sm btn-outline-secondary px-3">Search</button>
+                <?php if ($search !== '' || $categoryFilter !== 'All' || $stockFilter !== 'All'): ?>
+                    <button type="button" onclick="loadView('products')" class="btn btn-sm btn-link text-muted text-decoration-none">Clear</button>
+                <?php endif; ?>
+            </form>
+
+            <!-- Aisle & Stock Filter Controls -->
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <!-- Stock Health Toggles -->
+                <div class="btn-group btn-group-sm" role="group" aria-label="Stock Status Filter">
+                    <?php
+                    $stockOptions = [
+                        'All' => 'All Stock',
+                        'low' => 'Low Stock (< 5)',
+                        'out' => 'Out of Stock (0)'
+                    ];
+                    foreach ($stockOptions as $stKey => $stLabel):
+                        $activeCls = ($stockFilter === $stKey) ? 'btn-dark' : 'btn-outline-secondary';
+                        $param = "products&stock=$stKey" . ($categoryFilter !== 'All' ? "&category=" . urlencode($categoryFilter) : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
+                    ?>
+                        <button type="button" onclick="loadView('<?= $param ?>')" class="btn <?= $activeCls ?>">
+                            <?= $stLabel ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Category Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Aisle: <?= htmlspecialchars($categoryFilter) ?>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="font-size: 0.85rem;">
+                        <li><a class="dropdown-item <?= ($categoryFilter === 'All') ? 'active' : '' ?>" href="#" onclick="loadView('products&stock=<?= urlencode($stockFilter) ?><?= $search !== '' ? '&search=' . urlencode($search) : '' ?>')">All Categories (<?= $totalSkus ?>)</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <?php foreach ($categoryCounts as $cName => $cCount): 
+                            $cParam = "products&category=" . urlencode($cName) . "&stock=" . urlencode($stockFilter) . ($search !== '' ? '&search=' . urlencode($search) : '');
+                        ?>
+                            <li><a class="dropdown-item <?= ($categoryFilter === $cName) ? 'active' : '' ?>" href="#" onclick="loadView('<?= $cParam ?>')"><?= htmlspecialchars($cName) ?> (<?= $cCount ?>)</a></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Inventory Products Master Table -->
     <div class="admin-card p-0 overflow-hidden">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light border-bottom">
                     <tr>
-                        <th class="ps-3 py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Product</th>
-                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Category</th>
-                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Price</th>
-                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Stock Status</th>
+                        <th class="ps-3 py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Product Item</th>
+                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Aisle / Category</th>
+                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Retail Price</th>
+                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">On-Hand Stock</th>
+                        <th class="py-3 text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Stock Health</th>
                         <th class="pe-3 py-3 text-end text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (!empty($products)): ?>
-                        <?php foreach ($products as $p): ?>
+                        <?php foreach ($products as $p): 
+                            $sq = (int)$p['stock_qty'];
+                            if ($sq === 0) {
+                                $pill = '<span class="admin-status-pill status-cancelled">Out of Stock</span>';
+                            } elseif ($sq < 5) {
+                                $pill = '<span class="admin-status-pill status-pending">Low Stock</span>';
+                            } else {
+                                $pill = '<span class="admin-status-pill status-delivered">In Stock</span>';
+                            }
+                        ?>
                             <tr class="border-bottom">
                                 <td class="ps-3 py-2">
                                     <div class="d-flex align-items-center gap-3">
-                                        <img src="../assets/images/<?= $p['image'] ?: 'default.jpg' ?>" style="width: 42px; height: 42px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;" alt="thumb">
+                                        <img src="../assets/images/<?= $p['image'] ?: 'default.jpg' ?>" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;" alt="thumb">
                                         <div>
                                             <div class="fw-semibold text-dark small"><?= htmlspecialchars($p['name']) ?></div>
                                             <div class="text-muted" style="font-size: 0.7rem; font-family: monospace;">SKU: #<?= str_pad($p['id'], 4, '0', STR_PAD_LEFT) ?></div>
@@ -633,28 +801,24 @@ elseif ($view == 'products') {
                                     </div>
                                 </td>
                                 <td class="py-2">
-                                    <span class="text-dark small"><?= htmlspecialchars($p['category']) ?></span>
+                                    <span class="text-dark small fw-medium"><?= htmlspecialchars($p['category']) ?></span>
                                 </td>
                                 <td class="py-2">
-                                    <span class="fw-semibold text-dark small">$<?= number_format((float)$p['price'], 2) ?></span>
+                                    <span class="fw-semibold text-dark small" style="font-variant-numeric: tabular-nums;">$<?= number_format((float)$p['price'], 2) ?></span>
                                 </td>
                                 <td class="py-2">
-                                    <?php
-                                    $sq = (int)$p['stock_qty'];
-                                    if ($sq === 0) {
-                                        echo '<span class="admin-status-pill status-cancelled">Out of Stock</span>';
-                                    } elseif ($sq < 5) {
-                                        echo '<span class="admin-status-pill status-pending">Low Stock (' . $sq . ')</span>';
-                                    } else {
-                                        echo '<span class="admin-status-pill status-delivered">In Stock (' . $sq . ')</span>';
-                                    }
-                                    ?>
+                                    <span class="fw-semibold small text-dark" style="font-variant-numeric: tabular-nums;">
+                                        <?= $sq ?> <?= $sq === 1 ? 'unit' : 'units' ?>
+                                    </span>
+                                </td>
+                                <td class="py-2">
+                                    <?= $pill ?>
                                 </td>
                                 <td class="pe-3 py-2 text-end">
                                     <a href="product_edit.php?id=<?= $p['id'] ?>" class="btn btn-sm btn-outline-secondary py-1 px-2 me-1" title="Edit Product">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <a href="actions/product_delete.php?id=<?= $p['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger py-1 px-2" title="Delete Product" onclick="return confirm('Delete this product?');">
+                                    <a href="actions/product_delete.php?id=<?= $p['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger py-1 px-2" title="Delete Product" onclick="return confirm('Delete <?= htmlspecialchars(addslashes($p['name'])) ?> from catalog?');">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                 </td>
@@ -662,8 +826,16 @@ elseif ($view == 'products') {
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">
-                                No products found matching criteria.
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <div class="py-3">
+                                    <i class="bi bi-basket text-muted opacity-50 fs-2 d-block mb-2"></i>
+                                    <div>No products found matching the criteria.</div>
+                                    <?php if ($search !== '' || $categoryFilter !== 'All' || $stockFilter !== 'All'): ?>
+                                        <button type="button" onclick="loadView('products')" class="btn btn-sm btn-link text-decoration-none mt-2">
+                                            Reset Filters
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endif; ?>

@@ -1,7 +1,10 @@
 <?php
 // admin/product_edit.php
 require_once __DIR__ . '/../config/db.php';
-session_start();
+require_once __DIR__ . '/../config/security.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Security Check
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -70,90 +73,121 @@ if (!$product) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Product | Admin Portal</title>
+    <title>Edit Product #<?= $id ?> | Admin Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../assets/css/style.css?v=<?= time(); ?>">
 </head>
-<body style="background-color: var(--bg-color);">
+<body style="background-color: var(--color-canvas, #F7F6F2); color: #0f172a; min-height: 100vh;">
 
-    <div class="edit-product-wrapper">
-        <div class="edit-card animate-fade-in">
-            
-            <h2 class="edit-title">Edit Product</h2>
+    <div class="container py-4" style="max-width: 920px;">
+        
+        <!-- Navigation Header -->
+        <div class="mb-4">
+            <a href="index.php?view=products" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left"></i> Back to Inventory
+            </a>
+        </div>
 
+        <!-- View Header -->
+        <div class="admin-view-header mb-4">
+            <div>
+                <span class="admin-kicker">Inventory Management</span>
+                <h1 class="admin-view-title mb-1">Edit Product #<?= str_pad($id, 4, '0', STR_PAD_LEFT) ?></h1>
+                <p class="admin-view-subtitle mb-0">Update item pricing, warehouse stock levels, and catalog media.</p>
+            </div>
+        </div>
+
+        <!-- Main Edit Card -->
+        <div class="admin-card p-4">
             <form method="POST" enctype="multipart/form-data">
                 <?= csrf_input() ?>
-                
-                <div class="edit-img-preview-box mb-0">
-                    <img src="../assets/images/<?= htmlspecialchars($product['image'] ?: 'default.jpg') ?>" id="currentPreviewImage" alt="Current Image">
-                    <div class="edit-img-overlay" id="previewOverlay">Current</div>
-                </div>
-                <p id="changeImageHelper" class="text-center text-muted small fw-bold text-uppercase mt-2 mb-4" style="display: none; letter-spacing: 0.05em;">
-                    Click "Save Changes" below to confirm new image
-                </p>
 
-                <div class="mb-4 mt-4">
-                    <label class="form-label-edit">Product Name (Read-only)</label>
-                    <input type="text" class="form-control form-control-edit text-muted" value="<?= htmlspecialchars($product['name']) ?>" readonly style="background: #f0f0f0;">
-                </div>
+                <div class="row g-4">
+                    <!-- Left Col: Current Image Preview & Replacement -->
+                    <div class="col-lg-5">
+                        <label class="form-label text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Product Photography</label>
+                        <div class="border rounded p-3 text-center bg-light mb-3">
+                            <img src="../assets/images/<?= htmlspecialchars($product['image'] ?: 'default.jpg') ?>" id="currentPreviewImage" alt="Current Image" style="width: 100%; height: 200px; object-fit: cover; border-radius: 6px;">
+                            <div class="mt-2 text-muted small" id="previewBadge">
+                                Current Catalog Image
+                            </div>
+                        </div>
 
-                <div class="mb-4">
-                    <label class="form-label-edit">Update Image</label>
-                    <input type="file" name="image" id="editImageInput" class="form-control form-control-edit" accept="image/*">
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <label class="form-label-edit">Category</label>
-                        <select name="category" class="form-select form-control-edit">
-                            <option value="Fruits" <?= $product['category'] == 'Fruits' ? 'selected' : '' ?>>Fruits</option>
-                            <option value="Dairy" <?= $product['category'] == 'Dairy' ? 'selected' : '' ?>>Dairy</option>
-                            <option value="Bakery" <?= $product['category'] == 'Bakery' ? 'selected' : '' ?>>Bakery</option>
-                            <option value="Beverages" <?= $product['category'] == 'Beverages' ? 'selected' : '' ?>>Beverages</option>
-                            <option value="General" <?= $product['category'] == 'General' ? 'selected' : '' ?>>General</option>
-                            <option value="Pantry" <?= $product['category'] == 'Pantry' ? 'selected' : '' ?>>Pantry</option>
-                            <option value="Meat" <?= $product['category'] == 'Meat' ? 'selected' : '' ?>>Meat</option>
-                            <option value="Snacks" <?= $product['category'] == 'Snacks' ? 'selected' : '' ?>>Snacks</option>
-                            <option value="Vegetables" <?= $product['category'] == 'Vegetables' ? 'selected' : '' ?>>Vegetables</option>
-                        </select>
+                        <div>
+                            <label for="editImageInput" class="form-label text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Replace Photo (Optional)</label>
+                            <input type="file" name="image" id="editImageInput" class="form-control form-control-sm" accept="image/*">
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-4">
-                        <label class="form-label-edit">Price ($)</label>
-                        <input type="number" step="0.01" name="price" class="form-control form-control-edit" value="<?= $product['price'] ?>" required>
+
+                    <!-- Right Col: Product Information -->
+                    <div class="col-lg-7">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Product Title (SKU Protected)</label>
+                            <input type="text" class="form-control bg-light text-secondary" value="<?= htmlspecialchars($product['name']) ?>" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editCategory" class="form-label text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Aisle / Category</label>
+                            <select id="editCategory" name="category" class="form-select">
+                                <option value="Fruits" <?= $product['category'] == 'Fruits' ? 'selected' : '' ?>>Fruits</option>
+                                <option value="Dairy" <?= $product['category'] == 'Dairy' ? 'selected' : '' ?>>Dairy</option>
+                                <option value="Bakery" <?= $product['category'] == 'Bakery' ? 'selected' : '' ?>>Bakery</option>
+                                <option value="Beverages" <?= $product['category'] == 'Beverages' ? 'selected' : '' ?>>Beverages</option>
+                                <option value="General" <?= $product['category'] == 'General' ? 'selected' : '' ?>>General</option>
+                                <option value="Pantry" <?= $product['category'] == 'Pantry' ? 'selected' : '' ?>>Pantry</option>
+                                <option value="Meat" <?= $product['category'] == 'Meat' ? 'selected' : '' ?>>Meat</option>
+                                <option value="Snacks" <?= $product['category'] == 'Snacks' ? 'selected' : '' ?>>Snacks</option>
+                                <option value="Vegetables" <?= $product['category'] == 'Vegetables' ? 'selected' : '' ?>>Vegetables</option>
+                            </select>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-6">
+                                <label for="editPrice" class="form-label text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">Retail Price ($)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white text-muted">$</span>
+                                    <input type="number" id="editPrice" step="0.01" name="price" class="form-control" value="<?= $product['price'] ?>" required>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="editStock" class="form-label text-muted small text-uppercase fw-bold" style="font-size: 0.72rem;">On-Hand Stock Units</label>
+                                <input type="number" id="editStock" name="stock_qty" class="form-control" value="<?= $product['stock_qty'] ?>" required>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2 border-top pt-3">
+                            <button type="submit" class="btn btn-dark px-4 py-2 fw-semibold">
+                                Save Changes
+                            </button>
+                            <a href="index.php?view=products" class="btn btn-outline-secondary px-3 py-2">
+                                Cancel
+                            </a>
+                        </div>
                     </div>
                 </div>
-
-                <div class="mb-4">
-                    <label class="form-label-edit">Stock Quantity</label>
-                    <input type="number" name="stock_qty" class="form-control form-control-edit" value="<?= $product['stock_qty'] ?>" required>
-                </div>
-
-                <button type="submit" class="btn-save">Save Changes</button>
-                <a href="index.php?view=products" class="btn-cancel-link">Cancel</a>
             </form>
         </div>
+
     </div>
 
-    <script>
-        const editInput = document.getElementById('editImageInput');
-        const previewImg = document.getElementById('currentPreviewImage');
-        const helperText = document.getElementById('changeImageHelper');
-        const overlayText = document.getElementById('previewOverlay');
+<script>
+    const editInput = document.getElementById('editImageInput');
+    const previewImg = document.getElementById('currentPreviewImage');
+    const previewBadge = document.getElementById('previewBadge');
 
-        editInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    helperText.style.display = 'block';
-                    overlayText.innerText = 'New Selection';
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-    </script>
+    editInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewBadge.innerHTML = '<span class="text-success fw-semibold"><i class="bi bi-check2"></i> New image selected</span>';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 
 </body>
 </html>
