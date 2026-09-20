@@ -101,10 +101,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <!-- Right: Auth Form Panel -->
         <section class="auth-form-panel" aria-label="Sign In Form">
             <div class="auth-card">
-                <div class="auth-mobile-brand">
-                    <a href="<?= $appRoot ?>" class="auth-brand-logo text-dark">
-                        <span>FreshCart</span><span class="auth-brand-dot"></span>
+                <!-- Mobile App Header with Back Navigation -->
+                <div class="auth-mobile-header">
+                    <a href="<?= $appRoot ?>" class="auth-back-pill" aria-label="Back to Storefront">
+                        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                        <span>Market</span>
                     </a>
+                    <a href="<?= $appRoot ?>" class="auth-mobile-logo">
+                        FreshCart<span>.</span>
+                    </a>
+                </div>
+
+                <!-- 1-Tap Segmented Auth Switcher -->
+                <div class="auth-segmented-switch" role="tablist" aria-label="Account Access Options">
+                    <a href="login" class="auth-switch-tab active" role="tab" aria-selected="true">Sign In</a>
+                    <a href="register" class="auth-switch-tab" role="tab" aria-selected="false">Create Account</a>
                 </div>
 
                 <div class="auth-card-header">
@@ -126,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <label for="loginEmail" class="auth-field-label">Email Address or Username</label>
                         <div class="auth-input-wrapper">
                             <span class="auth-input-icon"><i class="bi bi-person" aria-hidden="true"></i></span>
-                            <input type="text" id="loginEmail" name="email" class="auth-input" placeholder="you@example.com or admin" value="<?= htmlspecialchars($email ?? '') ?>" required autofocus autocomplete="username">
+                            <input type="text" id="loginEmail" name="email" class="auth-input" placeholder="you@example.com or admin" value="<?= htmlspecialchars($email ?? '') ?>" required autofocus autocomplete="username" inputmode="email" autocapitalize="none" autocorrect="off">
                         </div>
                     </div>
 
@@ -147,6 +158,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <span>Sign In</span>
                         <i class="bi bi-arrow-right" aria-hidden="true"></i>
                     </button>
+
+                    <!-- Fast One-Tap Demo Fill for Reviewers & Mobile Testing -->
+                    <div class="auth-quick-fill">
+                        <span class="quick-fill-label"><i class="bi bi-lightning-charge-fill text-warning me-1"></i>Demo:</span>
+                        <button type="button" class="quick-fill-pill" onclick="fillDemo('customer@gmail.com', 'password')">Customer</button>
+                        <button type="button" class="quick-fill-pill" onclick="fillDemo('admin@freshcart.com', 'admin123')">Admin</button>
+                    </div>
 
                     <div class="auth-footer-nav">
                         <div>Don't have an account? <a href="register" class="auth-nav-link">Create an account</a></div>
@@ -178,6 +196,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             icon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
         }
         btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+    }
+
+    function fillDemo(email, pass) {
+        const emailInput = document.getElementById('loginEmail');
+        const passInput = document.getElementById('loginPassword');
+        if (emailInput && passInput) {
+            emailInput.value = email;
+            passInput.value = pass;
+            passInput.focus();
+        }
     }
     </script>
 </body>

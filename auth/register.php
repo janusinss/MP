@@ -87,10 +87,21 @@ $appRoot = $appRoot ? $appRoot . '/' : '/';
         <!-- Right: Auth Form Panel -->
         <section class="auth-form-panel" aria-label="Registration Form">
             <div class="auth-card">
-                <div class="auth-mobile-brand">
-                    <a href="<?= $appRoot ?>" class="auth-brand-logo text-dark">
-                        <span>FreshCart</span><span class="auth-brand-dot"></span>
+                <!-- Mobile App Header with Back Navigation -->
+                <div class="auth-mobile-header">
+                    <a href="<?= $appRoot ?>" class="auth-back-pill" aria-label="Back to Storefront">
+                        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                        <span>Market</span>
                     </a>
+                    <a href="<?= $appRoot ?>" class="auth-mobile-logo">
+                        FreshCart<span>.</span>
+                    </a>
+                </div>
+
+                <!-- 1-Tap Segmented Auth Switcher -->
+                <div class="auth-segmented-switch" role="tablist" aria-label="Account Access Options">
+                    <a href="login" class="auth-switch-tab" role="tab" aria-selected="false">Sign In</a>
+                    <a href="register" class="auth-switch-tab active" role="tab" aria-selected="true">Create Account</a>
                 </div>
 
                 <div class="auth-card-header">
@@ -118,7 +129,7 @@ $appRoot = $appRoot ? $appRoot . '/' : '/';
                         <label for="regFullName" class="auth-field-label">Full Name</label>
                         <div class="auth-input-wrapper">
                             <span class="auth-input-icon"><i class="bi bi-person" aria-hidden="true"></i></span>
-                            <input type="text" id="regFullName" name="full_name" class="auth-input" placeholder="e.g. John Doe" value="<?= htmlspecialchars($name ?? '') ?>" required autofocus autocomplete="name">
+                            <input type="text" id="regFullName" name="full_name" class="auth-input" placeholder="e.g. John Doe" value="<?= htmlspecialchars($name ?? '') ?>" required autofocus autocomplete="name" inputmode="text" autocapitalize="words">
                         </div>
                     </div>
 
@@ -126,14 +137,14 @@ $appRoot = $appRoot ? $appRoot . '/' : '/';
                         <label for="regEmail" class="auth-field-label">Email Address</label>
                         <div class="auth-input-wrapper">
                             <span class="auth-input-icon"><i class="bi bi-envelope" aria-hidden="true"></i></span>
-                            <input type="email" id="regEmail" name="email" class="auth-input" placeholder="you@example.com" value="<?= htmlspecialchars($email ?? '') ?>" required autocomplete="email">
+                            <input type="email" id="regEmail" name="email" class="auth-input" placeholder="you@example.com" value="<?= htmlspecialchars($email ?? '') ?>" required autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off">
                         </div>
                     </div>
 
                     <div class="auth-field-group">
                         <div class="auth-field-label">
                             <label for="regPassword" class="m-0">Password</label>
-                            <span class="text-muted fw-normal text-none">Min 6 characters</span>
+                            <span class="text-muted fw-normal small">Min 6 characters</span>
                         </div>
                         <div class="auth-input-wrapper">
                             <span class="auth-input-icon"><i class="bi bi-lock" aria-hidden="true"></i></span>
@@ -145,13 +156,13 @@ $appRoot = $appRoot ? $appRoot . '/' : '/';
                     </div>
 
                     <div class="auth-field-group">
-                        <label for="regAddress" class="auth-field-label">
-                            <span>Delivery Address</span>
-                            <span class="text-muted fw-normal text-none">Optional</span>
-                        </label>
+                        <div class="auth-field-label">
+                            <label for="regAddress" class="m-0">Delivery Address</label>
+                            <span class="text-muted fw-normal small">Optional</span>
+                        </div>
                         <div class="auth-input-wrapper">
                             <span class="auth-input-icon"><i class="bi bi-geo-alt" aria-hidden="true"></i></span>
-                            <input type="text" id="regAddress" name="address" class="auth-input" placeholder="Street Address, City, Postal Code" value="<?= htmlspecialchars($address ?? '') ?>" autocomplete="street-address">
+                            <input type="text" id="regAddress" name="address" class="auth-input" placeholder="Street Address, City, Postal Code" value="<?= htmlspecialchars($address ?? '') ?>" autocomplete="street-address" inputmode="text" autocapitalize="words">
                         </div>
                     </div>
 
