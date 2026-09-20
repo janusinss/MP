@@ -722,10 +722,10 @@ $firstKey = array_key_first($aisleReels);
         <div class="container hero-content-overdrive">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <div class="hero-kicker">CERTIFIED ORGANIC &bull; DIRECT REGENERATIVE SOURCING</div>
+                    <div class="hero-kicker"><i class="bi bi-patch-check-fill me-1" aria-hidden="true"></i>100% Certified Organic &bull; Local Harvest</div>
 
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <div class="hero-member-kicker mb-3">
+                        <div class="hero-member-kicker mb-2">
                             <span class="member-live-dot" aria-hidden="true"></span>
                             <span>MEMBER ACCESS &bull; WELCOME BACK, <?= strtoupper(htmlspecialchars($_SESSION['user_name'])) ?></span>
                         </div>
@@ -736,28 +736,35 @@ $firstKey = array_key_first($aisleReels);
                         <p class="hero-lead-od">Harvested within 24 hours. Certified organic produce, pasture-raised dairy, and artisan baked goods delivered directly to your door.</p>
                     <?php endif; ?>
 
-                    <div class="d-flex flex-wrap gap-3 mt-4">
-                        <a href="#catalog" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm fw-bold">Start Shopping</a>
+                    <div class="hero-cta-group">
+                        <a href="#catalog" class="hero-btn-primary">
+                            <span>Start Shopping</span>
+                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                        </a>
                         <?php if (isset($_SESSION['user_id'])): ?>
-                            <a href="orders" class="btn btn-outline-secondary btn-lg rounded-pill px-4 d-inline-flex align-items-center gap-2">
-                                <i class="bi bi-receipt"></i> My Orders
+                            <a href="orders" class="hero-btn-secondary">
+                                <i class="bi bi-receipt" aria-hidden="true"></i>
+                                <span>My Orders</span>
                             </a>
                         <?php else: ?>
-                            <a href="#categories" class="btn btn-outline-secondary btn-lg rounded-pill px-4">Browse Aisles</a>
+                            <a href="#categories" class="hero-btn-secondary">
+                                <i class="bi bi-compass" aria-hidden="true"></i>
+                                <span>Browse Aisles</span>
+                            </a>
                         <?php endif; ?>
                     </div>
 
                     <div class="hero-trust-rail">
                         <div class="trust-item">
-                            <i class="bi bi-patch-check-fill text-success" aria-hidden="true"></i>
+                            <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
                             <span>Certified Organic</span>
                         </div>
                         <div class="trust-item">
-                            <i class="bi bi-clock-history text-primary" aria-hidden="true"></i>
+                            <i class="bi bi-clock-history" aria-hidden="true"></i>
                             <span>24h Farm to Door</span>
                         </div>
                         <div class="trust-item">
-                            <i class="bi bi-shield-check text-warning" aria-hidden="true"></i>
+                            <i class="bi bi-shield-check" aria-hidden="true"></i>
                             <span>100% Pesticide Free</span>
                         </div>
                     </div>
