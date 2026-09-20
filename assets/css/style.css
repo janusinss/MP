@@ -1212,6 +1212,10 @@ h5{
     .auth-switch-tab:active {
         transform: scale(0.98);
     }
+    /* Hide redundant account switch prompt on mobile since top segmented switcher is present */
+    .auth-switch-prompt {
+        display: none !important;
+    }
 }
 
 /* --- 8. ADMIN & TABLES --- */

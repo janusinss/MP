@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
                     <div class="auth-footer-nav">
-                        <div>Don't have an account? <a href="register" class="auth-nav-link">Create an account</a></div>
+                        <div class="auth-switch-prompt">Don't have an account? <a href="register" class="auth-nav-link">Create an account</a></div>
                         <div>
                             <a href="<?= $appRoot ?>" class="auth-back-link">
                                 <i class="bi bi-arrow-left" aria-hidden="true"></i>

@@ -172,7 +172,7 @@ $appRoot = $appRoot ? $appRoot . '/' : '/';
                     </button>
 
                     <div class="auth-footer-nav">
-                        <div>Already have an account? <a href="login" class="auth-nav-link">Sign In</a></div>
+                        <div class="auth-switch-prompt">Already have an account? <a href="login" class="auth-nav-link">Sign In</a></div>
                         <div>
                             <a href="<?= $appRoot ?>" class="auth-back-link">
                                 <i class="bi bi-arrow-left" aria-hidden="true"></i>
