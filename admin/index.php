@@ -55,7 +55,7 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
         <div class="fw-bold font-serif fs-5 text-dark">
             FreshCart<span class="text-success">.</span> <span class="text-muted fw-normal fs-6">Admin</span>
         </div>
-        <a href="../" class="btn btn-sm btn-outline-secondary" target="_blank" title="View Storefront">
+        <a href="../" class="btn btn-sm btn-outline-secondary" title="View Storefront">
             <i class="bi bi-box-arrow-up-right"></i>
         </a>
     </header>
@@ -110,7 +110,7 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
                 </div>
 
                 <div class="d-flex gap-2">
-                    <a href="../" class="btn btn-sm btn-outline-secondary w-50 d-flex align-items-center justify-content-center gap-1" target="_blank" title="View Storefront">
+                    <a href="../" class="btn btn-sm btn-outline-secondary w-50 d-flex align-items-center justify-content-center gap-1" title="View Storefront">
                         <i class="bi bi-shop"></i> <span>Store</span>
                     </a>
                     <a href="logout.php" class="btn btn-sm btn-outline-danger w-50 d-flex align-items-center justify-content-center gap-1" title="Sign out">

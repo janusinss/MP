@@ -4,6 +4,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// User & Admin Role Status
+$isAdmin = !empty($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true;
+
 // Calculate Cart Count safely
 $cartCount = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
 $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
@@ -27,7 +30,7 @@ if ($pos !== false) {
 <body>
 
     <!-- Welcome Offer Lightbox Pop-up Modal (Guest Only) -->
-    <?php if (!isset($_SESSION['user_id'])): ?>
+    <?php if (!isset($_SESSION['user_id']) && !$isAdmin): ?>
     <div id="welcomePromoModal" class="promo-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="promoModalTitle" aria-describedby="promoModalDesc">
         <div class="promo-modal-dialog">
             <button type="button" class="promo-modal-close-btn" onclick="dismissPromoModal()" aria-label="Close welcome offer" title="Close (Esc)">
@@ -150,7 +153,43 @@ if ($pos !== false) {
 
             <div class="collapse navbar-collapse" id="navContent">
                 <ul class="navbar-nav ms-auto align-items-center gap-3">
-                    <?php if (isset($_SESSION['user_id'])): ?>
+                    <?php if ($isAdmin): ?>
+                        <li class="nav-item">
+                            <a href="<?= $rootPath ?>admin/" class="btn btn-dark rounded-pill px-3 py-1 d-inline-flex align-items-center gap-2 shadow-sm" style="font-size: 0.85rem; font-weight: 600;">
+                                <i class="bi bi-arrow-left-circle-fill text-success fs-6"></i>
+                                <span>Return to Admin</span>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <button class="nav-link-custom d-flex align-items-center gap-2 dropdown-toggle bg-transparent border-0 p-0 text-decoration-none" id="globalAdminDropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 34px; height: 34px; font-size: 0.85rem; background: #0f172a;">
+                                    A
+                                </div>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1" style="font-size: 0.72rem; font-weight: 700;">ADMIN</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border py-2 mt-2" aria-labelledby="globalAdminDropdown" style="border-radius: 14px; min-width: 230px; border-color: rgba(0,0,0,0.08);">
+                                <li class="px-3 py-2 border-bottom mb-1" style="background-color: #fafbf9;">
+                                    <div class="text-uppercase text-muted" style="font-size: 0.68rem; letter-spacing: 0.08em; font-weight: 700;">Signed in as</div>
+                                    <div class="fw-bold text-dark text-truncate" style="font-size: 0.9rem;">System Administrator</div>
+                                </li>
+                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/"><i class="bi bi-speedometer2 text-success"></i> <span>Operations Console</span></a></li>
+                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/index.php?view=products"><i class="bi bi-box-seam text-success"></i> <span>Manage Inventory</span></a></li>
+                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/index.php?view=orders"><i class="bi bi-receipt text-success"></i> <span>Manage Orders</span></a></li>
+                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/index.php?view=users"><i class="bi bi-people text-success"></i> <span>Manage Customers</span></a></li>
+                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="<?= $rootPath ?>admin/index.php?view=reviews"><i class="bi bi-star text-success"></i> <span>Manage Reviews</span></a></li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 text-danger" href="<?= $rootPath ?>admin/logout.php"><i class="bi bi-box-arrow-right"></i> <span>Sign Out Admin</span></a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item position-relative">
+                            <a href="<?= $rootPath ?>cart" class="btn btn-outline-secondary border-0 position-relative p-2" aria-label="Shopping Cart">
+                                <i class="bi bi-bag fs-5"></i>
+                                <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light <?= ($cartCount > 0) ? '' : 'd-none' ?>" style="font-size: 0.65rem;">
+                                    <?= $cartCount ?>
+                                </span>
+                            </a>
+                        </li>
+                    <?php elseif (isset($_SESSION['user_id'])): ?>
                         <li class="nav-item dropdown">
                             <button class="nav-link-custom d-flex align-items-center gap-2 dropdown-toggle bg-transparent border-0 p-0 text-decoration-none" id="globalUserDropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class="text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 34px; height: 34px; font-size: 0.85rem; background: var(--color-primary, #15803d);">
