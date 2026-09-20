@@ -329,7 +329,7 @@ $firstKey = array_key_first($aisleReels);
                 isDismissed = sessionStorage.getItem('promo_popup_dismissed') === '1';
             } catch (e) {}
 
-            if (!isDismissed) {
+            if (!isDismissed && window.innerWidth > 768) {
                 setTimeout(openPromoModal, 600);
             }
 
@@ -538,7 +538,18 @@ $firstKey = array_key_first($aisleReels);
                                         </div>
 
                                         <div class="spotlight-img-wrap">
-                                            <img src="<?= htmlspecialchars(!empty($sItem['image_url']) ? $sItem['image_url'] : (!empty($sItem['image']) ? 'assets/images/' . $sItem['image'] : 'assets/images/placeholder.jpg')) ?>" alt="<?= htmlspecialchars($sItem['name']) ?>" loading="lazy">
+                                            <?php 
+                                            $sHasLocal = !empty($sItem['image']) && file_exists(__DIR__ . '/assets/images/' . $sItem['image']);
+                                            $sHasUrl = !empty($sItem['image_url']);
+                                            $sImgSrc = $sHasUrl ? $sItem['image_url'] : ($sHasLocal ? 'assets/images/' . $sItem['image'] : '');
+                                            if (!empty($sImgSrc)):
+                                            ?>
+                                                <img src="<?= htmlspecialchars($sImgSrc) ?>" alt="<?= htmlspecialchars($sItem['name']) ?>" loading="lazy">
+                                            <?php else: ?>
+                                                <div class="food-card-fallback-icon" aria-hidden="true">
+                                                    <i class="bi <?= $categoryIcons[$sCat] ?? 'bi-basket2' ?>"></i>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
 
                                         <h3 class="spotlight-item-name"><?= htmlspecialchars($sItem['name']) ?></h3>
@@ -608,7 +619,9 @@ $firstKey = array_key_first($aisleReels);
                                         'farm' => 'Local Organic Producer',
                                         'telemetry' => 'Fresh Sourced'
                                     ];
-                                    $imgSrc = !empty($prod['image_url']) ? $prod['image_url'] : (!empty($prod['image']) ? 'assets/images/' . $prod['image'] : 'assets/images/placeholder.jpg');
+                                    $hasLocalImg = !empty($prod['image']) && file_exists(__DIR__ . '/assets/images/' . $prod['image']);
+                                    $hasUrlImg = !empty($prod['image_url']);
+                                    $imgSrc = $hasUrlImg ? $prod['image_url'] : ($hasLocalImg ? 'assets/images/' . $prod['image'] : '');
                                 ?>
                                     <div class="food-card">
                                         <div>
@@ -618,7 +631,13 @@ $firstKey = array_key_first($aisleReels);
                                             </div>
 
                                             <div class="food-card-img-wrap">
-                                                <img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($prod['name']) ?>" loading="lazy">
+                                                <?php if (!empty($imgSrc)): ?>
+                                                    <img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($prod['name']) ?>" loading="lazy">
+                                                <?php else: ?>
+                                                    <div class="food-card-fallback-icon" aria-hidden="true">
+                                                        <i class="bi <?= $categoryIcons[$pCat] ?? 'bi-basket2' ?>"></i>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
 
                                             <h3 class="food-card-title"><?= htmlspecialchars($prod['name']) ?></h3>
@@ -653,9 +672,9 @@ $firstKey = array_key_first($aisleReels);
                             <!-- Pagination -->
                             <?php if ($totalPages > 1): ?>
                                 <nav aria-label="Page navigation" class="mt-5">
-                                    <ul class="pagination justify-content-center">
+                                    <ul class="pagination justify-content-center flex-wrap gap-1">
                                         <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                                            <a class="page-link rounded-pill px-3 me-2" href="<?= catalog_url($page - 1, $search, $category, $sort) ?>">Previous</a>
+                                            <a class="page-link rounded-pill px-3" href="<?= catalog_url($page - 1, $search, $category, $sort) ?>">Previous</a>
                                         </li>
                                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                                             <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
@@ -663,7 +682,7 @@ $firstKey = array_key_first($aisleReels);
                                             </li>
                                         <?php endfor; ?>
                                         <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : '' ?>">
-                                            <a class="page-link rounded-pill px-3 ms-2" href="<?= catalog_url($page + 1, $search, $category, $sort) ?>">Next</a>
+                                            <a class="page-link rounded-pill px-3" href="<?= catalog_url($page + 1, $search, $category, $sort) ?>">Next</a>
                                         </li>
                                     </ul>
                                 </nav>
@@ -1021,7 +1040,7 @@ $firstKey = array_key_first($aisleReels);
                             
                             <!-- Interactive Live Farm Telemetry Preview -->
                             <div class="bento-live-farm-preview">
-                                <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=900&auto=format&fit=crop&q=80" alt="Misty Morning Organic Farm" class="bento-farm-img" loading="lazy" width="800" height="340">
+                                <img src="assets/images/gulay1.jpg" alt="Misty Morning Organic Farm" class="bento-farm-img" loading="lazy" width="800" height="340">
                                 <div class="bento-scrim-overlay"></div>
                                 <div class="bento-telemetry-glass-badge">
                                     <div class="telemetry-badge-row">

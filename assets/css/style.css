@@ -7174,18 +7174,66 @@ html, body {
     }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 768px) {
+    .bento-section {
+        padding: 3rem 0 3.5rem;
+    }
+    .bento-header {
+        margin-bottom: 2rem;
+    }
+    .bento-heading {
+        font-size: clamp(1.6rem, 5vw, 2.1rem);
+        margin-bottom: 0.5rem;
+    }
+    .bento-subtitle {
+        font-size: 0.92rem;
+    }
+    .bento-matrix {
+        gap: 1rem;
+    }
     .bento-card {
-        padding: 1.5rem;
+        padding: 1.35rem;
+        min-height: auto;
+    }
+    .bento-metric-large {
+        font-size: 2.15rem;
+        margin-bottom: 0.35rem;
+    }
+    .bento-card-title {
+        font-size: 1.2rem;
+    }
+    .bento-card-desc {
+        font-size: 0.88rem;
     }
     .bento-live-farm-preview {
         height: 180px;
+        margin-top: 1rem;
     }
     .bento-telemetry-glass-badge {
-        position: relative;
-        inset: auto;
-        margin-top: 0.5rem;
-        padding: 0.65rem 0.85rem;
+        position: static;
+        margin-top: 0.75rem;
+        padding: 0.75rem 0.85rem;
+        border-radius: var(--radius-sm);
+    }
+    .telemetry-badge-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.45rem;
+    }
+    .bento-soil-metrics-card,
+    .bento-transit-timeline-card,
+    .bento-economics-wrap {
+        margin-top: 1rem;
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .bento-card {
+        padding: 1.15rem;
+    }
+    .bento-live-farm-preview {
+        height: 160px;
     }
     .transit-temp-readout {
         flex-direction: column;
@@ -7196,13 +7244,13 @@ html, body {
         gap: 0.2rem;
     }
     .transit-node {
-        min-width: 58px;
+        min-width: 54px;
     }
     .transit-node .node-text strong {
-        font-size: 0.68rem;
+        font-size: 0.65rem;
     }
     .transit-node .node-text span {
-        font-size: 0.62rem;
+        font-size: 0.6rem;
     }
 }
 
@@ -7630,64 +7678,133 @@ html, body {
 
 @media (max-width: 768px) {
     .coverflow-stage-wrapper {
-        min-height: 360px;
-        height: 360px;
-        perspective: 850px;
+        min-height: 320px;
+        height: 320px;
+        perspective: 800px;
+        margin: 1rem 0;
     }
     .coverflow-card {
-        width: 210px;
-        height: 290px;
-        margin-top: -145px;
+        width: 200px;
+        height: 280px;
+        margin-top: -140px;
         padding: 0.85rem;
     }
     .coverflow-card-thumb {
-        height: 155px;
-        padding: 0.85rem;
+        height: 140px;
+        padding: 0.75rem;
     }
     .coverflow-card-thumb img {
-        max-height: 115px;
+        max-height: 105px;
     }
+    /* Hide overlapping navigation chevrons on mobile touch screens */
     .coverflow-nav-btn {
-        width: 36px;
-        height: 36px;
-        font-size: 1rem;
+        display: none !important;
     }
-    .coverflow-prev-btn {
-        left: 4px;
+    .coverflow-add-btn {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 1.1rem;
     }
-    .coverflow-next-btn {
-        right: 4px;
+    .coverflow-dots-bar {
+        margin: 0.75rem 0 0.25rem;
+    }
+    .coverflow-dot {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+    }
+    .aisle-explorer-section {
+        padding: 3rem 0 3.5rem;
+    }
+    .aisle-heading {
+        font-size: clamp(1.6rem, 5vw, 2.1rem);
+    }
+    .aisle-subtitle {
+        font-size: 0.92rem;
+    }
+    .aisle-nav-container {
+        margin-bottom: 1.75rem;
+    }
+    .hero-overdrive {
+        padding-top: calc(var(--header-height, 72px) + 16px);
+        padding-bottom: 2.75rem;
+        min-height: auto;
+    }
+    .hero-title-od, .hero-title-overdrive {
+        font-size: clamp(1.85rem, 6.5vw, 2.5rem);
+        line-height: 1.15;
+        margin-bottom: 0.85rem;
+    }
+    .hero-lead-od, .hero-desc-overdrive {
+        font-size: 0.95rem;
+        line-height: 1.55;
+        margin-bottom: 1.5rem;
+    }
+    .hero-trust-rail {
+        gap: 0.85rem;
+        margin-top: 1.25rem;
+        padding-top: 1rem;
+    }
+    .hero-showcase-card {
+        margin: 1.5rem auto 0;
+        max-width: 100%;
+    }
+    .hero-showcase-img {
+        height: 240px;
+        aspect-ratio: auto;
+    }
+    .hero-telemetry-badge {
+        position: static;
+        margin-top: 0;
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        background: #ffffff;
+        border: none;
+        border-top: 1px solid var(--color-border-subtle);
+        padding: 0.75rem 1rem;
+        box-shadow: none;
     }
 }
 
 @media (max-width: 576px) {
     .coverflow-stage-wrapper {
-        min-height: 330px;
-        height: 330px;
-        perspective: 700px;
+        min-height: 300px;
+        height: 300px;
+        perspective: 680px;
     }
     .coverflow-card {
-        width: 185px;
-        height: 265px;
-        margin-top: -132px;
+        width: 180px;
+        height: 255px;
+        margin-top: -127px;
         padding: 0.75rem;
     }
     .coverflow-card-thumb {
-        height: 135px;
-        padding: 0.65rem;
+        height: 125px;
+        padding: 0.5rem;
     }
     .coverflow-card-thumb img {
-        max-height: 95px;
+        max-height: 90px;
+    }
+    .hero-content-overdrive .d-flex.flex-wrap {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.75rem !important;
+    }
+    .hero-content-overdrive .d-flex.flex-wrap .btn {
+        width: 100%;
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 
 @media (max-width: 991px) {
     .bento-col-7, .bento-col-5, .bento-col-4, .bento-col-8 {
         grid-column: span 12;
-    }
-    .hero-overdrive {
-        padding-top: calc(var(--header-height, 72px) + 16px);
-        min-height: auto;
     }
     .hero-showcase-card {
         margin: 2rem auto 0;
@@ -8858,15 +8975,33 @@ body.modal-open-freeze {
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     .marquee-testimonials-section {
-        padding: 3.5rem 0 4.5rem;
+        padding: 2.75rem 0 3.25rem;
+    }
+    .marquee-header-title {
+        font-size: 1.65rem;
+        margin-bottom: 0.65rem;
+    }
+    .marquee-header-sub {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    .marquee-container-wrapper {
+        gap: 0;
+        padding: 0;
+    }
+    /* Mobile optimization: remove redundant reverse second row */
+    .marquee-row-track.is-reverse {
+        display: none !important;
     }
     .marquee-testimonial-card {
-        width: 290px;
-        min-width: 290px;
-        padding: 1.15rem 1.15rem;
+        width: 280px;
+        min-width: 280px;
+        padding: 1.1rem 1.15rem;
+        margin: 0 0.5rem;
     }
     .marquee-card-review-text {
         font-size: 0.84rem;
+        line-height: 1.5;
     }
 }
 
@@ -9874,6 +10009,23 @@ body.modal-open-freeze {
     padding: 0.75rem;
 }
 
+.food-card-fallback-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: var(--color-brand-tint, rgba(74, 116, 91, 0.08));
+    color: var(--color-brand, #4A745B);
+    font-size: 1.85rem;
+    transition: transform 0.25s ease;
+}
+
+.food-card:hover .food-card-fallback-icon {
+    transform: scale(1.1);
+}
+
 .food-card-img-wrap img {
     max-height: 100%;
     max-width: 100%;
@@ -10046,40 +10198,127 @@ body.modal-open-freeze {
     color: #ffffff;
 }
 
-@media (max-width: 576px) {
+@media (max-width: 768px) {
+    .food-aisles-section {
+        padding: 1.25rem 0 0.5rem;
+    }
+    
+    .food-aisle-search-input {
+        font-size: 16px !important; /* Prevents iOS Safari auto-zoom */
+    }
+
+    /* Peak Harvest Spotlights: Convert vertical stack into smooth horizontal scroll-snap rail */
+    .spotlight-grid {
+        display: flex !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory;
+        gap: 0.85rem;
+        padding-bottom: 0.75rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    
+    .spotlight-grid::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .spotlight-food-card {
+        flex: 0 0 280px;
+        max-width: 280px;
+        scroll-snap-align: start;
+        padding: 1.25rem;
+    }
+
+    .spotlight-img-wrap {
+        height: 130px;
+    }
+
+    .food-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.85rem;
+    }
+
+    .food-card {
+        padding: 0.85rem;
+        border-radius: 14px;
+    }
+
+    .food-card-img-wrap {
+        height: 120px;
+    }
+
+    .food-card-title {
+        font-size: 0.95rem;
+    }
+
+    .food-card-price {
+        font-size: 1.1rem;
+    }
+
+    .food-card-btn-add {
+        min-height: 44px;
+        font-size: 0.85rem;
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
+        row-gap: 8px;
+    }
+
+    .pagination .page-link {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     .floating-cart-tray {
-        bottom: 14px;
+        bottom: 12px;
         right: 12px;
         left: 12px;
         border-radius: 18px;
         justify-content: space-between;
         padding: 8px 12px;
     }
-    
-    .spotlight-grid {
-        grid-template-columns: 1fr;
+}
+
+@media (max-width: 576px) {
+    .market-catalog-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
     }
-    
+
+    .catalog-section-title {
+        font-size: 1.45rem;
+    }
+
     .food-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 0.85rem;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.65rem;
     }
-    
+
     .food-card {
-        padding: 0.85rem;
-        border-radius: 14px;
+        padding: 0.75rem;
     }
-    
+
     .food-card-img-wrap {
-        height: 110px;
+        height: 100px;
+        padding: 0.4rem;
     }
-    
+
     .food-card-title {
-        font-size: 0.95rem;
+        font-size: 0.88rem;
     }
-    
+
     .food-card-price {
-        font-size: 1.05rem;
+        font-size: 1rem;
     }
 }
 
