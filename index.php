@@ -470,31 +470,6 @@ $firstKey = array_key_first($aisleReels);
         <main class="site-main-content food-market-main">
             <div class="food-market-wrapper">
                 
-                <!-- Mobile Shopper Welcome Banner -->
-                <div class="mobile-shopper-banner d-lg-none">
-                    <div class="container">
-                        <div class="mobile-shopper-card">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="shopper-pill-avatar">
-                                        <?= $isAdmin ? '<i class="bi bi-shield-lock-fill"></i>' : strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?>
-                                    </div>
-                                    <div>
-                                        <div class="shopper-greeting">
-                                            Hi, <?= htmlspecialchars($isAdmin ? 'Administrator' : explode(' ', $_SESSION['user_name'] ?? 'Shopper')[0]) ?> 👋
-                                        </div>
-                                        <div class="shopper-subtext">Direct from 42 local partner growers</div>
-                                    </div>
-                                </div>
-                                <a href="<?= $isAdmin ? 'admin/' : 'orders' ?>" class="mobile-quick-orders-btn">
-                                    <i class="bi <?= $isAdmin ? 'bi-speedometer2' : 'bi-box-seam' ?>"></i>
-                                    <span><?= $isAdmin ? 'Admin' : 'My Orders' ?></span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- 1. Interactive Food Aisle Departments Rail & Search -->
                 <section class="food-aisles-section" id="food-aisles">
                     <div class="container">
@@ -519,29 +494,70 @@ $firstKey = array_key_first($aisleReels);
                             </form>
                         </div>
 
-                        <!-- Mobile Department Dropdown Selector -->
+                        <!-- Mobile Department Custom Dropdown Selector (Same Tactile Menu as Landing Page) -->
                         <div class="mobile-department-select-wrap d-lg-none mb-3">
-                            <div class="d-flex align-items-center justify-content-between mb-1" id="mobileDeptHeader">
-                                <label for="mobileDeptSelect" class="form-label text-uppercase text-muted m-0" style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;">
+                            <div class="d-flex align-items-center justify-content-between mb-2" id="mobileDeptHeader">
+                                <span class="text-uppercase text-muted m-0" style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;">
                                     Browse Department
-                                </label>
+                                </span>
                                 <?php if (!empty($category) || !empty($search)): ?>
                                     <a href="./" class="small text-success text-decoration-none fw-bold" id="showAllFoodsBtnMobile">Show All (<?= $totalFoodCount ?>)</a>
                                 <?php endif; ?>
                             </div>
-                            <div class="mobile-select-shell">
-                                <i class="bi bi-grid-fill mobile-select-icon" aria-hidden="true"></i>
-                                <select id="mobileDeptSelect" class="form-select mobile-dept-select" aria-label="Select Food Department">
-                                    <option value="./" <?= (empty($category)) ? 'selected' : '' ?>>All Departments (<?= $totalFoodCount ?> items)</option>
+                            <div class="aisle-custom-dropdown" id="foodHallMobileDropdown">
+                                <?php 
+                                $curLabel = empty($category) ? ('All Departments (' . $totalFoodCount . ' items)') : (htmlspecialchars($category) . ' (' . ($categoryCounts[$category] ?? 0) . ')');
+                                $curIcon = empty($category) ? 'bi-grid-fill' : ($categoryIcons[$category] ?? 'bi-basket2');
+                                ?>
+                                <button type="button" 
+                                        class="aisle-select-pill" 
+                                        id="foodHallDropdownTrigger" 
+                                        aria-haspopup="listbox" 
+                                        aria-expanded="false" 
+                                        aria-controls="foodHallDropdownMenu"
+                                        onclick="toggleFoodHallDropdown()" 
+                                        aria-label="Select harvest department">
+                                    <span class="aisle-select-icon"><i class="bi <?= $curIcon ?>" id="foodHallSelectActiveIcon" aria-hidden="true"></i></span>
+                                    <span class="aisle-select-label" id="foodHallSelectActiveLabel"><?= $curLabel ?></span>
+                                    <i class="bi bi-chevron-down aisle-select-chevron" aria-hidden="true"></i>
+                                </button>
+
+                                <div class="aisle-dropdown-menu" id="foodHallDropdownMenu" role="listbox" aria-label="Harvest departments">
+                                    <button type="button" 
+                                            role="option" 
+                                            aria-selected="<?= empty($category) ? 'true' : 'false' ?>" 
+                                            class="aisle-dropdown-item <?= empty($category) ? 'selected' : '' ?>" 
+                                            data-url="./" 
+                                            data-name="All Departments (<?= $totalFoodCount ?> items)"
+                                            data-icon="bi-grid-fill"
+                                            onclick="chooseFoodHallAisle('./', 'All Departments (<?= $totalFoodCount ?> items)', 'bi-grid-fill')">
+                                        <span class="aisle-item-icon"><i class="bi bi-grid-fill" aria-hidden="true"></i></span>
+                                        <span class="aisle-item-text">All Departments</span>
+                                        <span class="aisle-item-count"><?= $totalFoodCount ?></span>
+                                        <i class="bi bi-check2 aisle-item-check" aria-hidden="true"></i>
+                                    </button>
                                     <?php foreach ($categories as $catName): 
+                                        $isSelected = ($category === $catName);
                                         $catCount = $categoryCounts[$catName] ?? 0;
+                                        $catIcon = $categoryIcons[$catName] ?? 'bi-basket2';
+                                        $catUrl = "?category=" . urlencode($catName);
+                                        $catDisplay = htmlspecialchars($catName) . ' (' . $catCount . ')';
                                     ?>
-                                        <option value="?category=<?= urlencode($catName) ?>" <?= ($category === $catName) ? 'selected' : '' ?>>
-                                            <?= htmlspecialchars($catName) ?> (<?= $catCount ?>)
-                                        </option>
+                                        <button type="button" 
+                                                role="option" 
+                                                aria-selected="<?= $isSelected ? 'true' : 'false' ?>" 
+                                                class="aisle-dropdown-item <?= $isSelected ? 'selected' : '' ?>" 
+                                                data-url="<?= $catUrl ?>" 
+                                                data-name="<?= $catDisplay ?>"
+                                                data-icon="<?= $catIcon ?>"
+                                                onclick="chooseFoodHallAisle('<?= $catUrl ?>', '<?= $catDisplay ?>', '<?= $catIcon ?>')">
+                                            <span class="aisle-item-icon"><i class="bi <?= $catIcon ?>" aria-hidden="true"></i></span>
+                                            <span class="aisle-item-text"><?= htmlspecialchars($catName) ?></span>
+                                            <span class="aisle-item-count"><?= $catCount ?></span>
+                                            <i class="bi bi-check2 aisle-item-check" aria-hidden="true"></i>
+                                        </button>
                                     <?php endforeach; ?>
-                                </select>
-                                <i class="bi bi-chevron-down mobile-select-chevron" aria-hidden="true"></i>
+                                </div>
                             </div>
                         </div>
 
@@ -2113,12 +2129,11 @@ $firstKey = array_key_first($aisleReels);
                     curDesktopHeader.innerHTML = newDesktopHeader.innerHTML;
                 }
 
-                // Sync mobile department dropdown
-                const newDeptSelect = doc.getElementById('mobileDeptSelect');
-                const curDeptSelect = document.getElementById('mobileDeptSelect');
-                if (curDeptSelect && newDeptSelect) {
-                    curDeptSelect.innerHTML = newDeptSelect.innerHTML;
-                    curDeptSelect.value = newDeptSelect.value;
+                // Sync mobile department custom dropdown
+                const newDropdown = doc.getElementById('foodHallMobileDropdown');
+                const curDropdown = document.getElementById('foodHallMobileDropdown');
+                if (curDropdown && newDropdown) {
+                    curDropdown.innerHTML = newDropdown.innerHTML;
                 }
 
                 // D. Update Search Pill Form state
@@ -2184,11 +2199,62 @@ $firstKey = array_key_first($aisleReels);
             }
         });
 
-        // Mobile Department Dropdown Change
-        document.addEventListener('change', function(e) {
-            if (e.target && e.target.id === 'mobileDeptSelect') {
-                const targetUrl = e.target.value || './';
-                loadCategoryAsync(targetUrl);
+        // Mobile Department Custom Dropdown Handlers (Same Tactile Dropdown as Landing Page)
+        window.toggleFoodHallDropdown = function(forceState) {
+            const trigger = document.getElementById('foodHallDropdownTrigger');
+            const menu = document.getElementById('foodHallDropdownMenu');
+            if (!trigger || !menu) return;
+
+            const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+            const nextState = typeof forceState === 'boolean' ? forceState : !isExpanded;
+
+            trigger.setAttribute('aria-expanded', nextState ? 'true' : 'false');
+            if (nextState) {
+                menu.classList.add('open');
+            } else {
+                menu.classList.remove('open');
+            }
+        };
+
+        window.chooseFoodHallAisle = function(targetUrl, displayName, iconClass) {
+            window.toggleFoodHallDropdown(false);
+
+            const iconEl = document.getElementById('foodHallSelectActiveIcon');
+            const labelEl = document.getElementById('foodHallSelectActiveLabel');
+            if (iconEl && iconClass) {
+                iconEl.className = 'bi ' + iconClass;
+            }
+            if (labelEl && displayName) {
+                labelEl.textContent = displayName;
+            }
+
+            const menu = document.getElementById('foodHallDropdownMenu');
+            if (menu) {
+                menu.querySelectorAll('.aisle-dropdown-item').forEach(item => {
+                    const isMatch = item.getAttribute('data-url') === targetUrl;
+                    item.classList.toggle('selected', isMatch);
+                    item.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+                });
+            }
+
+            loadCategoryAsync(targetUrl);
+
+            const trigger = document.getElementById('foodHallDropdownTrigger');
+            if (trigger) trigger.focus();
+        };
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('foodHallMobileDropdown');
+            if (dropdown && !dropdown.contains(e.target)) {
+                window.toggleFoodHallDropdown(false);
+            }
+        });
+
+        // Close dropdown on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.toggleFoodHallDropdown(false);
             }
         });
 

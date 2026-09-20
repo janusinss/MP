@@ -8574,6 +8574,9 @@ html, body {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    max-height: 380px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px) scale(0.98);
@@ -8668,6 +8671,28 @@ html, body {
 .aisle-dropdown-item.selected .aisle-item-check {
     opacity: 1;
     transform: scale(1);
+}
+
+.aisle-item-count {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    margin-left: auto;
+    margin-right: 0.4rem;
+    transition: all 0.15s ease;
+}
+
+.aisle-dropdown-item:hover .aisle-item-count {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.aisle-dropdown-item.selected .aisle-item-count {
+    background: rgba(74, 116, 91, 0.18);
+    color: var(--color-brand-dark, #375743);
 }
 
 /* Single Department Showcase */
