@@ -123,7 +123,7 @@ include __DIR__ . '/../includes/header.php';
                             <i class="bi bi-receipt"></i>
                             <span>Order History</span>
                         </a>
-                        <a href="<?= $rootPath ?: './' ?>#catalog" class="profile-nav-btn">
+                        <a href="<?= $rootPath ?: './' ?>#harvest-catalog" class="profile-nav-btn">
                             <i class="bi bi-basket"></i>
                             <span>Browse Fresh Harvest</span>
                         </a>

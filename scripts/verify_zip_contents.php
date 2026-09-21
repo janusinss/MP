@@ -35,7 +35,6 @@ if ($zip->open(__DIR__ . '/../dist_infinityfree.zip') === true) {
         'config/db.php',
         'config/env.php',
         'config/security.php',
-        'db_check.php',
         'includes/header.php',
         'includes/footer.php',
         'orders/checkout.php',

@@ -99,6 +99,18 @@ $freeShippingUnlocked = ($subTotal >= $freeShippingThreshold);
 $shippingNeeded = max(0, $freeShippingThreshold - $subTotal);
 $shippingProgress = ($subTotal > 0) ? min(100, round(($subTotal / $freeShippingThreshold) * 100)) : 0;
 
+// 4. Fetch popular products for empty state quick-adds
+$quickAddProducts = [];
+if (empty($cartItems)) {
+    try {
+        $stmtQuick = $pdo->prepare("SELECT id, name, price, image, category, stock_qty FROM products WHERE stock_qty > 0 ORDER BY id ASC LIMIT 4");
+        $stmtQuick->execute();
+        $quickAddProducts = $stmtQuick->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        $quickAddProducts = [];
+    }
+}
+
 $pageTitle = "Your Seasonal Market Bag | FreshCart";
 require_once __DIR__ . '/../includes/header.php';
 ?>
@@ -126,36 +138,109 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
 
         <?php if (empty($cartItems)): ?>
-            <!-- Clean Farmstead Empty Basket State -->
-            <div class="cart-empty-panel">
-                <div class="cart-empty-icon" aria-hidden="true">
-                    <i class="bi bi-bag"></i>
-                </div>
+            <!-- Farmstead Web Empty Basket State (Anti-Slop, High-Density) -->
+            <div class="cart-empty-web-container">
+                <div class="cart-empty-hero-panel">
+                    <div class="cart-empty-hero-lead">
+                        <span class="cart-empty-eyebrow-text">Farm-Fresh Marketplace</span>
+                        <h2 class="cart-empty-main-title">Your basket is waiting for the morning harvest</h2>
+                        <p class="cart-empty-subtitle">
+                            Every item is picked to order from local family farms. Browse our organic produce, artisan bakery, and pasture-raised dairy to build your seasonal delivery.
+                        </p>
+                        <div class="cart-empty-cta-row">
+                            <a href="<?= $rootPath ?>#harvest-catalog" class="btn-cart-browse-catalog">
+                                <span>Browse All Departments</span>
+                                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
 
-                <h2 class="cart-empty-title">Your basket is empty</h2>
-                <p class="cart-empty-text">
-                    Looks like you haven't added anything to your cart yet. Explore our fresh harvest and local pantry to fill your basket.
-                </p>
-
-                <div class="cart-empty-actions">
-                    <a href="<?= $rootPath ?>" class="btn-cart-empty-cta">
-                        <span>Start Shopping</span>
-                        <i class="bi bi-arrow-right ms-2"></i>
-                    </a>
-                </div>
-
-                <div class="cart-empty-departments">
-                    <span class="cart-empty-departments-label">Popular departments:</span>
-                    <div class="cart-empty-department-links">
-                        <a href="<?= $rootPath ?>?category=Fruits#harvest-catalog">Fruits</a>
-                        <span class="cart-empty-sep">&bull;</span>
-                        <a href="<?= $rootPath ?>?category=Vegetables#harvest-catalog">Vegetables</a>
-                        <span class="cart-empty-sep">&bull;</span>
-                        <a href="<?= $rootPath ?>?category=Dairy#harvest-catalog">Dairy &amp; Eggs</a>
-                        <span class="cart-empty-sep">&bull;</span>
-                        <a href="<?= $rootPath ?>?category=Bakery#harvest-catalog">Artisan Bakery</a>
+                    <!-- Department Fast-Links Bento -->
+                    <div class="cart-empty-departments-grid">
+                        <a href="<?= $rootPath ?>?category=Fruits#harvest-catalog" class="cart-department-tile">
+                            <div class="cart-department-tile-body">
+                                <span class="cart-dept-icon"><i class="bi bi-apple" aria-hidden="true"></i></span>
+                                <div class="cart-dept-text">
+                                    <span class="cart-dept-title">Fresh Fruits</span>
+                                    <span class="cart-dept-note">Heirloom apples, berries &amp; citrus</span>
+                                </div>
+                            </div>
+                            <i class="bi bi-arrow-right cart-dept-arrow" aria-hidden="true"></i>
+                        </a>
+                        <a href="<?= $rootPath ?>?category=Vegetables#harvest-catalog" class="cart-department-tile">
+                            <div class="cart-department-tile-body">
+                                <span class="cart-dept-icon"><i class="bi bi-flower1" aria-hidden="true"></i></span>
+                                <div class="cart-dept-text">
+                                    <span class="cart-dept-title">Field Vegetables</span>
+                                    <span class="cart-dept-note">Crisp greens, carrots &amp; seasonal squash</span>
+                                </div>
+                            </div>
+                            <i class="bi bi-arrow-right cart-dept-arrow" aria-hidden="true"></i>
+                        </a>
+                        <a href="<?= $rootPath ?>?category=Dairy#harvest-catalog" class="cart-department-tile">
+                            <div class="cart-department-tile-body">
+                                <span class="cart-dept-icon"><i class="bi bi-cup-hot" aria-hidden="true"></i></span>
+                                <div class="cart-dept-text">
+                                    <span class="cart-dept-title">Dairy &amp; Pasture Eggs</span>
+                                    <span class="cart-dept-note">Grass-fed milk, farm butter &amp; raw cheeses</span>
+                                </div>
+                            </div>
+                            <i class="bi bi-arrow-right cart-dept-arrow" aria-hidden="true"></i>
+                        </a>
+                        <a href="<?= $rootPath ?>?category=Bakery#harvest-catalog" class="cart-department-tile">
+                            <div class="cart-department-tile-body">
+                                <span class="cart-dept-icon"><i class="bi bi-basket2" aria-hidden="true"></i></span>
+                                <div class="cart-dept-text">
+                                    <span class="cart-dept-title">Artisan Bakery</span>
+                                    <span class="cart-dept-note">Wild yeast sourdough &amp; fresh croissants</span>
+                                </div>
+                            </div>
+                            <i class="bi bi-arrow-right cart-dept-arrow" aria-hidden="true"></i>
+                        </a>
                     </div>
                 </div>
+
+                <!-- Quick-Add Seasonal Essentials Grid -->
+                <?php if (!empty($quickAddProducts)): ?>
+                    <div class="cart-empty-quick-add-wrap">
+                        <div class="cart-quick-add-header">
+                            <div>
+                                <h3 class="cart-quick-add-title">Seasonal Farmstead Essentials</h3>
+                                <p class="cart-quick-add-sub">Frequently reserved morning staples ready to add in one click.</p>
+                            </div>
+                            <a href="<?= $rootPath ?>#harvest-catalog" class="cart-quick-view-catalog">
+                                <span>See full catalog</span>
+                                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                            </a>
+                        </div>
+
+                        <div class="cart-quick-products-row">
+                            <?php foreach ($quickAddProducts as $qp): 
+                                $qpImg = !empty($qp['image']) ? $qp['image'] : 'placeholder.jpg';
+                                $qpSlug = function_exists('slugify') ? slugify($qp['name']) : urlencode(strtolower(str_replace(' ', '-', $qp['name'])));
+                            ?>
+                                <div class="cart-quick-item-card">
+                                    <a href="<?= $rootPath ?>product/<?= $qpSlug ?>" class="cart-quick-item-media" title="<?= htmlspecialchars($qp['name']) ?>">
+                                        <img src="<?= $rootPath ?>assets/images/<?= htmlspecialchars($qpImg) ?>" alt="<?= htmlspecialchars($qp['name']) ?>" loading="lazy" onerror="this.onerror=null; this.src='<?= $rootPath ?>assets/images/placeholder.jpg';">
+                                        <span class="cart-quick-item-aisle"><?= htmlspecialchars($qp['category']) ?></span>
+                                    </a>
+                                    <div class="cart-quick-item-content">
+                                        <a href="<?= $rootPath ?>product/<?= $qpSlug ?>" class="cart-quick-item-title" title="<?= htmlspecialchars($qp['name']) ?>">
+                                            <?= htmlspecialchars($qp['name']) ?>
+                                        </a>
+                                        <div class="cart-quick-item-actions">
+                                            <span class="cart-quick-item-price">$<?= number_format($qp['price'], 2) ?></span>
+                                            <button type="button" class="btn-quick-add-basket" onclick="quickAddToCart(<?= (int)$qp['id'] ?>, this)" aria-label="Add <?= htmlspecialchars($qp['name']) ?> to basket">
+                                                <i class="bi bi-plus" aria-hidden="true"></i>
+                                                <span>Add</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
 
         <?php else: ?>
@@ -171,9 +256,9 @@ require_once __DIR__ . '/../includes/header.php';
                             <div class="cart-threshold-msg">
                                 <i class="bi bi-truck" aria-hidden="true"></i>
                                 <?php if ($freeShippingUnlocked): ?>
-                                    <span>Complimentary Cold-Chain Eco Delivery Unlocked!</span>
+                                    <span>Free refrigerated farm delivery unlocked</span>
                                 <?php else: ?>
-                                    <span>Add $<?= number_format($shippingNeeded, 2) ?> more for Complimentary Cold-Chain Transit</span>
+                                    <span>Add <strong>$<?= number_format($shippingNeeded, 2) ?></strong> more for free refrigerated delivery</span>
                                 <?php endif; ?>
                             </div>
                             <span class="cart-threshold-pct"><?= $shippingProgress ?>%</span>
@@ -186,11 +271,11 @@ require_once __DIR__ . '/../includes/header.php';
                     <!-- Items Container Panel -->
                     <div class="cart-items-panel">
                         <div class="cart-table-header">
-                            <span>Harvest Item</span>
-                            <span>Unit Rate</span>
+                            <span>Product</span>
+                            <span>Unit Price</span>
                             <span class="text-center">Quantity</span>
                             <span class="text-end">Subtotal</span>
-                            <span></span>
+                            <span aria-hidden="true"></span>
                         </div>
 
                         <div class="cart-rows-list">
@@ -286,7 +371,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="col-lg-5 col-xl-4">
                     <div class="cart-summary-card">
                         <h2 class="cart-summary-title">Order Summary</h2>
-                        <p class="cart-summary-sub">Transparent calculation with applied vouchers and courier rates.</p>
+                        <p class="cart-summary-sub">All organic produce certified, packed in recyclable insulation.</p>
 
                         <!-- Promo Code Form -->
                         <form method="POST" action="<?= $rootPath ?>cart/" class="cart-promo-form" id="cartCouponForm">
@@ -363,7 +448,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <?php endif; ?>
 
                         <div class="cart-calc-row">
-                            <span>Cold-Chain Courier Transit</span>
+                            <span>Farmstead Delivery</span>
                             <span class="cart-calc-val text-success">Complimentary (Free)</span>
                         </div>
 
@@ -384,8 +469,8 @@ require_once __DIR__ . '/../includes/header.php';
 
                         <!-- Trust Bar -->
                         <div class="cart-trust-bar">
-                            <div><i class="bi bi-shield-check text-success me-1"></i> Temperature-Guaranteed 4°C Courier Transit</div>
-                            <div>100% Crisp Harvest Quality Guarantee</div>
+                            <div><i class="bi bi-shield-check text-success me-1"></i> Refrigerated 4°C delivery guarantee</div>
+                            <div>100% Crisp harvest satisfaction guarantee</div>
                         </div>
                     </div>
                 </div>
@@ -395,6 +480,46 @@ require_once __DIR__ . '/../includes/header.php';
         <?php endif; ?>
 
     </div>
+
+    <script>
+    function quickAddToCart(productId, btn) {
+        if (!btn || btn.disabled) return;
+        const originalContent = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="width: 14px; height: 14px;"></span>';
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        const formData = new FormData();
+        formData.append('product_id', productId);
+        formData.append('quantity', 1);
+        formData.append('csrf_token', csrfToken);
+
+        fetch('<?= $rootPath ?>cart/add.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                btn.innerHTML = '<i class="bi bi-check2"></i> Added';
+                btn.classList.add('is-added');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 350);
+            } else if (data.status === 'login_required') {
+                window.location.href = '<?= $rootPath ?>login';
+            } else {
+                alert(data.message || 'Could not add product to cart.');
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            window.location.reload();
+        });
+    }
+    </script>
 </main>
 
 <?php

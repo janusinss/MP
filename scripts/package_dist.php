@@ -28,8 +28,7 @@ $foldersToInclude = [
 
 $filesToInclude = [
     'index.php',
-    '.htaccess',
-    'db_check.php'
+    '.htaccess'
 ];
 
 $root = realpath(__DIR__ . '/..');

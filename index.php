@@ -152,7 +152,7 @@ if (!function_exists('catalog_url')) {
         if (!empty($catVal)) $params['category'] = trim($catVal);
         if (!empty($sortVal)) $params['sort'] = trim($sortVal);
 
-        $targetHash = $isLoggedIn ? '' : '#catalog';
+        $targetHash = $isLoggedIn ? '' : '#harvest-catalog';
         $query = !empty($params) ? '?' . http_build_query($params) : './';
         return htmlspecialchars($query . $targetHash);
     }
@@ -415,7 +415,7 @@ $firstKey = array_key_first($aisleReels);
                         <li class="nav-item"><a href="#all-foods" class="nav-link-custom">All Foods</a></li>
                         <li class="nav-item"><a href="orders" class="nav-link-custom">My Orders</a></li>
                     <?php else: ?>
-                        <li class="nav-item"><a href="#catalog" class="nav-link-custom">Community Reviews</a></li>
+                        <li class="nav-item"><a href="#community-reviews" class="nav-link-custom">Community Reviews</a></li>
                         <li class="nav-item"><a href="#categories" class="nav-link-custom">Aisles</a></li>
                         <li class="nav-item"><a href="#story" class="nav-link-custom">Our Growers</a></li>
                     <?php endif; ?>
@@ -627,7 +627,7 @@ $firstKey = array_key_first($aisleReels);
                             <div class="food-aisles-scroller">
                                 <a href="./" class="food-aisle-pill <?= (empty($category) && empty($search)) ? 'active' : '' ?>" data-category="">
                                     <i class="bi bi-grid-fill"></i>
-                                    <span>All Departments</span>
+                                    <span>All</span>
                                     <span class="aisle-count"><?= $totalFoodCount ?></span>
                                 </a>
 
@@ -762,6 +762,7 @@ $firstKey = array_key_first($aisleReels);
                 <?php endif; ?>
 
                 <!-- 4. Strictly Foods Catalog Grid -->
+                <div id="harvest-catalog"></div>
                 <section class="market-catalog-section" id="all-foods">
                     <div class="container">
                         <div class="market-catalog-header">
@@ -938,7 +939,7 @@ $firstKey = array_key_first($aisleReels);
                     <?php endif; ?>
 
                     <div class="hero-cta-group">
-                        <a href="#catalog" class="hero-btn-primary">
+                        <a href="#harvest-catalog" class="hero-btn-primary">
                             <span>Start Shopping</span>
                             <i class="bi bi-arrow-right" aria-hidden="true"></i>
                         </a>
@@ -998,6 +999,7 @@ $firstKey = array_key_first($aisleReels);
         <!-- =========================================================
              INTERACTIVE VISUAL AISLE EXPLORER (3D COVERFLOW) (#shop / #categories)
              ========================================================= -->
+        <div id="harvest-catalog"></div>
         <section class="aisle-explorer-section" id="shop">
             <div class="container" id="categories">
                 
@@ -1080,7 +1082,7 @@ $firstKey = array_key_first($aisleReels);
              21st.dev EXTRACTED COMPONENT: MARQUEE TESTIMONIAL CARDS
              Real positive verified order responses from FreshCart customers
              ========================================================= -->
-        <section class="marquee-testimonials-section" id="catalog">
+        <section class="marquee-testimonials-section" id="community-reviews">
             <div class="container-fluid px-0">
                 
                 <div class="marquee-testimonials-header">
