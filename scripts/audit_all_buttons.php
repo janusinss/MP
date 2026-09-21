@@ -117,7 +117,7 @@ $loginPost = sendReq("$baseUrl/login", [
 checkBtn("Customer", "Sign In Form Submit Button", $loginPost['code'] === 302, "Authenticated session active");
 
 // 2.2 Customer Add to Cart (AJAX)
-$resAdd = sendReq("$baseUrl/cart/add", ['product_id' => 1], $customerCookie);
+$resAdd = sendReq("$baseUrl/cart/add", ['product_id' => 1, 'csrf_token' => $custCsrf], $customerCookie);
 $addJson = json_decode($resAdd['body'], true);
 checkBtn("Customer", "Product Card 'Add' Button", ($addJson['status'] ?? '') === 'success', "Stock checked & added");
 
@@ -137,25 +137,31 @@ checkBtn("Customer", "Post Review Submit Button", strpos($reviewPost['body'], 'R
 // 2.4 Cart Quantity Increase (+) Button
 $resInc = sendReq("$baseUrl/cart/update", [
     'product_id' => 1,
-    'action' => 'increase'
+    'action' => 'increase',
+    'csrf_token' => $custCsrf
 ], $customerCookie);
 checkBtn("Customer", "Cart Quantity Plus (+) Button", $resInc['code'] === 302, "Quantity incremented");
 
 // 2.5 Cart Quantity Decrease (-) Button
 $resDec = sendReq("$baseUrl/cart/update", [
     'product_id' => 1,
-    'action' => 'decrease'
+    'action' => 'decrease',
+    'csrf_token' => $custCsrf
 ], $customerCookie);
 checkBtn("Customer", "Cart Quantity Minus (-) Button", $resDec['code'] === 302, "Quantity decremented");
 
 // 2.6 Cart Coupon Apply & Remove Buttons
 $resCoupon = sendReq("$baseUrl/cart/", [
     'coupon_code' => 'FRESH50',
-    'apply_coupon' => '1'
+    'apply_coupon' => '1',
+    'csrf_token' => $custCsrf
 ], $customerCookie);
 checkBtn("Customer", "Apply Coupon Button", strpos($resCoupon['body'], '50%') !== false, "50% Discount applied");
 
-$resRemoveCoupon = sendReq("$baseUrl/cart/?remove_coupon=true", null, $customerCookie);
+$resRemoveCoupon = sendReq("$baseUrl/cart/", [
+    'remove_coupon' => '1',
+    'csrf_token' => $custCsrf
+], $customerCookie);
 checkBtn("Customer", "Remove Coupon Button", $resRemoveCoupon['code'] === 302, "Discount removed");
 
 // 2.7 Checkout & Place Order Button

@@ -2,7 +2,7 @@
 // scripts/verify_security_suite.php
 // Comprehensive Security Standards & Negative TDD Verification (security.md)
 
-$baseUrl = 'http://localhost/YEAR%204/Skills/targets/grocery_app';
+$baseUrl = 'http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app';
 $cookieFile = __DIR__ . '/sec_test_cookies.txt';
 if (file_exists($cookieFile)) unlink($cookieFile);
 
@@ -130,6 +130,22 @@ assertTest("Enforce Defense-in-Depth Security Headers", $hasNoSniff && $hasFrame
 // 16. Server Fingerprinting: Suppression of X-Powered-By
 $noPoweredBy = stripos($homeRes['headers'], 'X-Powered-By') === false;
 assertTest("Server Fingerprint Suppression (Zero X-Powered-By)", $noPoweredBy, "X-Powered-By header suppressed");
+
+// 17. Direct Access Block: Zip Archives (VULN-01)
+$zipRes = httpReq("$baseUrl/dist_infinityfree.zip");
+assertTest("Block Direct Access to .zip Archives", $zipRes['code'] === 403, "HTTP {$zipRes['code']}");
+
+// 18. Admin Export Orders: Returns 403 on Unauthenticated Access (VULN-08, VULN-10)
+$exportRes = httpReq("$baseUrl/admin/export_orders.php");
+assertTest("Admin Export Returns 403 on Unauthenticated Access", $exportRes['code'] === 403, "HTTP {$exportRes['code']}");
+
+// 19. Admin Router: Returns 401 JSON on AJAX Unauthenticated Access (VULN-09)
+$routerRes = httpReq("$baseUrl/admin/router.php?view=dashboard", null, ['X-Requested-With: XMLHttpRequest']);
+assertTest("Admin Router Returns 401 on Unauthenticated AJAX Access", $routerRes['code'] === 401 && strpos($routerRes['body'], 'Unauthorized') !== false, "HTTP {$routerRes['code']}");
+
+// 20. Cart CSRF: Reject Apply Coupon Without CSRF Token (VULN-07)
+$couponRes = httpReq("$baseUrl/cart/", ['apply_coupon' => '1', 'coupon_code' => 'FRESH50']);
+assertTest("Cart Apply Coupon Rejects Submission Without CSRF Token", $couponRes['code'] === 403, "HTTP {$couponRes['code']}");
 
 echo "\n=========================================================\n";
 echo "Results: $testsPassed / $totalTests Tests Passed\n";

@@ -1,5 +1,5 @@
-# Prevent script execution in upload directory
-<FilesMatch "\.(php|phtml|php3|php4|php5|phps|phar|cgi|pl|py|sh|bash|exe)$">
+# Prevent script execution and block non-image files in upload directory
+<FilesMatch "\.(php|phtml|php3|php4|php5|phps|phar|cgi|pl|py|sh|bash|exe|bat|cmd|ps1|js|html|htm|txt|log|bak|sql)$">
     Require all denied
 </FilesMatch>
 

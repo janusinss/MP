@@ -1,14 +1,11 @@
 <?php
 // admin/export_orders.php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../config/db.php';
 
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) { 
+    http_response_code(403);
     exit("Access Denied"); 
 }
-
-require_once __DIR__ . '/../config/db.php';
 
 // Force CSV download
 header('Content-Type: text/csv; charset=utf-8');

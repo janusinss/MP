@@ -7,9 +7,19 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Security Check
+// Security Check: Administrator session enforcement (Phase 3 & 7.2)
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    echo "<script>window.location.href='../login';</script>";
+    $rootPath = function_exists('get_app_root') ? get_app_root() : '/';
+    $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+              || (strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false);
+    if ($isAjax) {
+        http_response_code(401);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Unauthorized: Administrator authentication required.', 'redirect' => $rootPath . 'login']);
+        exit;
+    }
+    http_response_code(403);
+    header("Location: " . $rootPath . "login");
     exit;
 }
 

@@ -4,8 +4,8 @@
 # 1. Disable Directory Listing / Browsing
 Options -Indexes -MultiViews
 
-# 2. Block Direct HTTP Access to Sensitive Files & Dotfiles
-<FilesMatch "(^\.env|\.sql$|\.sqlite$|\.db$|\.log$|\.bak$|\.old$|\.conf$|\.md$|composer\.(json|lock)$|package\.(json|lock)$|skills-lock\.json$)">
+# 2. Block Direct HTTP Access to Sensitive Files, Archives & Dotfiles
+<FilesMatch "(^\.env|\.sql$|\.sqlite$|\.db$|\.log$|\.bak$|\.old$|\.conf$|\.md$|\.zip$|\.tar$|\.gz$|\.rar$|\.7z$|\.ya?ml$|composer\.(json|lock)$|package\.(json|lock)$|skills-lock\.json$)">
     Require all denied
 </FilesMatch>
 

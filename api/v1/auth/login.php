@@ -15,8 +15,13 @@ if (!isset($data->email) || !isset($data->password)) {
     Response::error("Email and password are required.");
 }
 
-$email = $data->email;
-$password = $data->password;
+$email = trim((string)($data->email ?? ''));
+$password = (string)($data->password ?? '');
+
+// Rate limiting: Max 5 failed attempts per 15 min per IP/account (security.md Phase 2.1)
+if (!check_rate_limit('api_login_' . ($email ?: 'anon'), 5, 900)) {
+    Response::error("Too many login attempts. Please try again in 15 minutes.", 429);
+}
 
 try {
     // 1. Find user

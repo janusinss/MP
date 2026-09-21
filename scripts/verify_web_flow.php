@@ -85,8 +85,8 @@ $ok = $res['code'] === 200 && isset($json['grid']);
 echo "5. Products Fetch (products/fetch.php): HTTP {$res['code']}" . ($ok ? " [PASS]\n" : " [FAIL]\n");
 if (!$ok) $allPass = false;
 
-// 6. Add to Cart (authenticated via clean route cart/add)
-$res = makeReq("$baseUrl/cart/add", ['product_id' => 1]);
+// 6. Add to Cart (authenticated via clean route cart/add with CSRF token)
+$res = makeReq("$baseUrl/cart/add", ['product_id' => 1, 'csrf_token' => $token]);
 $json = json_decode($res['body'], true);
 $ok = $res['code'] === 200 && ($json['status'] ?? '') === 'success';
 echo "6. Cart Add (/cart/add): HTTP {$res['code']} (Status: " . ($json['status'] ?? 'unknown') . ")" . ($ok ? " [PASS]\n" : " [FAIL]\n");

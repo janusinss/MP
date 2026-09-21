@@ -61,7 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'])) {
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
-        die("Cancellation failed: " . htmlspecialchars($e->getMessage()));
+        error_log("Order Cancellation Error: " . $e->getMessage());
+        header("Location: index.php?error=cancellation_failed");
+        exit;
     }
 } else {
     header("Location: index.php");

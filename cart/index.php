@@ -7,43 +7,50 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 1. Handle Coupon Logic
+// 1. Handle Coupon Logic & Cart Mutation Actions (CSRF-hardened per Phase 2.4)
 $coupon_msg = '';
 $coupon_error = '';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['apply_coupon'])) {
-    $code = trim($_POST['coupon_code'] ?? '');
-    
-    // Check DB for valid coupon
-    $stmt = $pdo->prepare("SELECT * FROM coupons WHERE code = ? AND status = 'Active' AND expiry_date >= CURDATE()");
-    $stmt->execute([$code]);
-    $coupon = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['apply_coupon'])) {
+        if (!verify_csrf_token()) {
+            http_response_code(403);
+            die("Security validation failed. Please refresh.");
+        } else {
+            $code = trim($_POST['coupon_code'] ?? '');
+            $stmt = $pdo->prepare("SELECT * FROM coupons WHERE code = ? AND status = 'Active' AND expiry_date >= CURDATE()");
+            $stmt->execute([$code]);
+            $coupon = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($coupon) {
-        $_SESSION['discount'] = [
-            'code' => $coupon['code'],
-            'percent' => (int)$coupon['discount_percent']
-        ];
-        $coupon_msg = "Coupon '{$coupon['code']}' applied! You saved {$coupon['discount_percent']}%.";
-    } else {
-        $coupon_error = "Invalid or expired coupon code.";
+            if ($coupon) {
+                $_SESSION['discount'] = [
+                    'code' => $coupon['code'],
+                    'percent' => (int)$coupon['discount_percent']
+                ];
+                $coupon_msg = "Coupon '{$coupon['code']}' applied! You saved {$coupon['discount_percent']}%.";
+            } else {
+                $coupon_error = "Invalid or expired coupon code.";
+                unset($_SESSION['discount']);
+            }
+        }
+    } elseif (isset($_POST['remove_coupon'])) {
+        if (!verify_csrf_token()) {
+            http_response_code(403);
+            die("Security validation failed. Please refresh.");
+        }
         unset($_SESSION['discount']);
+        header("Location: ./");
+        exit;
+    } elseif (isset($_POST['clear_cart'])) {
+        if (!verify_csrf_token()) {
+            http_response_code(403);
+            die("Security validation failed. Please refresh.");
+        }
+        unset($_SESSION['cart']);
+        unset($_SESSION['discount']);
+        header("Location: ./");
+        exit;
     }
-}
-
-// Remove Coupon
-if (isset($_GET['remove_coupon'])) {
-    unset($_SESSION['discount']);
-    header("Location: ./");
-    exit;
-}
-
-// Clear Entire Cart
-if (isset($_GET['clear'])) {
-    unset($_SESSION['cart']);
-    unset($_SESSION['discount']);
-    header("Location: ./");
-    exit;
 }
 
 // 2. Fetch Cart Items
@@ -263,10 +270,13 @@ require_once __DIR__ . '/../includes/header.php';
                                 </div>
                             </div>
                             <div class="cart-clear-wrap">
-                                <a href="<?= $rootPath ?>cart/?clear=true" onclick="return confirm('Empty your harvest basket? All reserved items will be removed.');" class="btn-clear-basket">
-                                    <i class="bi bi-trash3 me-1"></i>
-                                    <span>Empty Entire Basket</span>
-                                </a>
+                                <form method="POST" action="<?= $rootPath ?>cart/" class="d-inline m-0 p-0" onsubmit="return confirm('Empty your harvest basket? All reserved items will be removed.');">
+                                    <?= csrf_input() ?>
+                                    <button type="submit" name="clear_cart" value="1" class="btn-clear-basket border-0 bg-transparent" aria-label="Empty Entire Basket">
+                                        <i class="bi bi-trash3 me-1"></i>
+                                        <span>Empty Entire Basket</span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -280,6 +290,7 @@ require_once __DIR__ . '/../includes/header.php';
 
                         <!-- Promo Code Form -->
                         <form method="POST" action="<?= $rootPath ?>cart/" class="cart-promo-form" id="cartCouponForm">
+                            <?= csrf_input() ?>
                             <label for="couponField" class="cart-promo-label">Promotional Voucher</label>
                             <div class="cart-promo-input-group">
                                 <input type="text" name="coupon_code" id="couponField" class="cart-promo-input" placeholder="e.g. FRESH50" value="<?= htmlspecialchars($_SESSION['discount']['code'] ?? '') ?>">
@@ -340,9 +351,12 @@ require_once __DIR__ . '/../includes/header.php';
                             <div class="cart-calc-row text-success">
                                 <div class="d-flex align-items-center gap-1">
                                     <span>Voucher Discount (<?= $_SESSION['discount']['percent'] ?>%)</span>
-                                    <a href="<?= $rootPath ?>cart/?remove_coupon=true" class="text-danger small text-decoration-none ms-1" title="Remove coupon">
-                                        <i class="bi bi-x-circle-fill"></i>
-                                    </a>
+                                    <form method="POST" action="<?= $rootPath ?>cart/" class="d-inline m-0 p-0">
+                                        <?= csrf_input() ?>
+                                        <button type="submit" name="remove_coupon" value="1" class="text-danger small border-0 bg-transparent p-0 ms-1" title="Remove coupon" aria-label="Remove coupon">
+                                            <i class="bi bi-x-circle-fill"></i>
+                                        </button>
+                                    </form>
                                 </div>
                                 <span class="cart-calc-val text-success">-$<?= number_format($discountAmount, 2) ?></span>
                             </div>

@@ -2,7 +2,7 @@
 // scripts/verify_strix_fixes.php
 // Verification test for Strix vulnerability fixes applied to targets/grocery_app
 
-$baseUrl = 'http://localhost/YEAR%204/Skills/targets/grocery_app';
+$baseUrl = 'http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app';
 
 function sendReq($url, $method = 'GET', $data = null, $headers = [], $cookieJar = null) {
     $ch = curl_init($url);

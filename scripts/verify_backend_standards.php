@@ -249,7 +249,7 @@ assertTest("Password verified using native password_verify()", password_verify('
 echo "\n6. RESTful API ENDPOINT VERIFICATION:\n";
 
 // Login API
-$targetBase = 'http://localhost/YEAR%204/Skills/targets/grocery_app';
+$targetBase = 'http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app';
 $loginPayload = json_encode(['email' => $user['email'], 'password' => 'password']);
 $ch = curl_init("$targetBase/api/v1/auth/login.php");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

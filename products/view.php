@@ -145,7 +145,7 @@ if (count($reviews) > 0) {
                     </div>
 
                     <p class="text-muted lead mb-4">
-                        Freshly sourced and carefully selected. Our <?= strtolower($product['name']) ?> is perfect for your daily needs, guaranteeing quality and taste in every bite.
+                        Freshly sourced and carefully selected. Our <?= htmlspecialchars(strtolower($product['name']), ENT_QUOTES, 'UTF-8') ?> is perfect for your daily needs, guaranteeing quality and taste in every bite.
                     </p>
 
                     <ul class="product-features">
@@ -177,7 +177,7 @@ if (count($reviews) > 0) {
             <h3 class="mb-4" style="font-family: var(--font-serif);">Customer Feedback</h3>
             
             <?php if ($review_msg): ?>
-                <div class="alert alert-success border-0 shadow-sm mb-4 rounded-3"><i class="bi bi-check-circle me-2"></i> <?= $review_msg ?></div>
+                <div class="alert alert-success border-0 shadow-sm mb-4 rounded-3"><i class="bi bi-check-circle me-2"></i> <?= htmlspecialchars($review_msg, ENT_QUOTES, 'UTF-8') ?></div>
             <?php endif; ?>
 
             <div class="review-form-card">
@@ -249,7 +249,7 @@ if (count($reviews) > 0) {
                                 <img src="../assets/images/<?= $rImg ?>" alt="<?= htmlspecialchars($rp['name']) ?>">
                             </div>
                             <div class="mini-details">
-                                <span class="badge bg-light text-secondary border mb-1" style="font-size: 0.6rem;"><?= $rp['category'] ?></span>
+                                <span class="badge bg-light text-secondary border mb-1" style="font-size: 0.6rem;"><?= htmlspecialchars($rp['category'], ENT_QUOTES, 'UTF-8') ?></span>
                                 <h6 class="text-truncate" style="max-width: 150px;"><?= htmlspecialchars($rp['name']) ?></h6>
                                 <div class="mini-price">$<?= number_format($rp['price'], 2) ?></div>
                             </div>

@@ -83,21 +83,63 @@ if (!function_exists('verify_csrf_token')) {
     }
 }
 
-// 4. Rate Limiting Helper (Session/IP bounded)
+// 4. Rate Limiting Helper (IP & Session bounded with atomic file-backed storage)
 if (!function_exists('check_rate_limit')) {
     function check_rate_limit(string $key, int $maxAttempts = 5, int $decaySeconds = 60): bool {
         $now = time();
-        if (!isset($_SESSION['rate_limits'][$key])) {
-            $_SESSION['rate_limits'][$key] = [];
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+        $lockKey = md5($ip . '_' . $key);
+        $tempDir = sys_get_temp_dir();
+        $filePath = $tempDir . DIRECTORY_SEPARATOR . 'fc_rl_' . $lockKey . '.dat';
+
+        $attempts = [];
+        $fp = @fopen($filePath, 'c+');
+        if ($fp) {
+            if (flock($fp, LOCK_EX)) {
+                $content = stream_get_contents($fp);
+                if (!empty($content)) {
+                    $decoded = @json_decode($content, true);
+                    if (is_array($decoded)) {
+                        $attempts = $decoded;
+                    }
+                }
+                // Filter timestamps within the decay window
+                $attempts = array_values(array_filter(
+                    $attempts,
+                    fn($timestamp) => is_numeric($timestamp) && ($now - (int)$timestamp) < $decaySeconds
+                ));
+
+                if (count($attempts) >= $maxAttempts) {
+                    flock($fp, LOCK_UN);
+                    fclose($fp);
+                    return false;
+                }
+
+                $attempts[] = $now;
+                ftruncate($fp, 0);
+                rewind($fp);
+                fwrite($fp, json_encode($attempts));
+                fflush($fp);
+                flock($fp, LOCK_UN);
+            }
+            fclose($fp);
+        } else {
+            // Fallback to session if filesystem is restricted
+            if (isset($_SESSION)) {
+                if (!isset($_SESSION['rate_limits'][$key])) {
+                    $_SESSION['rate_limits'][$key] = [];
+                }
+                $_SESSION['rate_limits'][$key] = array_values(array_filter(
+                    $_SESSION['rate_limits'][$key],
+                    fn($timestamp) => ($now - $timestamp) < $decaySeconds
+                ));
+                if (count($_SESSION['rate_limits'][$key]) >= $maxAttempts) {
+                    return false;
+                }
+                $_SESSION['rate_limits'][$key][] = $now;
+            }
         }
-        $_SESSION['rate_limits'][$key] = array_filter(
-            $_SESSION['rate_limits'][$key],
-            fn($timestamp) => ($now - $timestamp) < $decaySeconds
-        );
-        if (count($_SESSION['rate_limits'][$key]) >= $maxAttempts) {
-            return false;
-        }
-        $_SESSION['rate_limits'][$key][] = $now;
+
         return true;
     }
 }

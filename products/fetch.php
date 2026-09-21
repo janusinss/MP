@@ -8,7 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
 $search = $_GET['search'] ?? '';
 $category = $_GET['category'] ?? '';
 $sort = $_GET['sort'] ?? '';
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = max(1, (int)($_GET['page'] ?? 1));
 $limit = 12; 
 $offset = ($page - 1) * $limit;
 
