@@ -23,5 +23,10 @@ class Response
     {
         self::send(true, $data, $message, 200);
     }
+
+    public static function created($data = [], $message = 'Created')
+    {
+        self::send(true, $data, $message, 201);
+    }
 }
 ?>

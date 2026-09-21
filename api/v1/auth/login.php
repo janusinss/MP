@@ -18,8 +18,8 @@ if (!isset($data->email) || !isset($data->password)) {
 $email = trim((string)($data->email ?? ''));
 $password = (string)($data->password ?? '');
 
-// Rate limiting: Max 5 failed attempts per 15 min per IP/account (security.md Phase 2.1)
-if (!check_rate_limit('api_login_' . ($email ?: 'anon'), 5, 900)) {
+// Rate limiting: Max 15 attempts per 5 min per IP/account (security.md Phase 2.1)
+if (!check_rate_limit('api_login_' . ($email ?: 'anon'), 15, 300)) {
     Response::error("Too many login attempts. Please try again in 15 minutes.", 429);
 }
 

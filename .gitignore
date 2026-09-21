@@ -45,6 +45,7 @@ strix_runs/
 *.txt.cookie
 *cookies*.txt
 test_cookies.txt
+scripts/*.txt
 
 # IDEs and Code Editors
 .vscode/*
