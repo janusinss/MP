@@ -725,7 +725,7 @@ $firstKey = array_key_first($aisleReels);
                                             $sImgSrc = $sHasUrl ? $sItem['image_url'] : ($sHasLocal ? 'assets/images/' . $sItem['image'] : '');
                                             if (!empty($sImgSrc)):
                                             ?>
-                                                <img src="<?= htmlspecialchars($sImgSrc) ?>" alt="<?= htmlspecialchars($sItem['name']) ?>" loading="lazy">
+                                                <img src="<?= htmlspecialchars($sImgSrc) ?>" alt="<?= htmlspecialchars($sItem['name']) ?>" loading="lazy" onerror="this.onerror=null; this.src='assets/images/default.jpg';">
                                             <?php else: ?>
                                                 <div class="food-card-fallback-icon" aria-hidden="true">
                                                     <i class="bi <?= $categoryIcons[$sCat] ?? 'bi-basket2' ?>"></i>
@@ -831,7 +831,7 @@ $firstKey = array_key_first($aisleReels);
 
                                             <div class="food-card-img-wrap">
                                                 <?php if (!empty($imgSrc)): ?>
-                                                    <img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($prod['name']) ?>" loading="lazy">
+                                                    <img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($prod['name']) ?>" loading="lazy" onerror="this.onerror=null; this.src='assets/images/default.jpg';">
                                                 <?php else: ?>
                                                     <div class="food-card-fallback-icon" aria-hidden="true">
                                                         <i class="bi <?= $categoryIcons[$pCat] ?? 'bi-basket2' ?>"></i>
@@ -1891,10 +1891,11 @@ $firstKey = array_key_first($aisleReels);
                 const safeName = item.name.replace(/"/g, '&quot;');
                 const productSlug = slugify(item.name);
                 const isOutOfStock = item.stock_qty <= 0;
+                const fallbackSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180' fill='%23f5f7f5'%3E%3Crect width='180' height='180' rx='16' fill='%23f5f7f5'/%3E%3Ccircle cx='90' cy='82' r='42' fill='%23e8f5e9'/%3E%3Cpath d='M83 88c-7 0-12-6-12-14 0-11 9-20 20-20 8 0 14 5 15 12 1 7-4 15-11 19-3 2-8 3-12 3z' fill='%232d6a4f' opacity='0.7'/%3E%3Cpath d='M91 63c2-5 7-8 12-8-1 5-4 9-8 10-2 0-3-1-4-2z' fill='%2352b788'/%3E%3Ctext x='90' y='142' font-family='system-ui,sans-serif' font-size='12' font-weight='600' fill='%236c757d' text-anchor='middle'%3EFresh Produce%3C/text%3E%3C/svg%3E";
 
                 card.innerHTML = `
                     <div class="coverflow-card-thumb">
-                        <img src="assets/images/${imgName}" width="180" height="180" alt="${safeName}" loading="eager" draggable="false">
+                        <img src="assets/images/${imgName}" width="180" height="180" alt="${safeName}" loading="eager" draggable="false" onerror="this.onerror=null; this.src='assets/images/default.jpg'; this.onerror=() => { this.src='${fallbackSvg}'; };">
                     </div>
                     <div class="coverflow-card-body">
                         <div class="coverflow-card-cat">${item.category}</div>
