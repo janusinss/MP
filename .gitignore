@@ -113,6 +113,7 @@ playwright-report/
 blob-report/
 playwright/.cache/
 .playwright/
+.phpunit.cache/
 cypress/videos/
 cypress/screenshots/
 tests/screenshots/
