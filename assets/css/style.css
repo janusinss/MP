@@ -2311,6 +2311,102 @@ h5{
     }
 }
 
+/* ==========================================================================
+   MINIMAL UTILITY FOOTER (Enclosed Checkout, Success, Cart & App Screens)
+   Strict adherence to frontend.md & UI_Always.md:
+   - Eliminates exit leaks and sitemap scroll fatigue
+   - 1-level container depth with tinted border
+   - Touch targets >= 44px
+   - Clearance for mobile bottom navigation
+   ========================================================================== */
+.site-footer-minimal {
+    background-color: var(--color-bg, #F9F8F6);
+    border-top: 1px solid var(--color-border-subtle, #EDEAE1);
+    padding: 1.25rem 0;
+    margin-top: auto;
+}
+
+.footer-minimal-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+}
+
+.footer-minimal-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.82rem;
+    color: var(--color-text-secondary, #6E7368);
+}
+
+.footer-minimal-copy {
+    font-weight: 500;
+}
+
+.footer-minimal-trust {
+    font-weight: 600;
+    color: var(--color-brand-dark, #375743);
+    display: inline-flex;
+    align-items: center;
+}
+
+.footer-minimal-trust i {
+    color: var(--color-brand, #4A745B);
+}
+
+.footer-minimal-links {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.footer-minimal-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-secondary, #6E7368);
+    text-decoration: none;
+    transition: color var(--duration-fast, 150ms) ease;
+    cursor: pointer;
+}
+
+.footer-minimal-link:hover {
+    color: var(--color-brand, #4A745B);
+}
+
+.footer-minimal-link:focus-visible {
+    outline: 2px solid var(--color-brand, #4A745B);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.footer-minimal-sep {
+    color: var(--color-border, #E5E0D5);
+    font-size: 0.75rem;
+}
+
+@media (max-width: 767.98px) {
+    .site-footer-minimal {
+        padding: 1rem 0 5.5rem;
+    }
+    .footer-minimal-inner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.4rem;
+    }
+    .footer-minimal-links {
+        justify-content: center;
+    }
+}
+
 .badge-pill {
     font-size: 0.7rem;
     font-weight: 700;
@@ -4838,7 +4934,7 @@ main#checkout-main ~ .fc-mobile-bottom-bar {
 }
 
 /* Mobile responsive */
-@media (max-width: 991.98px) {
+@media (max-width: 991.98px) and (min-width: 768px) {
     .success-card-header {
         flex-direction: column;
         align-items: flex-start;
@@ -4865,23 +4961,418 @@ main#checkout-main ~ .fc-mobile-bottom-bar {
     }
 }
 
-@media (max-width: 575.98px) {
+/* ==========================================================================
+   MOBILE SUCCESS PAGE REDESIGN (<768px)
+   Strict adherence to frontend.md & UI_Always.md:
+   - 1-level container depth (anti-cardocalypse; eliminates nested subcards)
+   - Centered celebration hero with unboxed typographic kicker
+   - Glanceable 2x2 order telemetry strip
+   - Continuous horizontal fulfillment tracker (replaces awkward 2x2 grid)
+   - Clean unboxed basket items with zero scroll trapping
+   - High-contrast thumb-first action buttons (>=44px touch targets)
+   ========================================================================== */
+@media (max-width: 767.98px) {
     .success-page-wrapper {
-        padding: 1.5rem 0.75rem 3.5rem;
+        padding: 1.25rem 0.75rem 6.5rem;
+        background-color: var(--color-bg, #F9F8F6);
     }
+
+    .success-wide-container {
+        padding: 0;
+        max-width: 100%;
+    }
+
+    /* Single-Surface Artisan Container */
+    .receipt-card,
+    .success-wide-card {
+        border-radius: 16px;
+        border: 1px solid var(--color-border-subtle, #EDEAE1);
+        box-shadow: 0 4px 16px rgba(35, 38, 32, 0.04);
+        background: #FFFFFF;
+        overflow: hidden;
+    }
+
+    /* 1. Centered Hero Confirmation */
     .success-card-header {
-        padding: 1.5rem 1.25rem;
-    }
-    .success-card-body {
-        padding: 1.25rem;
-    }
-    .success-actions,
-    .success-actions-group {
         flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 2rem 1.25rem 1.25rem;
+        gap: 1.25rem;
+        background: linear-gradient(180deg, rgba(74, 116, 91, 0.07) 0%, rgba(255, 255, 255, 0) 100%);
+        border-bottom: 1px solid var(--color-border-subtle, #EDEAE1);
     }
-    .dispatch-stepper {
+
+    .success-header-lead {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.85rem;
+        max-width: 100%;
+    }
+
+    .success-status-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background-color: var(--color-brand-tint, rgba(74, 116, 91, 0.12));
+        color: var(--color-brand, #4A745B);
+        border: 1.5px solid rgba(74, 116, 91, 0.25);
+        font-size: 1.75rem;
+        margin: 0 auto;
+        box-shadow: 0 4px 12px rgba(74, 116, 91, 0.15);
+    }
+
+    .success-kicker {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--color-brand, #4A745B);
+        margin-bottom: 0.35rem;
+    }
+
+    .success-title {
+        font-family: var(--font-serif, 'Fraunces', Georgia, serif);
+        font-size: 1.65rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--color-text-primary, #232620);
+        margin: 0 0 0.45rem;
+        line-height: 1.22;
+    }
+
+    .success-subtitle {
+        font-size: 0.86rem;
+        color: var(--color-text-secondary, #6E7368);
+        line-height: 1.45;
+        max-width: 320px;
+        margin: 0 auto;
+    }
+
+    /* 2. Compact Order Telemetry Grid (Glanceable 2x2 strip) */
+    .success-meta-panel {
+        display: grid;
         grid-template-columns: repeat(2, 1fr);
-        row-gap: 1rem;
+        gap: 0.75rem 1rem;
+        width: 100%;
+        min-width: 0;
+        padding: 0.85rem 1rem;
+        background-color: var(--color-surface-subtle, #F7F6F2);
+        border: 1px solid var(--color-border-subtle, #EDEAE1);
+        border-radius: 12px;
+        box-shadow: none;
+    }
+
+    .success-meta-row {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        gap: 0.15rem;
+    }
+
+    .success-meta-lbl {
+        font-size: 0.68rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-text-tertiary, #989E92);
+    }
+
+    .success-meta-val {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--color-text-primary, #232620);
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    /* 3. Elimination of Nested Subcards (Anti-Cardocalypse) */
+    .success-card-body {
+        padding: 0 1.25rem 1.5rem;
+    }
+
+    .success-card-body .row {
+        --bs-gutter-y: 0;
+    }
+
+    .success-subcard {
+        background-color: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 1.25rem 0;
+        margin-bottom: 0;
+        border-bottom: 1px solid var(--color-border-subtle, #EDEAE1);
+        box-shadow: none;
+    }
+
+    .success-subcard-title {
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--color-brand, #4A745B);
+        margin-bottom: 0.65rem;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .success-destination-name {
+        font-size: 0.96rem;
+        font-weight: 700;
+        color: var(--color-text-primary, #232620);
+        margin-bottom: 0.2rem;
+    }
+
+    .success-destination-address {
+        font-size: 0.85rem;
+        color: var(--color-text-secondary, #6E7368);
+        margin: 0 0 0.5rem;
+        line-height: 1.45;
+    }
+
+    .success-destination-hint {
+        font-size: 0.75rem;
+        color: var(--color-brand-dark, #375743);
+        background: rgba(74, 116, 91, 0.08);
+        border: 1px solid rgba(74, 116, 91, 0.15);
+        border-radius: 8px;
+        padding: 0.45rem 0.65rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    /* 4. Streamlined Horizontal Fulfillment Tracker */
+    .dispatch-stepper {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin: 1.25rem 0 0.35rem;
+        padding: 0 0.25rem;
+    }
+
+    .dispatch-stepper::before {
+        content: "";
+        position: absolute;
+        top: 13px;
+        left: 1.5rem;
+        right: 1.5rem;
+        height: 2px;
+        background-color: var(--color-border, #E5E0D5);
+        z-index: 0;
+    }
+
+    .dispatch-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.35rem;
+        position: relative;
+        z-index: 1;
+        flex: 1;
+    }
+
+    .dispatch-step-dot {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: #FFFFFF;
+        border: 2px solid var(--color-border, #E5E0D5);
+        color: var(--color-text-tertiary, #989E92);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.72rem;
+        font-weight: 700;
+        box-shadow: 0 0 0 3px #FFFFFF;
+    }
+
+    .dispatch-step.is-done .dispatch-step-dot {
+        background-color: var(--color-brand, #4A745B);
+        border-color: var(--color-brand, #4A745B);
+        color: #FFFFFF;
+    }
+
+    .dispatch-step.is-active .dispatch-step-dot {
+        background-color: #FFFFFF;
+        border-color: var(--color-brand, #4A745B);
+        color: var(--color-brand, #4A745B);
+        box-shadow: 0 0 0 3px var(--color-brand-glow, rgba(74, 116, 91, 0.22)), 0 0 0 5px #FFFFFF;
+    }
+
+    .dispatch-step-label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        color: var(--color-text-secondary, #6E7368);
+        line-height: 1.22;
+        max-width: 64px;
+        margin-top: 0.15rem;
+    }
+
+    .dispatch-step.is-done .dispatch-step-label,
+    .dispatch-step.is-active .dispatch-step-label {
+        color: var(--color-text-primary, #232620);
+        font-weight: 700;
+    }
+
+    /* 5. Clean Basket Panel (Single-level, no trapped scrollbar) */
+    .success-summary-panel {
+        background-color: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 1.25rem 0;
+        box-shadow: none;
+        border-bottom: 1px solid var(--color-border-subtle, #EDEAE1);
+    }
+
+    .success-items-scroll {
+        max-height: none;
+        overflow-y: visible;
+        padding-right: 0;
+        margin-bottom: 0.85rem;
+    }
+
+    .success-item-row {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px dashed var(--color-border-subtle, #EDEAE1);
+    }
+
+    .success-item-thumb {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        border: 1px solid var(--color-border-subtle, #EDEAE1);
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .success-item-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .success-item-name {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--color-text-primary, #232620);
+        margin: 0 0 0.15rem;
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .success-item-rate {
+        font-size: 0.76rem;
+        color: var(--color-text-secondary, #6E7368);
+    }
+
+    .success-item-total {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: var(--color-text-primary, #232620);
+    }
+
+    .success-calc-table {
+        border-top: 1px dashed var(--color-border, #E5E0D5);
+        padding-top: 0.75rem;
+    }
+
+    .success-calc-row {
+        font-size: 0.84rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .success-total-row {
+        padding-top: 0.85rem;
+        margin-top: 0.5rem;
+        align-items: center;
+    }
+
+    .success-total-amount {
+        font-size: 1.55rem;
+        font-weight: 800;
+        color: var(--color-brand-dark, #375743);
+    }
+
+    /* 6. Action Area (Thumb-Zone Optimized & 44px+ touch targets) */
+    .success-bottom-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.85rem;
+        padding-top: 1.25rem;
+        margin-top: 0;
+        border-top: none;
+    }
+
+    .success-actions-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+        width: 100%;
+        min-width: unset;
+        order: 1;
+    }
+
+    .btn-continue,
+    .btn-continue-shopping {
+        width: 100%;
+        min-height: 48px;
+        font-size: 0.94rem;
+        font-weight: 700;
+        border-radius: 12px;
+        order: 1;
+        box-shadow: 0 4px 14px rgba(74, 116, 91, 0.28);
+    }
+
+    .btn-print,
+    .btn-print-receipt {
+        width: 100%;
+        min-height: 44px;
+        font-size: 0.86rem;
+        font-weight: 600;
+        border-radius: 12px;
+        order: 2;
+        background-color: var(--color-surface-subtle, #F7F6F2);
+        border: 1px solid var(--color-border, #E5E0D5);
+        color: var(--color-text-secondary, #6E7368);
+    }
+
+    .success-footer-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.65rem;
+        width: 100%;
+        text-align: center;
+        order: 2;
+    }
+
+    .success-history-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0.4rem 1rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--color-brand, #4A745B);
+    }
+
+    .success-guarantee-badge {
+        font-size: 0.76rem;
+        color: var(--color-text-tertiary, #989E92);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
     }
 }
 

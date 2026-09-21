@@ -6,7 +6,42 @@ if ($pos !== false) {
 } else {
     $rootPath = '/';
 }
+
+$reqUri = str_replace('\\', '/', $_SERVER['REQUEST_URI'] ?? '');
+
+// Identify transactional and utility app pages that should use the minimal enclosed footer
+$isCheckoutPage = (strpos($reqUri, '/checkout') !== false);
+$isSuccessPage  = (strpos($reqUri, 'success.php') !== false || strpos($reqUri, '/orders/success') !== false);
+$isCartPage     = (strpos($reqUri, '/cart') !== false);
+$isOrdersPage   = (strpos($reqUri, '/orders') !== false || strpos($reqUri, '/order/') !== false);
+$isProfilePage  = (strpos($reqUri, '/profile') !== false || strpos($reqUri, '/account') !== false);
+$isAdminPage    = (strpos($reqUri, '/admin') !== false);
+
+$isMinimalFooter = ($isCheckoutPage || $isSuccessPage || $isCartPage || $isOrdersPage || $isProfilePage || $isAdminPage);
 ?>
+<?php if ($isMinimalFooter): ?>
+    <!-- Minimal Distraction-Free Utility Footer (Checkout, Confirmation, Orders, Profile, Cart) -->
+    <footer class="site-footer-minimal no-print" id="siteFooter">
+        <div class="container">
+            <div class="footer-minimal-inner">
+                <div class="footer-minimal-brand">
+                    <span class="footer-minimal-copy">&copy; <?= date('Y') ?> FreshCart Market.</span>
+                    <span class="footer-minimal-trust d-none d-sm-inline">
+                        <i class="bi bi-shield-check text-brand me-1" aria-hidden="true"></i>256-Bit SSL Secured
+                    </span>
+                </div>
+                <div class="footer-minimal-links">
+                    <a href="<?= $rootPath ?>privacy" class="footer-minimal-link">Privacy</a>
+                    <span class="footer-minimal-sep" aria-hidden="true">&bull;</span>
+                    <a href="<?= $rootPath ?>terms" class="footer-minimal-link">Terms</a>
+                    <span class="footer-minimal-sep" aria-hidden="true">&bull;</span>
+                    <a href="<?= $rootPath ?>contact" class="footer-minimal-link">Support</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+<?php else: ?>
+    <!-- Full Marketing & Sourcing Footer (Homepage, Catalog, Content Pages) -->
     <footer class="site-footer" id="siteFooter">
         <!-- Top Agricultural Sourcing Trust Strip -->
         <div class="footer-trust-banner">
@@ -132,6 +167,7 @@ if ($pos !== false) {
             </div>
         </div>
     </footer>
+<?php endif; ?>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
