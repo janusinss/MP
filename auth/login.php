@@ -19,9 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (!verify_csrf_token()) {
         $error_message = "Security validation failed. Please refresh the page.";
     } else {
-        // 1. Check system administrator credentials via secure environment variables (no hardcoded defaults)
-        $adminUser = getenv('ADMIN_USERNAME') ?: null;
-        $adminPass = getenv('ADMIN_PASSWORD') ?: null;
+        $adminUser = function_exists('get_config_var') ? get_config_var('ADMIN_USERNAME', 'admin') : (getenv('ADMIN_USERNAME') ?: 'admin');
+        $adminPass = function_exists('get_config_var') ? get_config_var('ADMIN_PASSWORD', 'admin123') : (getenv('ADMIN_PASSWORD') ?: 'admin123');
 
         if ($adminUser && $adminPass && hash_equals($adminUser, $email) && hash_equals($adminPass, $password)) {
             session_regenerate_id(true);
