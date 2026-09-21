@@ -140,7 +140,7 @@ if ($pos !== false) {
                 isDismissed = sessionStorage.getItem('promo_popup_dismissed') === '1';
             } catch (e) {}
 
-            if (!isDismissed) {
+            if (!isDismissed && window.innerWidth > 768) {
                 setTimeout(openPromoModal, 600);
             }
 

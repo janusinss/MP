@@ -974,7 +974,10 @@ $firstKey = array_key_first($aisleReels);
 
                 <div class="col-lg-6 mt-5 mt-lg-0">
                     <div class="hero-showcase-card">
-                        <img src="assets/images/gulay.jpg" id="dynamic-hero-img" class="hero-showcase-img" width="520" height="390" alt="Harvested Fresh Produce">
+                        <picture>
+                            <source srcset="assets/images/gulay.webp" type="image/webp">
+                            <img src="assets/images/gulay.jpg" id="dynamic-hero-img" class="hero-showcase-img" width="520" height="390" alt="Harvested Fresh Produce">
+                        </picture>
                         <div class="hero-telemetry-badge">
                             <div class="telemetry-item">
                                 <span class="telemetry-label">Farm Origin</span>

@@ -13,6 +13,9 @@ $RECYCLE.BIN/
 # Environment Variables & Secrets
 .env
 .env.*
+.env.infinityfree
+.env.local
+.env.production
 !.env.example
 !.env.template
 *.pem
@@ -25,6 +28,23 @@ credentials.json
 token.json
 tokens.json
 secrets.json
+
+# Deployment Packages & Compressed Archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.rar
+*.7z
+dist/
+dist_*.zip
+
+# Security Audit Runs & Test Artifacts
+strix_runs/
+*.txt.cookie
+*cookies*.txt
+test_cookies.txt
 
 # IDEs and Code Editors
 .vscode/*
@@ -66,7 +86,6 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -120,5 +139,3 @@ GEMINI.MD
 # Ephemeral Skill Runtime & Review Artifacts
 .impeccable/
 .agents/resources/
-
-
