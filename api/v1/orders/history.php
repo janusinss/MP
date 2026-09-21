@@ -20,6 +20,7 @@ try {
     Response::success(['orders' => $orders]);
 
 } catch (Exception $e) {
-    Response::error("Database Error: " . $e->getMessage(), 500);
+    error_log("API Order History Error: " . $e->getMessage());
+    Response::error("An internal error occurred while fetching order history.", 500);
 }
 ?>

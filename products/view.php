@@ -156,6 +156,7 @@ if (count($reviews) > 0) {
 
                     <?php if ($product['stock_qty'] > 0): ?>
                         <form action="../cart/add" method="POST" id="addToCartForm" class="mt-4">
+                            <?= csrf_input() ?>
                             <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                             <button type="submit" class="btn-add-large">
                                 Add to Cart — $<?= number_format($product['price'], 2) ?>
@@ -265,29 +266,39 @@ if (count($reviews) > 0) {
 
     </div>
 
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="liveToast" class="toast align-items-center text-bg-dark border-0 rounded-4 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex p-2">
-                <div class="toast-body d-flex align-items-center gap-2">
-                    <i class="bi bi-bag-check-fill text-success fs-5"></i>
-                    <span>Item added to cart!</span>
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.getElementById('addToCartForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
+            const form = this;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const origHtml = submitBtn ? submitBtn.innerHTML : '';
             const formData = new FormData(this);
-            fetch('../cart/add.php', { method: 'POST', body: formData })
+            if (!formData.has('csrf_token') || !formData.get('csrf_token')) {
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                if (csrfMeta && csrfMeta.content) {
+                    formData.append('csrf_token', csrfMeta.content);
+                }
+            }
+            const csrfToken = formData.get('csrf_token') || document.querySelector('meta[name="csrf-token"]')?.content || '';
+            fetch('../cart/add.php', {
+                method: 'POST',
+                headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
+                body: formData
+            })
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    const toast = new bootstrap.Toast(document.getElementById('liveToast'));
-                    toast.show();
+                    const badge = document.getElementById('cart-badge');
+                    if (badge) badge.innerText = data.cart_count;
+                    if (submitBtn) {
+                        submitBtn.innerHTML = '<i class="bi bi-check2 me-1"></i> Added to Cart';
+                        submitBtn.classList.add('btn-success');
+                        setTimeout(() => {
+                            submitBtn.innerHTML = origHtml;
+                            submitBtn.classList.remove('btn-success');
+                        }, 1800);
+                    }
                 } else if (data.status === 'login_required') {
                     window.location.href = '../auth/login.php';
                 } else {

@@ -53,7 +53,8 @@ try {
     $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (Exception $e) {
-    die("Error: " . htmlspecialchars($e->getMessage()));
+    error_log("Admin Order Details Error: " . $e->getMessage());
+    die("An unexpected error occurred while loading order details.");
 }
 
 $s = $order['status'];

@@ -75,6 +75,7 @@ if (count($products) > 0) {
                     <div class="card-action-overlay">
                         <?php if ($product['stock_qty'] > 0): ?>
                             <form action="cart/add" method="POST" class="add-cart-form">
+                                <?= csrf_input() ?>
                                 <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                                 <button type="submit" class="btn-quick-add" title="Add to Cart">
                                     <i class="bi bi-plus-lg fs-5"></i>

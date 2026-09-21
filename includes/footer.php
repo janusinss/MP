@@ -133,17 +133,6 @@ if ($pos !== false) {
         </div>
     </footer>
 
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="liveToast" class="toast align-items-center text-bg-dark border-0 rounded-4 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex p-2">
-                <div class="toast-body d-flex align-items-center gap-2">
-                    <i class="bi bi-bag-check-fill text-success fs-5"></i>
-                    <span>Item added to cart!</span>
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -172,20 +161,32 @@ if ($pos !== false) {
             if (e.target && e.target.classList.contains('add-cart-form')) {
                 e.preventDefault();
                 const formData = new FormData(e.target);
-                fetch('<?= $rootPath ?>cart/add.php', { method: 'POST', body: formData })
+                if (!formData.has('csrf_token') || !formData.get('csrf_token')) {
+                    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                    if (csrfMeta && csrfMeta.content) {
+                        formData.append('csrf_token', csrfMeta.content);
+                    }
+                }
+                const csrfToken = formData.get('csrf_token') || document.querySelector('meta[name="csrf-token"]')?.content || '';
+                fetch('<?= $rootPath ?>cart/add.php', {
+                    method: 'POST',
+                    headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
+                    body: formData
+                })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
                         const badge = document.getElementById('cart-badge');
                         if (badge) badge.innerText = data.cart_count;
                         else location.reload();
-                        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
-                        toast.show();
                     } else if (data.status === 'login_required') {
                         window.location.href = '<?= $rootPath ?>auth/login.php';
                     } else {
                         alert(data.message);
                     }
+                })
+                .catch(err => {
+                    console.error('Add to cart failed:', err);
                 });
             }
         });

@@ -74,7 +74,7 @@ include __DIR__ . '/../includes/header.php';
         
         <!-- Header & Breadcrumb -->
         <div class="checkout-header-bar">
-            <a href="<?= $rootPath ?>cart" class="checkout-back-link">
+            <a href="<?= $rootPath ?>cart" class="checkout-back-link" aria-label="Return to Basket">
                 <i class="bi bi-arrow-left" aria-hidden="true"></i>
                 <span>Return to Basket</span>
             </a>
@@ -82,6 +82,13 @@ include __DIR__ . '/../includes/header.php';
                 <span class="checkout-kicker">Direct Farm Fulfillment</span>
                 <h1 class="checkout-title">Secure Checkout</h1>
                 <p class="checkout-subtitle">Verify your delivery location and payment preference to schedule your fresh harvest dispatch.</p>
+                <div class="checkout-progress-steps">
+                    <span class="checkout-step-chip active"><i class="bi bi-geo-alt-fill me-1" aria-hidden="true"></i> Destination</span>
+                    <i class="bi bi-arrow-right checkout-step-arrow" aria-hidden="true"></i>
+                    <span class="checkout-step-chip active"><i class="bi bi-credit-card-2-front-fill me-1" aria-hidden="true"></i> Payment</span>
+                    <i class="bi bi-arrow-right checkout-step-arrow" aria-hidden="true"></i>
+                    <span class="checkout-step-chip"><i class="bi bi-check2-circle me-1" aria-hidden="true"></i> Dispatch</span>
+                </div>
             </div>
         </div>
 
@@ -94,6 +101,66 @@ include __DIR__ . '/../includes/header.php';
 
         <form action="<?= $rootPath ?>orders/place" method="POST" id="checkoutForm" novalidate>
             <?= csrf_input() ?>
+
+            <!-- Mobile Collapsible Order Summary Accordion -->
+            <div class="checkout-mobile-summary-card d-lg-none mb-3">
+                <button type="button" class="checkout-mobile-summary-toggle" id="mobileSummaryToggle" aria-expanded="false" aria-controls="checkoutMobileSummaryBody">
+                    <div class="checkout-mobile-summary-left">
+                        <i class="bi bi-bag-check-fill text-brand" aria-hidden="true"></i>
+                        <span>Order Summary (<?= count($cartItems) ?> <?= count($cartItems) === 1 ? 'item' : 'items' ?>)</span>
+                        <i class="bi bi-chevron-down toggle-chevron" id="mobileSummaryChevron" aria-hidden="true"></i>
+                    </div>
+                    <div class="checkout-mobile-summary-right">
+                        <span class="checkout-mobile-summary-total">$<?= number_format($finalTotal, 2) ?></span>
+                    </div>
+                </button>
+                <div class="checkout-mobile-summary-body" id="checkoutMobileSummaryBody" style="display: none;">
+                    <div class="checkout-mobile-items-list">
+                        <?php foreach ($cartItems as $item): ?>
+                            <div class="checkout-mobile-item-row">
+                                <div class="checkout-mobile-item-thumb-wrap">
+                                    <img src="<?= $rootPath ?>assets/images/<?= htmlspecialchars($item['image'] ?: 'default.jpg') ?>" 
+                                         alt="<?= htmlspecialchars($item['name']) ?>" 
+                                         class="checkout-mobile-item-thumb" 
+                                         width="44" height="44" loading="lazy"
+                                         onerror="this.onerror=null; this.src='<?= $rootPath ?>assets/images/default.jpg';">
+                                </div>
+                                <div class="checkout-mobile-item-info">
+                                    <div class="checkout-mobile-item-name" title="<?= htmlspecialchars($item['name']) ?>"><?= htmlspecialchars($item['name']) ?></div>
+                                    <div class="checkout-mobile-item-meta">
+                                        <span>Qty: <?= (int)$item['qty'] ?></span>
+                                        <span>&times; $<?= number_format($item['price'], 2) ?></span>
+                                    </div>
+                                </div>
+                                <div class="checkout-mobile-item-total">
+                                    $<?= number_format($item['line_total'], 2) ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="checkout-mobile-calc-breakdown">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted small">Produce Subtotal</span>
+                            <span class="fw-semibold small">$<?= number_format($subTotal, 2) ?></span>
+                        </div>
+                        <?php if ($discountAmount > 0): ?>
+                            <div class="d-flex justify-content-between mb-1 text-success">
+                                <span class="small"><i class="bi bi-tag-fill me-1" aria-hidden="true"></i>Coupon Discount</span>
+                                <span class="fw-semibold small">-$<?= number_format($discountAmount, 2) ?></span>
+                            </div>
+                        <?php endif; ?>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">Farm Route Delivery</span>
+                            <span class="text-success fw-semibold small">Free</span>
+                        </div>
+                        <div class="d-flex justify-content-between pt-2 border-top">
+                            <span class="fw-bold">Total Due</span>
+                            <span class="fw-bold text-brand fs-6">$<?= number_format($finalTotal, 2) ?></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row g-4 g-lg-5 align-items-start">
                 
                 <!-- Left: Order Fulfillment & Payment -->
@@ -310,6 +377,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span>Scheduling Dispatch...</span> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        });
+    }
+
+    // Mobile Collapsible Order Summary Accordion Toggle
+    const summaryToggle = document.getElementById('mobileSummaryToggle');
+    const summaryBody = document.getElementById('checkoutMobileSummaryBody');
+    const summaryChevron = document.getElementById('mobileSummaryChevron');
+    if (summaryToggle && summaryBody) {
+        summaryToggle.addEventListener('click', function() {
+            const isExpanded = summaryToggle.getAttribute('aria-expanded') === 'true';
+            summaryToggle.setAttribute('aria-expanded', !isExpanded);
+            if (!isExpanded) {
+                summaryBody.style.display = 'block';
+                if (summaryChevron) summaryChevron.style.transform = 'rotate(180deg)';
+            } else {
+                summaryBody.style.display = 'none';
+                if (summaryChevron) summaryChevron.style.transform = 'rotate(0deg)';
+            }
         });
     }
 });

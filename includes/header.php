@@ -3,6 +3,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+require_once __DIR__ . '/../config/security.php';
 
 // User & Admin Role Status
 $isAdmin = !empty($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true;
@@ -23,6 +24,7 @@ if ($pos !== false) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= function_exists('get_csrf_token') ? htmlspecialchars(get_csrf_token(), ENT_QUOTES, 'UTF-8') : '' ?>">
     <title>FreshCart Market</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -48,7 +50,7 @@ if ($pos !== false) {
         })();
     </script>
 </head>
-<body>
+<body class="<?= $isLoggedIn ? 'has-fc-bottom-nav' : '' ?>">
 
     <!-- Welcome Offer Lightbox Pop-up Modal (Guest Only) -->
     <?php if (!isset($_SESSION['user_id']) && !$isAdmin): ?>
@@ -257,11 +259,13 @@ if ($pos !== false) {
 
     <?php if ($isLoggedIn): 
         $reqUri = $_SERVER['REQUEST_URI'] ?? '';
+        $isCheckout = (strpos($reqUri, '/checkout') !== false);
         $isOrdersActive = (strpos($reqUri, '/orders') !== false || strpos($reqUri, '/order/') !== false);
         $isCartActive = (strpos($reqUri, '/cart') !== false);
         $isProfileActive = (strpos($reqUri, '/profile') !== false);
         $isMarketActive = (!$isOrdersActive && !$isCartActive && !$isProfileActive);
     ?>
+    <?php if (!$isCheckout): ?>
     <!-- Sleek Mobile Bottom Navigation Bar for Logged-In Shoppers -->
     <nav class="fc-mobile-bottom-bar d-lg-none" aria-label="Quick Mobile Navigation">
         <a href="<?= $rootPath ?: './' ?>" class="fc-bottom-tab <?= $isMarketActive ? 'active' : '' ?>">
@@ -288,4 +292,5 @@ if ($pos !== false) {
             <span>Account</span>
         </a>
     </nav>
+    <?php endif; ?>
     <?php endif; ?>

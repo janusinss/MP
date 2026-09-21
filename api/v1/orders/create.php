@@ -51,13 +51,22 @@ try {
     $stmtOrder->execute([$user['id'], $user['full_name'], $address, $total]);
     $orderId = $pdo->lastInsertId();
 
-    // 3. Create Order Items & Clear Cart
+    // 3. Create Order Items, Decrement Inventory & Clear Cart
     $stmtItem = $pdo->prepare("
         INSERT INTO order_items (order_id, product_id, quantity)
         VALUES (?, ?, ?)
     ");
+    $stmtStock = $pdo->prepare("
+        UPDATE products 
+        SET stock_qty = stock_qty - ? 
+        WHERE id = ? AND stock_qty >= ?
+    ");
 
     foreach ($items as $item) {
+        $stmtStock->execute([$item['quantity'], $item['product_id'], $item['quantity']]);
+        if ($stmtStock->rowCount() === 0) {
+            throw new Exception("Product '{$item['name']}' has insufficient stock.");
+        }
         $stmtItem->execute([$orderId, $item['product_id'], $item['quantity']]);
     }
 
@@ -73,6 +82,10 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    Response::error($e->getMessage(), 400);
+    error_log("API Order Create Error: " . $e->getMessage());
+    $safeMsg = (str_contains($e->getMessage(), 'Cart is empty') || str_contains($e->getMessage(), 'stock') || str_contains($e->getMessage(), 'required'))
+        ? $e->getMessage()
+        : "Failed to process order. Please try again.";
+    Response::error($safeMsg, 400);
 }
 ?>

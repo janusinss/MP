@@ -43,6 +43,7 @@ try {
     ], "Login successful");
 
 } catch (Exception $e) {
-    Response::error("Internal Server Error: " . $e->getMessage(), 500);
+    error_log("API Auth Login Error: " . $e->getMessage());
+    Response::error("An internal error occurred during authentication.", 500);
 }
 ?>

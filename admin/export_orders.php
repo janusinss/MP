@@ -19,7 +19,11 @@ fputcsv($output, ['Order ID', 'Customer Name', 'Address', 'Total Amount', 'Statu
 
 $stmt = $pdo->query("SELECT id, customer_name, address, total_amount, status, created_at FROM orders ORDER BY id DESC");
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    fputcsv($output, $row);
+    $safeRow = array_map(function($val) {
+        $str = (string)$val;
+        return preg_match('/^[=+\-@\t\r]/', $str) ? "'" . $str : $str;
+    }, $row);
+    fputcsv($output, $safeRow);
 }
 
 fclose($output);

@@ -66,14 +66,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SESSION['cart'])) {
             $trgCheck = $pdo->query("SHOW TRIGGERS LIKE 'order_items'")->fetchAll();
             $hasTrigger = !empty($trgCheck);
         }
-        $stmtStock = !$hasTrigger ? $pdo->prepare("UPDATE products SET stock_qty = stock_qty - ? WHERE id = ?") : null;
+        $stmtStock = !$hasTrigger ? $pdo->prepare("UPDATE products SET stock_qty = stock_qty - ? WHERE id = ? AND stock_qty >= ?") : null;
 
         foreach ($products as $p) {
             $qty = $_SESSION['cart'][$p['id']];
-            $stmtItem->execute([$orderId, $p['id'], $qty]);
             if ($stmtStock) {
-                $stmtStock->execute([$qty, $p['id']]);
+                $stmtStock->execute([$qty, $p['id'], $qty]);
+                if ($stmtStock->rowCount() === 0) {
+                    throw new Exception("Product '{$p['name']}' has insufficient stock.");
+                }
             }
+            $stmtItem->execute([$orderId, $p['id'], $qty]);
         }
 
         // Commit transaction
@@ -99,7 +102,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SESSION['cart'])) {
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
-        die("Order failed: " . htmlspecialchars($e->getMessage()));
+        error_log("Order Placement Error: " . $e->getMessage());
+        $safeMsg = str_contains($e->getMessage(), 'stock') ? $e->getMessage() : "An error occurred while processing your order.";
+        header("Location: checkout.php?error=" . urlencode($safeMsg));
+        exit;
     }
 } else {
     $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');

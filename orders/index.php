@@ -26,6 +26,39 @@ try {
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Fetch first item and item counts for each order
+$orderSummaries = [];
+if (!empty($orders)) {
+    $orderIds = array_column($orders, 'id');
+    $placeholders = implode(',', array_fill(0, count($orderIds), '?'));
+    try {
+        $stmtItems = $pdo->prepare("
+            SELECT oi.order_id, oi.product_id, oi.quantity, p.name AS product_name, p.image AS product_image 
+            FROM order_items oi 
+            JOIN products p ON oi.product_id = p.id 
+            WHERE oi.order_id IN ($placeholders) 
+            ORDER BY oi.id ASC
+        ");
+        $stmtItems->execute($orderIds);
+        $rawItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($rawItems as $item) {
+            $oid = $item['order_id'];
+            if (!isset($orderSummaries[$oid])) {
+                $orderSummaries[$oid] = [
+                    'first_image' => $item['product_image'] ?? '',
+                    'first_name'  => $item['product_name'] ?? 'Fresh Harvest Produce',
+                    'first_qty'   => (int)($item['quantity'] ?? 1),
+                    'total_items' => 0
+                ];
+            }
+            $orderSummaries[$oid]['total_items'] += 1;
+        }
+    } catch (PDOException $e) {
+        error_log("Failed to load order item previews: " . $e->getMessage());
+    }
+}
+
 include __DIR__ . '/../includes/header.php';
 ?>
 
@@ -35,35 +68,28 @@ include __DIR__ . '/../includes/header.php';
         <!-- Orders Header -->
         <div class="orders-header-row">
             <div>
-                <nav class="orders-breadcrumb" aria-label="Breadcrumb">
-                    <a href="<?= $rootPath ?: './' ?>"><i class="bi bi-house-door" aria-hidden="true"></i> Marketplace</a>
+                <nav class="orders-breadcrumb d-none d-md-flex" aria-label="Breadcrumb">
+                    <a href="<?= $rootPath ?: './' ?>">Marketplace</a>
                     <i class="bi bi-chevron-right" style="font-size: 0.72rem;" aria-hidden="true"></i>
                     <span class="text-dark fw-medium">Order History</span>
                 </nav>
-                <h1 class="orders-header-title">My Orders</h1>
-                <p class="orders-header-meta">Track and manage your farm-to-table deliveries and past seasonal purchases.</p>
-            </div>
-            <div class="orders-header-actions">
-                <span class="orders-count-indicator">
-                    <i class="bi bi-box-seam text-success" aria-hidden="true"></i>
-                    <span id="ordersTotalCount"><?= count($orders) ?> <?= count($orders) === 1 ? 'Order' : 'Orders' ?> Placed</span>
-                </span>
-                <a href="<?= $rootPath ?>profile" class="btn-continue-browsing">
-                    <i class="bi bi-person-gear" aria-hidden="true"></i>
-                    <span>Account Settings</span>
-                </a>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h1 class="orders-header-title mb-0">My Orders</h1>
+                    <span class="orders-count-badge"><?= count($orders) ?></span>
+                </div>
+                <p class="orders-header-meta">Track deliveries and past purchases.</p>
             </div>
         </div>
 
         <?php if (isset($_GET['msg']) && $_GET['msg'] === 'cancelled'): ?>
             <div class="alert alert-warning border-0 rounded-3 mb-4 d-flex align-items-center gap-2 py-2 px-3 small" role="alert">
                 <i class="bi bi-check-circle-fill text-warning flex-shrink-0" aria-hidden="true"></i>
-                <div>Your order has been successfully cancelled and inventory restocked.</div>
+                <div>Your order has been cancelled.</div>
             </div>
         <?php endif; ?>
 
         <?php if (count($orders) > 0): ?>
-            <!-- Mobile Quick Status Filter Chips -->
+            <!-- Quick Status Filter Chips -->
             <div class="orders-filter-bar mb-3" aria-label="Filter Orders by Status">
                 <div class="orders-filter-chips">
                     <button type="button" class="orders-chip-btn active" data-filter="all">
@@ -71,19 +97,15 @@ include __DIR__ . '/../includes/header.php';
                         <span class="chip-count"><?= count($orders) ?></span>
                     </button>
                     <button type="button" class="orders-chip-btn" data-filter="pending">
-                        <i class="bi bi-hourglass-split" aria-hidden="true"></i>
                         <span>Pending</span>
                     </button>
                     <button type="button" class="orders-chip-btn" data-filter="shipped">
-                        <i class="bi bi-truck" aria-hidden="true"></i>
                         <span>Shipped</span>
                     </button>
                     <button type="button" class="orders-chip-btn" data-filter="delivered">
-                        <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
                         <span>Delivered</span>
                     </button>
                     <button type="button" class="orders-chip-btn" data-filter="cancelled">
-                        <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
                         <span>Cancelled</span>
                     </button>
                 </div>
@@ -93,60 +115,84 @@ include __DIR__ . '/../includes/header.php';
                 <?php foreach ($orders as $order): 
                     $status = $order['status'] ?: 'Pending';
                     $statusLower = strtolower($status);
-                    $icon = 'bi-hourglass-split';
-
-                    if ($status == 'Shipped') {
-                        $icon = 'bi-truck';
-                    } elseif ($status == 'Delivered') {
-                        $icon = 'bi-check-circle-fill';
-                    } elseif ($status == 'Cancelled') {
-                        $icon = 'bi-x-circle-fill';
-                    }
+                    $summary = $orderSummaries[$order['id']] ?? null;
+                    $itemImage = $summary['first_image'] ?? '';
+                    $itemName = $summary['first_name'] ?? 'Fresh Harvest Produce';
+                    $totalItems = $summary['total_items'] ?? 1;
+                    $extraCount = $totalItems - 1;
+                    $imageExists = !empty($itemImage) && file_exists(__DIR__ . '/../assets/images/' . $itemImage);
                 ?>
                     <div class="order-history-card shadow-sm" data-status="<?= $statusLower ?>">
                         <div class="order-card-top">
                             <div class="order-meta-lead">
                                 <span class="order-card-ref">#<?= str_pad($order['id'], 6, "0", STR_PAD_LEFT) ?></span>
                                 <span class="order-card-date">
-                                    <i class="bi bi-calendar3" aria-hidden="true"></i>
                                     <span><?= date('M d, Y • h:i A', strtotime($order['created_at'])) ?></span>
                                 </span>
                             </div>
 
                             <span class="order-status-badge status-<?= $statusLower ?>">
-                                <i class="bi <?= $icon ?>" aria-hidden="true"></i>
                                 <span><?= htmlspecialchars($status) ?></span>
                             </span>
                         </div>
 
                         <div class="order-card-main">
-                            <div class="order-card-detail-group">
-                                <span class="order-col-label">Total Amount</span>
-                                <div class="order-total-val">$<?= number_format($order['total_amount'], 2) ?></div>
+                            <!-- 1. First Picture of what user chose to buy -->
+                            <div class="order-card-item-preview">
+                                <a href="<?= $rootPath ?>order/<?= $order['id'] ?>" class="order-thumb-wrap" aria-label="View <?= htmlspecialchars($itemName) ?>">
+                                    <?php if ($imageExists): ?>
+                                        <img src="<?= $rootPath ?>assets/images/<?= htmlspecialchars($itemImage) ?>" 
+                                             alt="<?= htmlspecialchars($itemName) ?>" 
+                                             class="order-product-thumb" 
+                                             width="60" 
+                                             height="60" 
+                                             loading="lazy">
+                                    <?php else: ?>
+                                        <div class="order-thumb-fallback" aria-hidden="true">
+                                            <i class="bi bi-box-seam"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                </a>
+                                <div class="order-item-info">
+                                    <a href="<?= $rootPath ?>order/<?= $order['id'] ?>" class="order-item-name text-truncate" title="<?= htmlspecialchars($itemName) ?>">
+                                        <?= htmlspecialchars($itemName) ?>
+                                    </a>
+                                    <span class="order-item-count">
+                                        <?php if ($extraCount > 0): ?>
+                                            <span class="order-count-pill">+<?= $extraCount ?> more item<?= $extraCount > 1 ? 's' : '' ?></span>
+                                        <?php else: ?>
+                                            <span class="order-count-single">1 item</span>
+                                        <?php endif; ?>
+                                    </span>
+                                </div>
                             </div>
 
-                            <div class="order-card-dest-group">
-                                <span class="order-col-label">Delivery Destination</span>
-                                <p class="order-dest-val text-truncate mb-0">
-                                    <i class="bi bi-geo-alt-fill text-muted me-1" aria-hidden="true"></i>
-                                    <span><?= htmlspecialchars($order['address'] ?: 'Customer address on file') ?></span>
-                                </p>
+                            <div class="order-card-body-row">
+                                <div class="order-card-dest-group">
+                                    <span class="order-col-label">Delivery Destination</span>
+                                    <p class="order-dest-val text-truncate mb-0" title="<?= htmlspecialchars($order['address'] ?: 'Customer address on file') ?>">
+                                        <i class="bi bi-geo-alt text-muted me-1" aria-hidden="true"></i>
+                                        <span><?= htmlspecialchars($order['address'] ?: 'Customer address on file') ?></span>
+                                    </p>
+                                </div>
+
+                                <div class="order-card-detail-group">
+                                    <span class="order-col-label">Total Amount</span>
+                                    <div class="order-total-val">$<?= number_format($order['total_amount'], 2) ?></div>
+                                </div>
                             </div>
 
                             <div class="order-card-actions">
                                 <a href="<?= $rootPath ?>order/<?= $order['id'] ?>" class="btn-order-view" aria-label="View details for order #<?= $order['id'] ?>">
-                                    <i class="bi bi-receipt" aria-hidden="true"></i>
                                     <span>View Details</span>
-                                    <i class="bi bi-chevron-right ms-auto d-md-none" aria-hidden="true"></i>
                                 </a>
 
                                 <?php if ($status == 'Pending'): ?>
-                                    <form action="<?= $rootPath ?>orders/cancel" method="POST" onsubmit="return confirm('Are you sure you want to cancel order #<?= $order['id'] ?>?');" class="m-0">
+                                    <form action="<?= $rootPath ?>orders/cancel" method="POST" onsubmit="return confirm('Are you sure you want to cancel order #<?= $order['id'] ?>?');" class="order-cancel-form m-0">
                                         <?= csrf_input() ?>
                                         <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
                                         <button type="submit" class="btn-order-cancel" aria-label="Cancel order #<?= $order['id'] ?>">
-                                            <i class="bi bi-x-circle" aria-hidden="true"></i>
-                                            <span>Cancel Order</span>
+                                            <span>Cancel</span>
                                         </button>
                                     </form>
                                 <?php endif; ?>

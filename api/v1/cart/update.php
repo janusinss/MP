@@ -53,6 +53,14 @@ try {
         $stmt->execute([$user['id'], $pid]);
         Response::success([], "Item removed (qty 0).");
     } else {
+        // Validate against available stock
+        $stmtStock = $pdo->prepare("SELECT stock_qty FROM products WHERE id = ?");
+        $stmtStock->execute([$pid]);
+        $prod = $stmtStock->fetch(PDO::FETCH_ASSOC);
+        if ($prod && $newQty > $prod['stock_qty']) {
+            Response::error("Quantity exceeds available stock ({$prod['stock_qty']}).", 400);
+        }
+
         // Update
         $stmt = $pdo->prepare("UPDATE api_cart SET quantity = ? WHERE user_id = ? AND product_id = ?");
         $stmt->execute([$newQty, $user['id'], $pid]);
@@ -60,6 +68,7 @@ try {
     }
 
 } catch (Exception $e) {
-    Response::error("Database Error: " . $e->getMessage(), 500);
+    error_log("API Cart Update Error: " . $e->getMessage());
+    Response::error("An internal error occurred while updating cart.", 500);
 }
 ?>

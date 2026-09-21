@@ -7,6 +7,10 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'], $_POST['action'])) {
+    if (!verify_csrf_token()) {
+        http_response_code(403);
+        die("Security validation failed. Invalid CSRF token.");
+    }
     $id = (int)$_POST['product_id'];
     $action = $_POST['action'];
     

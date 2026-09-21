@@ -49,6 +49,7 @@ try {
     Response::success([], "Item added to cart.");
 
 } catch (Exception $e) {
-    Response::error("Database Error: " . $e->getMessage(), 500);
+    error_log("API Cart Add Error: " . $e->getMessage());
+    Response::error("An internal error occurred while adding to cart.", 500);
 }
 ?>

@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             } else {
                 $target_dir = __DIR__ . "/../assets/images/";
                 if (!is_dir($target_dir)) {
-                    mkdir($target_dir, 0777, true);
+                    mkdir($target_dir, 0755, true);
                 }
                 $new_filename = uniqid('prod_') . "." . $file_extension;
                 $target_file = $target_dir . $new_filename;

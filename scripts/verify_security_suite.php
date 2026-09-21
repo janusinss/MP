@@ -2,7 +2,7 @@
 // scripts/verify_security_suite.php
 // Comprehensive Security Standards & Negative TDD Verification (security.md)
 
-$baseUrl = 'http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app';
+$baseUrl = 'http://localhost/YEAR%204/Skills/targets/grocery_app';
 $cookieFile = __DIR__ . '/sec_test_cookies.txt';
 if (file_exists($cookieFile)) unlink($cookieFile);
 

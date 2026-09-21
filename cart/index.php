@@ -119,19 +119,36 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
 
         <?php if (empty($cartItems)): ?>
-            <!-- Clean Farmstead Empty Cart State -->
+            <!-- Clean Farmstead Empty Basket State -->
             <div class="cart-empty-panel">
                 <div class="cart-empty-icon" aria-hidden="true">
-                    <i class="bi bi-basket3"></i>
+                    <i class="bi bi-bag"></i>
                 </div>
-                <h2 class="cart-empty-title">Your harvest bag is empty</h2>
+
+                <h2 class="cart-empty-title">Your basket is empty</h2>
                 <p class="cart-empty-text">
-                    Explore freshly picked seasonal produce, farmstead dairy, and artisanal pantry goods sourced directly from certified organic growers.
+                    Looks like you haven't added anything to your cart yet. Explore our fresh harvest and local pantry to fill your basket.
                 </p>
-                <a href="<?= $rootPath ?>" class="btn-cart-checkout d-inline-flex w-auto px-4 py-2">
-                    <i class="bi bi-shop me-1"></i>
-                    <span>Explore Fresh Market</span>
-                </a>
+
+                <div class="cart-empty-actions">
+                    <a href="<?= $rootPath ?>" class="btn-cart-empty-cta">
+                        <span>Start Shopping</span>
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                </div>
+
+                <div class="cart-empty-departments">
+                    <span class="cart-empty-departments-label">Popular departments:</span>
+                    <div class="cart-empty-department-links">
+                        <a href="<?= $rootPath ?>?category=Fruits#harvest-catalog">Fruits</a>
+                        <span class="cart-empty-sep">&bull;</span>
+                        <a href="<?= $rootPath ?>?category=Vegetables#harvest-catalog">Vegetables</a>
+                        <span class="cart-empty-sep">&bull;</span>
+                        <a href="<?= $rootPath ?>?category=Dairy#harvest-catalog">Dairy &amp; Eggs</a>
+                        <span class="cart-empty-sep">&bull;</span>
+                        <a href="<?= $rootPath ?>?category=Bakery#harvest-catalog">Artisan Bakery</a>
+                    </div>
+                </div>
             </div>
 
         <?php else: ?>
@@ -182,9 +199,9 @@ require_once __DIR__ . '/../includes/header.php';
                                             <a href="<?= $rootPath ?>product/<?= $productSlug ?>" class="cart-product-title" title="<?= htmlspecialchars($item['name']) ?>">
                                                 <?= htmlspecialchars($item['name']) ?>
                                             </a>
-                                            <div class="cart-unit-rate-mobile d-md-none text-muted small">$<?= number_format($item['price'], 2) ?> / unit</div>
+                                            <div class="cart-unit-rate-mobile d-md-none">$<?= number_format($item['price'], 2) ?> <span class="text-muted">/ unit</span></div>
                                             <?php if ($item['stock_qty'] <= 5): ?>
-                                                <span class="cart-stock-hint">Only <?= $item['stock_qty'] ?> remaining in harvest</span>
+                                                <span class="cart-stock-hint"><i class="bi bi-exclamation-circle-fill me-1"></i>Only <?= $item['stock_qty'] ?> remaining</span>
                                             <?php endif; ?>
                                         </div>
                                     </div>
@@ -196,6 +213,7 @@ require_once __DIR__ . '/../includes/header.php';
                                     <div class="cart-row-controls">
                                         <div class="cart-stepper-control">
                                             <form action="<?= $rootPath ?>cart/update" method="POST" class="m-0 p-0">
+                                                <?= csrf_input() ?>
                                                 <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
                                                 <input type="hidden" name="action" value="decrease">
                                                 <button type="submit" class="cart-step-btn" title="Decrease quantity" aria-label="Decrease quantity">
@@ -206,6 +224,7 @@ require_once __DIR__ . '/../includes/header.php';
                                             <span class="cart-step-count"><?= $item['qty'] ?></span>
                                             
                                             <form action="<?= $rootPath ?>cart/update" method="POST" class="m-0 p-0">
+                                                <?= csrf_input() ?>
                                                 <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
                                                 <input type="hidden" name="action" value="increase">
                                                 <button type="submit" class="cart-step-btn" <?= ($item['qty'] >= $item['stock_qty']) ? 'disabled title="Stock limit reached"' : 'title="Increase quantity"' ?> aria-label="Increase quantity">
@@ -215,13 +234,14 @@ require_once __DIR__ . '/../includes/header.php';
                                         </div>
 
                                         <div class="cart-subtotal-cell text-end">
-                                            <span class="cart-subtotal-label d-md-none text-muted small me-1">Subtotal:</span>
-                                            <span class="cart-subtotal-val font-monospace fw-bold">$<?= number_format($item['subtotal'], 2) ?></span>
+                                            <span class="cart-subtotal-label d-md-none">Subtotal</span>
+                                            <span class="cart-subtotal-val">$<?= number_format($item['subtotal'], 2) ?></span>
                                         </div>
                                     </div>
 
                                     <div class="cart-remove-cell text-end">
                                         <form action="<?= $rootPath ?>cart/remove" method="POST" class="m-0 p-0">
+                                            <?= csrf_input() ?>
                                             <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
                                             <button type="submit" class="cart-remove-btn" title="Remove <?= htmlspecialchars($item['name']) ?>" aria-label="Remove item">
                                                 <i class="bi bi-trash3"></i>
@@ -233,13 +253,21 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
 
                         <div class="cart-items-footer">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="bi bi-patch-check-fill text-success" aria-hidden="true"></i>
-                                <span>Packed in 100% biodegradable temperature-preserving plant fiber.</span>
+                            <div class="cart-eco-banner">
+                                <div class="cart-eco-icon" aria-hidden="true">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <div class="cart-eco-content">
+                                    <span class="cart-eco-title">Cold-Chain Eco Packaging</span>
+                                    <span class="cart-eco-text">Packed in 100% biodegradable temperature-preserving plant fiber.</span>
+                                </div>
                             </div>
-                            <a href="<?= $rootPath ?>cart/?clear=true" onclick="return confirm('Empty your harvest basket?');" class="cart-clear-link">
-                                Empty Basket
-                            </a>
+                            <div class="cart-clear-wrap">
+                                <a href="<?= $rootPath ?>cart/?clear=true" onclick="return confirm('Empty your harvest basket? All reserved items will be removed.');" class="btn-clear-basket">
+                                    <i class="bi bi-trash3 me-1"></i>
+                                    <span>Empty Entire Basket</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

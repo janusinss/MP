@@ -8,13 +8,18 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    die("Method Not Allowed. State modifications must use POST.");
+}
+
 // Enforce CSRF protection
 if (!verify_csrf_token()) {
     http_response_code(403);
     die("Security validation failed. Invalid or missing CSRF token.");
 }
 
-$id = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
+$id = (int)($_POST['id'] ?? 0);
 if ($id > 0) {
     $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
     $stmt->execute([$id]);

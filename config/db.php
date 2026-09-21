@@ -30,10 +30,10 @@ $isLocal = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1', '::1
     || strpos($_SERVER['HTTP_HOST'] ?? '', '192.168.') === 0
     || (php_sapi_name() === 'cli' && !getenv('MYSQLHOST'));
 
-$host = getenv('MYSQLHOST') ?: ($isLocal ? 'localhost' : 'sql105.infinityfree.com');
-$dbname = getenv('MYSQLDATABASE') ?: ($isLocal ? 'grocery_db' : 'if0_42958450_grocery_db');
-$username = getenv('MYSQLUSER') ?: ($isLocal ? 'root' : 'if0_42958450');
-$password = getenv('MYSQLPASSWORD') !== false ? getenv('MYSQLPASSWORD') : ($isLocal ? '' : 'LDK0QkYYT4jd');
+$host = getenv('MYSQLHOST') ?: ($isLocal ? 'localhost' : '');
+$dbname = getenv('MYSQLDATABASE') ?: ($isLocal ? 'grocery_db' : '');
+$username = getenv('MYSQLUSER') ?: ($isLocal ? 'root' : '');
+$password = getenv('MYSQLPASSWORD') !== false ? getenv('MYSQLPASSWORD') : ($isLocal ? '' : '');
 $port = getenv('MYSQLPORT') ?: 3306;
 
 try {
@@ -42,11 +42,9 @@ try {
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 } catch (PDOException $e) {
-    // If debug flag provided in query string, output precise diagnostic
-    if (isset($_GET['debug']) && $_GET['debug'] === '1') {
-        die("Database Debug Error: " . htmlspecialchars($e->getMessage()) . " [Host: $host, User: $username, DB: $dbname, env_exists: " . (file_exists($envFile) ? 'YES' : 'NO') . "]");
-    }
-    
+    // Log internal error safely server-side without exposing to client
+    error_log("Database Connection Error: " . $e->getMessage());
+
     // If we are in an API call, return JSON without internal detail disclosure
     if (strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false) {
         header('Content-Type: application/json');
@@ -54,7 +52,7 @@ try {
         echo json_encode(['success' => false, 'message' => 'Service Unavailable: Database connection failed.']);
         exit;
     }
-    // Otherwise standard message for HTML
+    // Otherwise standard generic message for HTML
     http_response_code(503);
     die("Service Unavailable: Database connection failed.");
 }

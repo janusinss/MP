@@ -8,7 +8,7 @@ include '../../utils/Response.php';
 $search = $_GET['search'] ?? '';
 $category = $_GET['category'] ?? '';
 $sort = $_GET['sort'] ?? '';
-$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$page = max(1, (int)($_GET['page'] ?? 1));
 $limit = 12;
 $offset = ($page - 1) * $limit;
 
@@ -70,6 +70,7 @@ try {
     ]);
 
 } catch (Exception $e) {
-    Response::error("Database Error: " . $e->getMessage(), 500);
+    error_log("API Products Error: " . $e->getMessage());
+    Response::error("An internal error occurred while fetching products.", 500);
 }
 ?>

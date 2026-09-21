@@ -75,8 +75,15 @@ assertTest("Index on `products.category` active", in_array('idx_products_categor
 
 // Get active test user ID
 $user = $pdo->query("SELECT * FROM users WHERE email = 'customer@example.com'")->fetch();
-if (!$user) {
-    $user = $pdo->query("SELECT * FROM users LIMIT 1")->fetch();
+if (!$user || !password_verify('password', $user['password'])) {
+    if (!$user) {
+        $pdo->prepare("INSERT INTO users (full_name, email, password, address, role) VALUES ('Test Customer', 'customer@example.com', ?, '123 Test St', 'customer')")
+            ->execute([password_hash('password', PASSWORD_DEFAULT)]);
+    } else {
+        $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")
+            ->execute([password_hash('password', PASSWORD_DEFAULT), $user['id']]);
+    }
+    $user = $pdo->query("SELECT * FROM users WHERE email = 'customer@example.com'")->fetch();
 }
 $validUserId = (int)$user['id'];
 
@@ -242,8 +249,9 @@ assertTest("Password verified using native password_verify()", password_verify('
 echo "\n6. RESTful API ENDPOINT VERIFICATION:\n";
 
 // Login API
+$targetBase = 'http://localhost/YEAR%204/Skills/targets/grocery_app';
 $loginPayload = json_encode(['email' => $user['email'], 'password' => 'password']);
-$ch = curl_init("http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app/api/v1/auth/login.php");
+$ch = curl_init("$targetBase/api/v1/auth/login.php");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, $loginPayload);
@@ -256,7 +264,7 @@ $token = $loginData['data']['token'] ?? '';
 assertTest("API Auth returns Bearer token", !empty($token));
 
 // Protected Orders API with Bearer token
-$ch = curl_init("http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app/api/v1/orders/history.php");
+$ch = curl_init("$targetBase/api/v1/orders/history.php");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: Bearer $token"]);
 $ordersRes = curl_exec($ch);
@@ -266,7 +274,7 @@ curl_close($ch);
 assertTest("Protected API route succeeds with valid Bearer token", ($ordersData['success'] ?? false) === true);
 
 // Protected Orders API without Bearer token (Must return 401)
-$ch = curl_init("http://localhost/YEAR%203/Mini%20Project%20ADS/grocery_app/api/v1/orders/history.php");
+$ch = curl_init("$targetBase/api/v1/orders/history.php");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $unauthRes = curl_exec($ch);
 $unauthCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

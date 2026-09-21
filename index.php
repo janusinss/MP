@@ -235,6 +235,7 @@ $firstKey = array_key_first($aisleReels);
     <title>FreshCart Market | Clean Organic Sourcing</title>
     <meta name="description" content="Certified organic produce, local dairy, and pantry staples direct from family farms.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= function_exists('get_csrf_token') ? htmlspecialchars(get_csrf_token(), ENT_QUOTES, 'UTF-8') : '' ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
@@ -259,7 +260,7 @@ $firstKey = array_key_first($aisleReels);
         })();
     </script>
 </head>
-<body>
+<body class="<?= $isLoggedIn ? 'has-fc-bottom-nav' : '' ?>">
 
     <?php if (!$isLoggedIn): ?>
     <!-- Welcome Offer Lightbox Pop-up Modal -->
@@ -729,6 +730,7 @@ $firstKey = array_key_first($aisleReels);
                                         </div>
 
                                         <form action="cart/add" method="POST" class="add-cart-form d-inline m-0">
+                                            <?= csrf_input() ?>
                                             <input type="hidden" name="product_id" value="<?= $sItem['id'] ?>">
                                             <input type="hidden" name="quantity" value="1">
                                             <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
@@ -836,6 +838,7 @@ $firstKey = array_key_first($aisleReels);
                                             </div>
 
                                             <form action="cart/add" method="POST" class="add-cart-form m-0">
+                                                <?= csrf_input() ?>
                                                 <input type="hidden" name="product_id" value="<?= $prod['id'] ?>">
                                                 <input type="hidden" name="quantity" value="1">
                                                 <button type="submit" class="food-card-btn-add">
@@ -1586,17 +1589,6 @@ $firstKey = array_key_first($aisleReels);
         </div>
     </footer>
 
-    <div class="toast-container position-fixed bottom-0 start-0 p-3" style="z-index: 1060;">
-        <div id="liveToast" class="toast align-items-center text-bg-dark border-0 rounded-4 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex p-2">
-                <div class="toast-body d-flex align-items-center gap-2">
-                    <i class="bi bi-bag-check-fill text-success fs-5"></i>
-                    <span>Item added to cart!</span>
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
@@ -1890,6 +1882,7 @@ $firstKey = array_key_first($aisleReels);
                                 <span class="coverflow-card-unit">/ unit</span>
                             </div>
                             <form action="cart/add" method="POST" class="add-cart-form m-0">
+                                <?= csrf_input() ?>
                                 <input type="hidden" name="product_id" value="${item.id}">
                                 <button type="submit" class="coverflow-add-btn" aria-label="Add ${safeName} to cart" ${isOutOfStock ? 'disabled title="Out of Stock"' : 'title="Add to cart"'}>
                                     <i class="bi ${isOutOfStock ? 'bi-slash-circle' : 'bi-plus-lg'}" aria-hidden="true"></i>
@@ -2071,7 +2064,18 @@ $firstKey = array_key_first($aisleReels);
             if (e.target && e.target.classList.contains('add-cart-form')) {
                 e.preventDefault();
                 const formData = new FormData(e.target);
-                fetch('cart/add', { method: 'POST', body: formData })
+                if (!formData.has('csrf_token') || !formData.get('csrf_token')) {
+                    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                    if (csrfMeta && csrfMeta.content) {
+                        formData.append('csrf_token', csrfMeta.content);
+                    }
+                }
+                const csrfToken = formData.get('csrf_token') || document.querySelector('meta[name="csrf-token"]')?.content || '';
+                fetch('cart/add', {
+                    method: 'POST',
+                    headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
+                    body: formData
+                })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -2091,17 +2095,14 @@ $firstKey = array_key_first($aisleReels);
 
                         const badge = document.getElementById('cart-badge');
                         if (badge) badge.innerText = data.cart_count;
-                        
-                        const toastEl = document.getElementById('liveToast');
-                        if (toastEl) {
-                            const toast = new bootstrap.Toast(toastEl);
-                            toast.show();
-                        }
                     } else if (data.status === 'login_required') {
                         window.location.href = 'login';
                     } else {
                         alert(data.message);
                     }
+                })
+                .catch(err => {
+                    console.error('Add to basket error:', err);
                 });
             }
         });

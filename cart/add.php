@@ -15,6 +15,13 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// 1.1 CSRF Validation
+if (!verify_csrf_token()) {
+    http_response_code(403);
+    echo json_encode(['status' => 'error', 'message' => 'Security validation failed. Invalid CSRF token.']);
+    exit;
+}
+
 if (isset($_POST['product_id'])) {
     $productId = (int)$_POST['product_id'];
     $qtyRequested = isset($_POST['quantity']) ? max(1, (int)$_POST['quantity']) : 1;

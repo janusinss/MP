@@ -19,11 +19,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (!verify_csrf_token()) {
         $error_message = "Security validation failed. Please refresh the page.";
     } else {
-        // 1. Check system administrator credentials
-        $adminUser = getenv('ADMIN_USERNAME') ?: 'admin';
-        $adminPass = getenv('ADMIN_PASSWORD') ?: 'admin123';
+        // 1. Check system administrator credentials via secure environment variables (no hardcoded defaults)
+        $adminUser = getenv('ADMIN_USERNAME') ?: null;
+        $adminPass = getenv('ADMIN_PASSWORD') ?: null;
 
-        if (($email === $adminUser || $email === 'admin@freshcart.com') && $password === $adminPass) {
+        if ($adminUser && $adminPass && hash_equals($adminUser, $email) && hash_equals($adminPass, $password)) {
             session_regenerate_id(true);
             $_SESSION['admin_logged_in'] = true;
             $_SESSION['user_id'] = 1;
