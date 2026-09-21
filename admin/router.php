@@ -120,71 +120,71 @@ if ($view == 'dashboard') {
 
     <!-- View Header -->
     <div class="admin-view-header">
-        <div>
+        <div class="admin-view-header-main">
             <span class="admin-kicker">Store Operations &amp; Intelligence</span>
-            <h1 class="admin-view-title">Analytics</h1>
-            <p class="admin-view-subtitle">Dashboard Overview &bull; Live store sales, order velocity, and inventory health.</p>
+            <div class="admin-view-heading-group">
+                <h1 class="admin-view-title">Analytics</h1>
+            </div>
+            <p class="admin-view-subtitle">Store sales velocity, fulfillment rates, and stock health.</p>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <span class="text-muted small me-2 d-none d-md-inline">
-                <i class="bi bi-clock-history text-success me-1"></i> Live Sync
-            </span>
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadView('dashboard')" title="Refresh Data">
+        <div class="admin-view-header-actions">
+            <button type="button" class="admin-header-btn admin-header-btn-icon" onclick="loadView('dashboard')" title="Refresh Analytics Data" aria-label="Refresh Data">
                 <i class="bi bi-arrow-clockwise"></i>
             </button>
-            <a href="export_orders.php" class="btn btn-sm btn-outline-secondary">
-                <i class="bi bi-download me-1"></i> Export Report
+            <a href="export_orders.php" class="admin-header-btn" title="Export Orders Report">
+                <i class="bi bi-download"></i>
+                <span>Export Report</span>
             </a>
         </div>
     </div>
 
     <!-- 1. Primary 4 KPI Cards -->
-    <div class="row g-3 mb-4">
+    <div class="row g-2 g-md-3 mb-4">
         <!-- Gross Revenue -->
-        <div class="col-sm-6 col-xl-3">
-            <div class="admin-card">
+        <div class="col-6 col-xl-3">
+            <div class="admin-card h-100">
                 <div class="admin-kpi-label">Gross Revenue</div>
                 <div class="admin-kpi-value text-dark">$<?= number_format($totalRevenue, 2) ?></div>
                 <div class="admin-kpi-caption">
-                    <span class="text-success fw-semibold">Net Sales</span> &bull; Paid customer checkouts
+                    <span class="text-success fw-semibold">Net Sales</span> &bull; Checkouts
                 </div>
             </div>
         </div>
 
         <!-- Total Orders -->
-        <div class="col-sm-6 col-xl-3">
-            <div class="admin-card interactive" onclick="loadView('orders')" title="View all customer orders">
+        <div class="col-6 col-xl-3">
+            <div class="admin-card interactive h-100" onclick="loadView('orders')" title="View all customer orders">
                 <div class="admin-kpi-label">Total Orders</div>
                 <div class="admin-kpi-value text-dark"><?= $totalOrderCount ?></div>
                 <div class="admin-kpi-caption">
-                    <span class="fw-semibold text-dark"><?= $fulfillmentRate ?>% Fulfilled</span> &bull; <?= $deliveredOrders ?> delivered
+                    <span class="fw-semibold text-dark"><?= $fulfillmentRate ?>% Fulfilled</span>
                 </div>
             </div>
         </div>
 
         <!-- Average Order Value -->
-        <div class="col-sm-6 col-xl-3">
-            <div class="admin-card">
-                <div class="admin-kpi-label">Average Order Value</div>
+        <div class="col-6 col-xl-3">
+            <div class="admin-card h-100">
+                <div class="admin-kpi-label">Avg. Order Value</div>
                 <div class="admin-kpi-value text-dark">$<?= number_format($aov, 2) ?></div>
                 <div class="admin-kpi-caption">
-                    Mean basket value across paid orders
+                    Mean basket value
                 </div>
             </div>
         </div>
 
         <!-- Pending Orders -->
-        <div class="col-sm-6 col-xl-3">
-            <div class="admin-card interactive" onclick="loadView('orders&status=Pending')" title="Filter by pending orders">
+        <div class="col-6 col-xl-3">
+            <div class="admin-card interactive h-100" onclick="loadView('orders&status=Pending')" title="Filter by pending orders">
                 <div class="admin-kpi-label">Pending Orders</div>
                 <div class="admin-kpi-value <?= $pendingOrders > 0 ? 'text-dark' : 'text-muted' ?>">
                     <?= $pendingOrders ?>
                 </div>
                 <div class="admin-kpi-caption">
                     <?php if ($pendingOrders > 0): ?>
-                        <span class="text-danger fw-semibold"><?= $pendingOrders ?> orders</span> awaiting warehouse pack
+                        <span class="text-danger fw-semibold"><?= $pendingOrders ?> orders</span> in pack
                     <?php else: ?>
-                        <span class="text-success fw-semibold">All clear</span> &bull; Zero queue backlog
+                        <span class="text-success fw-semibold">All clear</span> &bull; 0 backlog
                     <?php endif; ?>
                 </div>
             </div>
@@ -354,7 +354,8 @@ if ($view == 'dashboard') {
                 </div>
 
                 <?php if (count($lowStockItems) > 0): ?>
-                    <div class="table-responsive">
+                    <!-- Desktop Table -->
+                    <div class="table-responsive d-none d-md-block">
                         <table class="table table-sm table-borderless align-middle mb-0">
                             <tbody>
                                 <?php foreach ($lowStockItems as $item):
@@ -388,6 +389,39 @@ if ($view == 'dashboard') {
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Mobile Touch Feed -->
+                    <div class="d-md-none admin-touch-feed">
+                        <?php foreach ($lowStockItems as $item):
+                            $qty = (int)$item['stock_qty'];
+                            $img = $item['image'] ?: 'default.jpg';
+                        ?>
+                            <div class="admin-touch-card">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="../assets/images/<?= htmlspecialchars($img) ?>" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; flex-shrink: 0;" alt="thumb">
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="fw-semibold text-dark text-truncate" style="font-size: 0.88rem;"><?= htmlspecialchars($item['name']) ?></div>
+                                        <div class="text-muted" style="font-size: 0.74rem;">
+                                            <span style="font-family: monospace;">#<?= str_pad($item['id'], 4, '0', STR_PAD_LEFT) ?></span> &bull; <?= htmlspecialchars($item['category']) ?>
+                                        </div>
+                                    </div>
+                                    <div class="flex-shrink-0 text-end">
+                                        <?php if ($qty === 0): ?>
+                                            <span class="admin-status-pill status-cancelled">Out of stock</span>
+                                        <?php else: ?>
+                                            <span class="admin-status-pill status-pending"><?= $qty ?> left</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="admin-touch-card-footer mt-2 pt-2">
+                                    <a href="product_edit.php?id=<?= $item['id'] ?>" class="btn btn-sm btn-outline-secondary w-100 admin-touch-action-btn">
+                                        Restock SKU
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+
                     <div class="pt-3 mt-1 text-end border-top">
                         <a href="#" onclick="loadView('products')" class="text-success text-decoration-none small fw-semibold">
                             Open Product Inventory <i class="bi bi-arrow-right"></i>
@@ -416,7 +450,8 @@ if ($view == 'dashboard') {
                 </div>
 
                 <?php if (!empty($recentOrders)): ?>
-                    <div class="table-responsive">
+                    <!-- Desktop Table -->
+                    <div class="table-responsive d-none d-md-block">
                         <table class="table table-sm table-borderless align-middle mb-0">
                             <tbody>
                                 <?php foreach ($recentOrders as $ro): 
@@ -451,6 +486,38 @@ if ($view == 'dashboard') {
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile Touch Feed -->
+                    <div class="d-md-none admin-touch-feed">
+                        <?php foreach ($recentOrders as $ro): 
+                            $status = $ro['status'];
+                            $pillClass = match($status) {
+                                'Delivered' => 'status-delivered',
+                                'Shipped' => 'status-shipped',
+                                'Pending' => 'status-pending',
+                                default => 'status-cancelled'
+                            };
+                        ?>
+                            <div class="admin-touch-card">
+                                <div class="admin-touch-card-header">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.75rem;">#<?= str_pad($ro['id'], 5, '0', STR_PAD_LEFT) ?></span>
+                                        <span class="fw-semibold text-dark text-truncate" style="max-width: 140px; font-size: 0.88rem;"><?= htmlspecialchars($ro['customer_name']) ?></span>
+                                    </div>
+                                    <span class="admin-status-pill <?= $pillClass ?>"><?= $status ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center my-2">
+                                    <span class="text-muted small"><?= date('M d, Y', strtotime($ro['created_at'])) ?></span>
+                                    <span class="fw-bold text-dark fs-6" style="font-variant-numeric: tabular-nums;">$<?= number_format((float)$ro['total_amount'], 2) ?></span>
+                                </div>
+                                <div class="admin-touch-card-footer">
+                                    <a href="order_details.php?order_id=<?= $ro['id'] ?>" class="btn btn-sm btn-outline-secondary w-100 admin-touch-action-btn d-flex align-items-center justify-content-center gap-1">
+                                        <span>Manage Order</span> <i class="bi bi-chevron-right small"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 <?php else: ?>
                     <div class="py-5 text-center text-muted small">No customer orders recorded yet.</div>
@@ -662,14 +729,21 @@ elseif ($view == 'products') {
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     ?>
     <div class="admin-view-header">
-        <div>
+        <div class="admin-view-header-main">
             <span class="admin-kicker">Catalog &amp; Stock Control</span>
-            <h1 class="admin-view-title">Product Inventory</h1>
+            <div class="admin-view-heading-group">
+                <h1 class="admin-view-title">Product Inventory</h1>
+                <span class="admin-count-badge"><?= number_format($totalSkus) ?> SKUs</span>
+            </div>
             <p class="admin-view-subtitle">Live catalog stock tracking, pricing, and product records.</p>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <a href="product_add.php" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1">
-                <i class="bi bi-plus-circle"></i> Add New Product
+        <div class="admin-view-header-actions">
+            <button type="button" class="admin-header-btn admin-header-btn-icon" onclick="loadView('products')" title="Refresh Product Inventory" aria-label="Refresh Inventory">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <a href="product_add.php" class="admin-header-btn admin-header-btn-primary" title="Add New Product">
+                <i class="bi bi-plus-circle"></i>
+                <span>Add Product</span>
             </a>
         </div>
     </div>
@@ -736,73 +810,157 @@ elseif ($view == 'products') {
     </div>
 
     <!-- 2. Search & Category Filters -->
-    <div class="admin-card p-3 mb-4">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <!-- Search Form -->
-            <form onsubmit="event.preventDefault(); loadView('products<?= ($categoryFilter !== 'All') ? '&category=' . urlencode($categoryFilter) : '' ?><?= ($stockFilter !== 'All') ? '&stock=' . urlencode($stockFilter) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="d-flex align-items-center gap-2" style="max-width: 320px; width: 100%;">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by name, SKU..." value="<?= htmlspecialchars($search) ?>" style="font-size: 0.82rem;">
+    <div class="admin-card admin-toolbar-card mb-4">
+        <!-- Mobile 1-Line Search & Filters Bar -->
+        <div class="d-lg-none">
+            <form onsubmit="event.preventDefault(); loadView('products<?= ($categoryFilter !== 'All') ? '&category=' . urlencode($categoryFilter) : '' ?><?= ($stockFilter !== 'All') ? '&stock=' . urlencode($stockFilter) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="admin-search-filter-row">
+                <div class="admin-search-box">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" name="search" placeholder="Search catalog..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
                 </div>
-                <button type="submit" class="btn btn-sm btn-dark px-3 fw-semibold text-nowrap">Search</button>
-                <?php if ($search !== ''): ?>
-                    <button type="button" onclick="loadView('products<?= ($categoryFilter !== 'All') ? '&category=' . urlencode($categoryFilter) : '' ?><?= ($stockFilter !== 'All') ? '&stock=' . urlencode($stockFilter) : '' ?>')" class="btn btn-sm btn-outline-secondary px-2 text-nowrap">Clear</button>
-                <?php endif; ?>
-            </form>
-
-            <!-- Aisle & Stock Filter Controls -->
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <!-- Stock Status Filter Tabs (Consistent btn-group) -->
-                <div class="btn-group btn-group-sm" role="group" aria-label="Stock Filter">
-                    <?php
-                    $stockOptions = [
-                        'All' => ['label' => 'All Stock', 'count' => $scopedTotal],
-                        'low' => ['label' => 'Low Stock (< 5)', 'count' => $scopedLowStock],
-                        'out' => ['label' => 'Out of Stock (0)', 'count' => $scopedOutOfStock]
-                    ];
-                    foreach ($stockOptions as $stKey => $stData):
-                        $isActive = ($stockFilter === $stKey);
-                        $activeClass = $isActive ? 'btn-dark' : 'btn-outline-secondary';
-                        $param = "products&stock=$stKey" . ($categoryFilter !== 'All' ? "&category=" . urlencode($categoryFilter) : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
-                    ?>
-                        <button type="button" onclick="loadView('<?= $param ?>')" class="btn <?= $activeClass ?>">
-                            <?= $stData['label'] ?> <span class="badge <?= $isActive ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?> ms-1" style="font-size: 0.68rem;"><?= $stData['count'] ?></span>
-                        </button>
-                    <?php endforeach; ?>
-                </div>
-
-                <!-- Custom Interactive Aisle Dropdown -->
-                <div class="dropdown position-relative d-inline-block">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-inline-flex align-items-center gap-1" type="button" id="aisleDropdownBtn" onclick="toggleAisleMenu(event)">
-                        <span>Aisle: <strong><?= htmlspecialchars($categoryFilter) ?></strong></span>
+                <button type="submit" class="admin-search-submit-btn" title="Search Catalog" aria-label="Search">
+                    <i class="bi bi-search"></i>
+                </button>
+                <!-- Stock Dropdown (Mobile) -->
+                <div class="dropdown">
+                    <button class="btn admin-filter-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Filter by Stock Status">
+                        <span class="filter-text">Stock: <strong><?= ($stockFilter === 'All') ? 'All' : ($stockFilter === 'low' ? 'Low' : 'Out') ?></strong></span>
+                        <i class="bi bi-chevron-down ms-1"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow" id="aisleDropdownMenu" style="font-size: 0.82rem; min-width: 220px; z-index: 1050;">
-                        <li>
-                            <a class="dropdown-item py-2 d-flex justify-content-between align-items-center <?= ($categoryFilter === 'All') ? 'active fw-bold' : '' ?>" href="javascript:void(0)" onclick="selectAisle('All')">
-                                <span>All Categories</span>
-                                <span class="badge rounded-pill ms-2 <?= ($categoryFilter === 'All') ? 'bg-white text-dark' : 'bg-secondary-subtle text-secondary' ?>"><?= $totalSkus ?></span>
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider my-1"></li>
-                        <?php foreach ($categoryCounts as $cName => $cCount): 
-                            $isCatActive = ($categoryFilter === $cName);
+                    <ul class="dropdown-menu dropdown-menu-end admin-dropdown-menu shadow">
+                        <li class="admin-dropdown-header">Inventory Status</li>
+                        <?php
+                        $stockOptions = [
+                            'All' => ['label' => 'All Stock', 'count' => $scopedTotal],
+                            'low' => ['label' => 'Low Stock (< 5)', 'count' => $scopedLowStock],
+                            'out' => ['label' => 'Out of Stock (0)', 'count' => $scopedOutOfStock]
+                        ];
+                        foreach ($stockOptions as $stKey => $stData):
+                            $isActive = ($stockFilter === $stKey);
+                            $param = "products&stock=$stKey" . ($categoryFilter !== 'All' ? "&category=" . urlencode($categoryFilter) : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
                         ?>
                             <li>
-                                <a class="dropdown-item py-2 d-flex justify-content-between align-items-center <?= $isCatActive ? 'active fw-bold' : '' ?>" href="javascript:void(0)" onclick="selectAisle('<?= htmlspecialchars(addslashes($cName)) ?>')">
-                                    <span><?= htmlspecialchars($cName) ?></span>
-                                    <span class="badge rounded-pill ms-2 <?= $isCatActive ? 'bg-white text-dark' : 'bg-secondary-subtle text-secondary' ?>"><?= $cCount ?></span>
-                                </a>
+                                <button type="button" onclick="loadView('<?= $param ?>')" class="admin-dropdown-item <?= $isActive ? 'active' : '' ?>">
+                                    <span class="item-label">
+                                        <?php if ($isActive): ?><i class="bi bi-check2 text-success"></i><?php endif; ?>
+                                        <?= $stData['label'] ?>
+                                    </span>
+                                    <span class="badge"><?= $stData['count'] ?></span>
+                                </button>
                             </li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
-
-                <?php if ($categoryFilter !== 'All'): ?>
-                    <button type="button" onclick="selectAisle('All')" class="btn btn-sm btn-link text-muted text-decoration-none small py-1 px-2" title="Reset selected aisle">
-                        <i class="bi bi-x-circle me-1"></i>Reset
+                <!-- Aisle Dropdown (Mobile) -->
+                <div class="dropdown">
+                    <button class="btn admin-filter-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Filter by Aisle / Category">
+                        <span class="filter-text">Aisle: <strong><?= htmlspecialchars($categoryFilter) ?></strong></span>
+                        <i class="bi bi-chevron-down ms-1"></i>
                     </button>
-                <?php endif; ?>
+                    <ul class="dropdown-menu dropdown-menu-end admin-dropdown-menu shadow">
+                        <li class="admin-dropdown-header">Store Aisles</li>
+                        <li>
+                            <button type="button" class="admin-dropdown-item <?= ($categoryFilter === 'All') ? 'active' : '' ?>" onclick="selectAisle('All')">
+                                <span class="item-label">
+                                    <?php if ($categoryFilter === 'All'): ?><i class="bi bi-check2 text-success"></i><?php endif; ?>
+                                    All Categories
+                                </span>
+                                <span class="badge"><?= $totalSkus ?></span>
+                            </button>
+                        </li>
+                        <li class="admin-dropdown-divider"></li>
+                        <?php foreach ($categoryCounts as $cName => $cCount): 
+                            $isCatActive = ($categoryFilter === $cName);
+                        ?>
+                            <li>
+                                <button type="button" class="admin-dropdown-item <?= $isCatActive ? 'active' : '' ?>" onclick="selectAisle('<?= htmlspecialchars(addslashes($cName)) ?>')">
+                                    <span class="item-label">
+                                        <?php if ($isCatActive): ?><i class="bi bi-check2 text-success"></i><?php endif; ?>
+                                        <?= htmlspecialchars($cName) ?>
+                                    </span>
+                                    <span class="badge"><?= $cCount ?></span>
+                                </button>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </form>
+            <?php if ($search !== '' || $categoryFilter !== 'All'): ?>
+                <div class="mt-2 text-end d-flex justify-content-end gap-2">
+                    <?php if ($search !== ''): ?>
+                        <button type="button" onclick="loadView('products<?= ($categoryFilter !== 'All') ? '&category=' . urlencode($categoryFilter) : '' ?><?= ($stockFilter !== 'All') ? '&stock=' . urlencode($stockFilter) : '' ?>')" class="admin-search-clear-btn">
+                            <i class="bi bi-x-circle me-1"></i>Clear search
+                        </button>
+                    <?php endif; ?>
+                    <?php if ($categoryFilter !== 'All'): ?>
+                        <button type="button" onclick="selectAisle('All')" class="admin-search-clear-btn text-muted">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Reset aisle
+                        </button>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Desktop Search & Expanded Chip Tabs Bar -->
+        <div class="d-none d-lg-flex align-items-center justify-content-between gap-3 admin-desktop-toolbar">
+            <div class="d-flex align-items-center gap-2">
+                <div class="admin-chip-rail" role="group" aria-label="Stock Filter">
+                    <?php
+                    foreach ($stockOptions as $stKey => $stData):
+                        $isActive = ($stockFilter === $stKey);
+                        $activeClass = $isActive ? 'active' : '';
+                        $param = "products&stock=$stKey" . ($categoryFilter !== 'All' ? "&category=" . urlencode($categoryFilter) : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
+                    ?>
+                        <button type="button" onclick="loadView('<?= $param ?>')" class="admin-chip-btn <?= $activeClass ?>">
+                            <span><?= $stData['label'] ?></span> <span class="badge <?= $isActive ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?> ms-1" style="font-size: 0.68rem;"><?= $stData['count'] ?></span>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+
+                <div class="dropdown">
+                    <button class="btn admin-filter-dropdown-btn dropdown-toggle <?= ($categoryFilter !== 'All') ? 'active' : '' ?>" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="filter-text">Aisle: <strong><?= htmlspecialchars($categoryFilter) ?></strong></span>
+                        <i class="bi bi-chevron-down ms-1"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end admin-dropdown-menu shadow">
+                        <li class="admin-dropdown-header">Store Aisles</li>
+                        <li>
+                            <button type="button" class="admin-dropdown-item <?= ($categoryFilter === 'All') ? 'active' : '' ?>" onclick="selectAisle('All')">
+                                <span class="item-label">
+                                    <?php if ($categoryFilter === 'All'): ?><i class="bi bi-check2 text-success"></i><?php endif; ?>
+                                    All Categories
+                                </span>
+                                <span class="badge"><?= $totalSkus ?></span>
+                            </button>
+                        </li>
+                        <li class="admin-dropdown-divider"></li>
+                        <?php foreach ($categoryCounts as $cName => $cCount): 
+                            $isCatActive = ($categoryFilter === $cName);
+                        ?>
+                            <li>
+                                <button type="button" class="admin-dropdown-item <?= $isCatActive ? 'active' : '' ?>" onclick="selectAisle('<?= htmlspecialchars(addslashes($cName)) ?>')">
+                                    <span class="item-label">
+                                        <?php if ($isCatActive): ?><i class="bi bi-check2 text-success"></i><?php endif; ?>
+                                        <?= htmlspecialchars($cName) ?>
+                                    </span>
+                                    <span class="badge"><?= $cCount ?></span>
+                                </button>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
             </div>
+
+            <form onsubmit="event.preventDefault(); loadView('products<?= ($categoryFilter !== 'All') ? '&category=' . urlencode($categoryFilter) : '' ?><?= ($stockFilter !== 'All') ? '&stock=' . urlencode($stockFilter) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="admin-desktop-search-form">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by name, SKU..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                </div>
+                <button type="submit" class="admin-desktop-search-btn">Search</button>
+                <?php if ($search !== ''): ?>
+                    <button type="button" onclick="loadView('products<?= ($categoryFilter !== 'All') ? '&category=' . urlencode($categoryFilter) : '' ?><?= ($stockFilter !== 'All') ? '&stock=' . urlencode($stockFilter) : '' ?>')" class="admin-desktop-clear-btn" title="Clear search">Clear</button>
+                <?php endif; ?>
+            </form>
         </div>
     </div>
 
@@ -847,7 +1005,8 @@ elseif ($view == 'products') {
 
     <!-- 3. Inventory Products Master Table -->
     <div class="admin-card p-0 overflow-hidden">
-        <div class="table-responsive">
+        <!-- Desktop Table View -->
+        <div class="table-responsive d-none d-md-block">
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light border-bottom">
                     <tr>
@@ -923,6 +1082,54 @@ elseif ($view == 'products') {
                 </tbody>
             </table>
         </div>
+
+        <!-- Mobile Touch Card Feed -->
+        <div class="d-md-none admin-touch-feed p-2 p-sm-3">
+            <?php if (!empty($products)): ?>
+                <?php foreach ($products as $p): 
+                    $sq = (int)$p['stock_qty'];
+                    if ($sq === 0) {
+                        $pill = '<span class="admin-status-pill status-cancelled">Out of Stock</span>';
+                    } elseif ($sq < 5) {
+                        $pill = '<span class="admin-status-pill status-pending">' . $sq . ' Left (Low)</span>';
+                    } else {
+                        $pill = '<span class="admin-status-pill status-delivered">' . $sq . ' Units</span>';
+                    }
+                ?>
+                    <div class="admin-touch-card">
+                        <div class="d-flex align-items-start gap-3">
+                            <img src="../assets/images/<?= $p['image'] ?: 'default.jpg' ?>" style="width: 52px; height: 52px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; flex-shrink: 0;" alt="thumb">
+                            <div class="flex-grow-1 overflow-hidden">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div class="fw-bold text-dark text-truncate" style="font-size: 0.92rem;"><?= htmlspecialchars($p['name']) ?></div>
+                                    <div class="fw-bold text-dark fs-6" style="font-variant-numeric: tabular-nums;">$<?= number_format((float)$p['price'], 2) ?></div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.72rem;">#<?= str_pad($p['id'], 4, '0', STR_PAD_LEFT) ?></span>
+                                    <span class="text-muted small"><?= htmlspecialchars($p['category']) ?></span>
+                                </div>
+                                <div class="mt-2">
+                                    <?= $pill ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="admin-touch-card-footer mt-3">
+                            <a href="product_edit.php?id=<?= $p['id'] ?>" class="btn btn-sm btn-outline-secondary flex-grow-1 admin-touch-action-btn d-flex align-items-center justify-content-center gap-1">
+                                <i class="bi bi-pencil me-1"></i> <span>Edit Product</span>
+                            </a>
+                            <a href="actions/product_delete.php?id=<?= $p['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger admin-touch-action-btn d-flex align-items-center justify-content-center px-3" onclick="return confirm('Delete <?= htmlspecialchars(addslashes($p['name'])) ?>?');" title="Delete Product" aria-label="Delete">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-basket text-muted opacity-50 fs-2 d-block mb-2"></i>
+                    <div>No products found matching criteria.</div>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
     <?php
 }
@@ -992,17 +1199,18 @@ elseif ($view == 'users') {
     $users = $stmtUsers->fetchAll(PDO::FETCH_ASSOC);
     ?>
     <div class="admin-view-header">
-        <div>
+        <div class="admin-view-header-main">
             <span class="admin-kicker">Client Accounts &amp; Profiles</span>
-            <h1 class="admin-view-title">Registered Customers</h1>
+            <div class="admin-view-heading-group">
+                <h1 class="admin-view-title">Customers</h1>
+                <span class="admin-count-badge"><?= number_format($totalUsers) ?> Profiles</span>
+            </div>
             <p class="admin-view-subtitle">Verified customer accounts, transaction histories, and lifetime store value.</p>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <span class="text-muted small me-2 d-none d-md-inline">
-                <i class="bi bi-people text-success me-1"></i> <?= $totalUsers ?> Total Profiles
-            </span>
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadView('users')" title="Refresh Customer Directory">
+        <div class="admin-view-header-actions">
+            <button type="button" class="admin-header-btn" onclick="loadView('users')" title="Refresh Customer Directory" aria-label="Refresh Customer Directory">
                 <i class="bi bi-arrow-clockwise"></i>
+                <span>Refresh Directory</span>
             </button>
         </div>
     </div>
@@ -1061,46 +1269,88 @@ elseif ($view == 'users') {
     </div>
 
     <!-- 2. Search & Filter Bar -->
-    <div class="admin-card p-3 mb-4">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <!-- Search Form -->
-            <form onsubmit="event.preventDefault(); loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="d-flex align-items-center gap-2" style="max-width: 320px; width: 100%;">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by name, email, or ID..." value="<?= htmlspecialchars($search) ?>" style="font-size: 0.82rem;">
+    <div class="admin-card admin-toolbar-card mb-4">
+        <!-- Mobile 1-Line Search & Filter Bar -->
+        <div class="d-md-none">
+            <?php
+            $filterTabs = [
+                'all' => ['label' => 'All Accounts', 'count' => $totalUsers],
+                'buyers' => ['label' => 'Active Buyers', 'count' => $activeBuyers],
+                'inactive' => ['label' => 'No Orders Yet', 'count' => max(0, $totalUsers - $activeBuyers)]
+            ];
+            ?>
+            <form onsubmit="event.preventDefault(); loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="admin-search-filter-row">
+                <div class="admin-search-box">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" name="search" placeholder="Search accounts..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
                 </div>
-                <button type="submit" class="btn btn-sm btn-dark px-3 fw-semibold text-nowrap">Search</button>
+                <button type="submit" class="admin-search-submit-btn" title="Search Accounts" aria-label="Search">
+                    <i class="bi bi-search"></i>
+                </button>
+                <div class="dropdown">
+                    <button class="btn admin-filter-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Filter by Account Type">
+                        <span class="filter-text"><?= htmlspecialchars($filterTabs[$filter]['label'] ?? 'All Accounts') ?></span>
+                        <i class="bi bi-chevron-down ms-1"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end admin-dropdown-menu shadow">
+                        <li class="admin-dropdown-header">Customer Segments</li>
+                        <?php foreach ($filterTabs as $fKey => $fData):
+                            $isActive = ($filter === $fKey);
+                            $param = "users&filter=$fKey" . ($search !== '' ? "&search=" . urlencode($search) : '');
+                        ?>
+                            <li>
+                                <button type="button" onclick="loadView('<?= $param ?>')" class="admin-dropdown-item <?= $isActive ? 'active' : '' ?>">
+                                    <span class="item-label">
+                                        <?php if ($isActive): ?><i class="bi bi-check2 text-success"></i><?php endif; ?>
+                                        <?= $fData['label'] ?>
+                                    </span>
+                                    <span class="badge"><?= $fData['count'] ?></span>
+                                </button>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </form>
+            <?php if ($search !== ''): ?>
+                <div class="mt-2 text-end">
+                    <button type="button" onclick="loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>')" class="admin-search-clear-btn">
+                        <i class="bi bi-x-circle me-1"></i>Clear search "<?= htmlspecialchars($search) ?>"
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Desktop Search & Expanded Chip Tabs Bar -->
+        <div class="d-none d-md-flex align-items-center justify-content-between gap-3 admin-desktop-toolbar">
+            <div class="admin-chip-rail" role="group" aria-label="Customer Filter">
+                <?php foreach ($filterTabs as $fKey => $fData):
+                    $isActive = ($filter === $fKey);
+                    $activeClass = $isActive ? 'active' : '';
+                    $param = "users&filter=$fKey" . ($search !== '' ? "&search=" . urlencode($search) : '');
+                ?>
+                    <button type="button" onclick="loadView('<?= $param ?>')" class="admin-chip-btn <?= $activeClass ?>">
+                        <span><?= $fData['label'] ?></span> <span class="badge <?= $isActive ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?> ms-1" style="font-size: 0.68rem;"><?= $fData['count'] ?></span>
+                    </button>
+                <?php endforeach; ?>
+            </div>
+
+            <form onsubmit="event.preventDefault(); loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="admin-desktop-search-form">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search name, email, ID..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                </div>
+                <button type="submit" class="admin-desktop-search-btn">Search</button>
                 <?php if ($search !== ''): ?>
-                    <button type="button" onclick="loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>')" class="btn btn-sm btn-outline-secondary px-2 text-nowrap">Clear</button>
+                    <button type="button" onclick="loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>')" class="admin-desktop-clear-btn" title="Clear search">Clear</button>
                 <?php endif; ?>
             </form>
-
-            <!-- Segmented Filter Control -->
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <div class="btn-group btn-group-sm" role="group" aria-label="Customer Filter">
-                    <?php
-                    $filterTabs = [
-                        'all' => ['label' => 'All Accounts', 'count' => $totalUsers],
-                        'buyers' => ['label' => 'Active Buyers', 'count' => $activeBuyers],
-                        'inactive' => ['label' => 'No Orders Yet', 'count' => max(0, $totalUsers - $activeBuyers)]
-                    ];
-                    foreach ($filterTabs as $fKey => $fData):
-                        $isActive = ($filter === $fKey);
-                        $activeClass = $isActive ? 'btn-dark' : 'btn-outline-secondary';
-                        $param = "users&filter=$fKey" . ($search !== '' ? "&search=" . urlencode($search) : '');
-                    ?>
-                        <button type="button" onclick="loadView('<?= $param ?>')" class="btn <?= $activeClass ?>">
-                            <?= $fData['label'] ?> <span class="badge <?= $isActive ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?> ms-1" style="font-size: 0.68rem;"><?= $fData['count'] ?></span>
-                        </button>
-                    <?php endforeach; ?>
-                </div>
-            </div>
         </div>
     </div>
 
     <!-- 3. Customer Directory Data Table -->
     <div class="admin-card p-0 overflow-hidden">
-        <div class="table-responsive">
+        <!-- Desktop Table View -->
+        <div class="table-responsive d-none d-md-block">
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light border-bottom">
                     <tr>
@@ -1200,6 +1450,66 @@ elseif ($view == 'users') {
                 </tbody>
             </table>
         </div>
+
+        <!-- Mobile Touch Card Feed -->
+        <div class="d-md-none admin-touch-feed p-2 p-sm-3">
+            <?php if (!empty($users)): ?>
+                <?php foreach ($users as $u): 
+                    $orderCount = (int)($u['valid_order_count'] ?? 0);
+                    $spend = (float)($u['lifetime_spent'] ?? 0);
+                    $isBuyer = ($orderCount > 0);
+                ?>
+                    <div class="admin-touch-card">
+                        <div class="admin-touch-card-header">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="admin-avatar-initial" style="width: 36px; height: 36px; font-size: 0.9rem; background-color: #0f172a; color: #ffffff; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center;">
+                                    <?= strtoupper(substr($u['full_name'], 0, 1)) ?>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.92rem;"><?= htmlspecialchars($u['full_name']) ?></div>
+                                    <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.7rem;">#<?= str_pad($u['id'], 4, '0', STR_PAD_LEFT) ?></span>
+                                </div>
+                            </div>
+                            <div>
+                                <?php if ($isBuyer): ?>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold px-2 py-1" style="font-size: 0.72rem;">
+                                        Active Buyer
+                                    </span>
+                                <?php else: ?>
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1" style="font-size: 0.72rem;">
+                                        New Member
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="admin-touch-card-body">
+                            <div class="text-muted small mb-2 text-truncate">
+                                <i class="bi bi-envelope me-1"></i><?= htmlspecialchars($u['email']) ?>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center small py-1 bg-light rounded px-2">
+                                <span class="text-muted"><?= $orderCount ?> <?= $orderCount === 1 ? 'Order' : 'Orders' ?> &bull; Joined <?= date('M Y', strtotime($u['created_at'])) ?></span>
+                                <span class="fw-bold <?= $spend > 0 ? 'text-success' : 'text-muted' ?>" style="font-variant-numeric: tabular-nums;">
+                                    $<?= number_format($spend, 2) ?>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="admin-touch-card-footer">
+                            <button type="button" onclick="loadView('customer_details&id=<?= $u['id'] ?>')" class="btn btn-sm btn-outline-secondary flex-grow-1 admin-touch-action-btn d-flex align-items-center justify-content-center gap-1">
+                                <i class="bi bi-eye me-1"></i> <span>View Profile &amp; Orders</span>
+                            </button>
+                            <a href="actions/user_delete.php?id=<?= $u['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger admin-touch-action-btn d-flex align-items-center justify-content-center px-3" onclick="return confirm('Delete user <?= htmlspecialchars(addslashes($u['full_name'])) ?>?');" title="Delete Account" aria-label="Delete">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-people text-muted opacity-50 fs-2 d-block mb-2"></i>
+                    <div>No customers found matching criteria.</div>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
     <?php
 }
@@ -1273,28 +1583,28 @@ elseif ($view == 'reviews') {
     $filteredCount = count($reviews);
     ?>
     <div class="admin-view-header">
-        <div>
+        <div class="admin-view-header-main">
             <span class="admin-kicker">Shopper Feedback &amp; Ratings</span>
-            <h1 class="admin-view-title">Review Gallery</h1>
+            <div class="admin-view-heading-group">
+                <h1 class="admin-view-title">Reviews</h1>
+                <span class="admin-count-badge"><?= number_format($totalReviews) ?> Reviews</span>
+            </div>
             <p class="admin-view-subtitle">Verified customer product feedback, star ratings, and sentiment records.</p>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <span class="text-muted small me-2 d-none d-md-inline">
-                <i class="bi bi-star-fill text-warning me-1"></i> <?= $totalReviews ?> Total Reviews
-            </span>
-            <div class="btn-group btn-group-sm" role="group" aria-label="Display Mode">
+        <div class="admin-view-header-actions">
+            <div class="admin-view-mode-toggle" role="group" aria-label="Display Mode">
                 <?php
                 $tableParam = "reviews&mode=table" . ($ratingFilter !== 'all' ? "&rating=$ratingFilter" : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
                 $gridParam = "reviews&mode=grid" . ($ratingFilter !== 'all' ? "&rating=$ratingFilter" : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
                 ?>
-                <button type="button" onclick="loadView('<?= $tableParam ?>')" class="btn <?= $mode === 'table' ? 'btn-dark' : 'btn-outline-secondary' ?>" title="Table View">
-                    <i class="bi bi-table me-1"></i>Table
+                <button type="button" onclick="loadView('<?= $tableParam ?>')" class="admin-mode-btn <?= $mode === 'table' ? 'active' : '' ?>" title="Table View" aria-label="Table View">
+                    <i class="bi bi-table"></i> Table
                 </button>
-                <button type="button" onclick="loadView('<?= $gridParam ?>')" class="btn <?= $mode === 'grid' ? 'btn-dark' : 'btn-outline-secondary' ?>" title="Card Gallery View">
-                    <i class="bi bi-grid-fill me-1"></i>Cards
+                <button type="button" onclick="loadView('<?= $gridParam ?>')" class="admin-mode-btn <?= $mode === 'grid' ? 'active' : '' ?>" title="Card Gallery View" aria-label="Card Gallery View">
+                    <i class="bi bi-grid-fill"></i> Cards
                 </button>
             </div>
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadView('reviews')" title="Refresh Reviews">
+            <button type="button" class="admin-header-btn admin-header-btn-icon" onclick="loadView('reviews')" title="Refresh Reviews" aria-label="Refresh Reviews">
                 <i class="bi bi-arrow-clockwise"></i>
             </button>
         </div>
@@ -1360,42 +1670,83 @@ elseif ($view == 'reviews') {
     </div>
 
     <!-- 2. Search & Rating Filter Bar -->
-    <div class="admin-card p-3 mb-4">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <!-- Search Form -->
-            <form onsubmit="event.preventDefault(); loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="d-flex align-items-center gap-2" style="max-width: 320px; width: 100%;">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search customer, product, comment..." value="<?= htmlspecialchars($search) ?>" style="font-size: 0.82rem;">
+    <div class="admin-card admin-toolbar-card mb-4">
+        <!-- Mobile 1-Line Search & Filter Bar -->
+        <div class="d-md-none">
+            <?php
+            $ratingTabs = [
+                'all' => ['label' => 'All Reviews', 'count' => $totalReviews],
+                '5' => ['label' => '5 Stars', 'count' => $fiveStarCount],
+                '4' => ['label' => '4 Stars', 'count' => $fourStarCount],
+                '3' => ['label' => '3 Stars', 'count' => $threeStarCount],
+                'low' => ['label' => '1-2 Stars', 'count' => $lowStarCount]
+            ];
+            ?>
+            <form onsubmit="event.preventDefault(); loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="admin-search-filter-row">
+                <div class="admin-search-box">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" name="search" placeholder="Search reviews..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
                 </div>
-                <button type="submit" class="btn btn-sm btn-dark px-3 fw-semibold text-nowrap">Search</button>
+                <button type="submit" class="admin-search-submit-btn" title="Search Reviews" aria-label="Search">
+                    <i class="bi bi-search"></i>
+                </button>
+                <div class="dropdown">
+                    <button class="btn admin-filter-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Filter by Rating">
+                        <span class="filter-text"><?= htmlspecialchars($ratingTabs[$ratingFilter]['label'] ?? 'All Reviews') ?></span>
+                        <i class="bi bi-chevron-down ms-1"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end admin-dropdown-menu shadow">
+                        <li class="admin-dropdown-header">Filter by Star Rating</li>
+                        <?php foreach ($ratingTabs as $rKey => $rData):
+                            $isActive = ($ratingFilter === $rKey);
+                            $param = "reviews&rating=$rKey" . ($mode !== 'table' ? "&mode=$mode" : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
+                        ?>
+                            <li>
+                                <button type="button" onclick="loadView('<?= $param ?>')" class="admin-dropdown-item <?= $isActive ? 'active' : '' ?>">
+                                    <span class="item-label">
+                                        <?php if ($isActive): ?><i class="bi bi-check2 text-success"></i><?php endif; ?>
+                                        <?= $rData['label'] ?>
+                                    </span>
+                                    <span class="badge"><?= $rData['count'] ?></span>
+                                </button>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </form>
+            <?php if ($search !== ''): ?>
+                <div class="mt-2 text-end">
+                    <button type="button" onclick="loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>')" class="admin-search-clear-btn">
+                        <i class="bi bi-x-circle me-1"></i>Clear search "<?= htmlspecialchars($search) ?>"
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Desktop Search & Expanded Chip Tabs Bar -->
+        <div class="d-none d-md-flex align-items-center justify-content-between gap-3 admin-desktop-toolbar">
+            <div class="admin-chip-rail" role="group" aria-label="Rating Filter">
+                <?php foreach ($ratingTabs as $rKey => $rData):
+                    $isActive = ($ratingFilter === $rKey);
+                    $activeClass = $isActive ? 'active' : '';
+                    $param = "reviews&rating=$rKey" . ($mode !== 'table' ? "&mode=$mode" : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
+                ?>
+                    <button type="button" onclick="loadView('<?= $param ?>')" class="admin-chip-btn <?= $activeClass ?>">
+                        <span><?= $rData['label'] ?></span> <span class="badge <?= $isActive ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?> ms-1" style="font-size: 0.68rem;"><?= $rData['count'] ?></span>
+                    </button>
+                <?php endforeach; ?>
+            </div>
+
+            <form onsubmit="event.preventDefault(); loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="admin-desktop-search-form">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search customer, product..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                </div>
+                <button type="submit" class="admin-desktop-search-btn">Search</button>
                 <?php if ($search !== ''): ?>
-                    <button type="button" onclick="loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>')" class="btn btn-sm btn-outline-secondary px-2 text-nowrap">Clear</button>
+                    <button type="button" onclick="loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>')" class="admin-desktop-clear-btn" title="Clear search">Clear</button>
                 <?php endif; ?>
             </form>
-
-            <!-- Segmented Rating Filter (No floating reset button) -->
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <div class="btn-group btn-group-sm" role="group" aria-label="Rating Filter">
-                    <?php
-                    $ratingTabs = [
-                        'all' => ['label' => 'All Reviews', 'count' => $totalReviews],
-                        '5' => ['label' => '5 Stars', 'count' => $fiveStarCount],
-                        '4' => ['label' => '4 Stars', 'count' => $fourStarCount],
-                        '3' => ['label' => '3 Stars', 'count' => $threeStarCount],
-                        'low' => ['label' => '1-2 Stars', 'count' => $lowStarCount]
-                    ];
-                    foreach ($ratingTabs as $rKey => $rData):
-                        $isActive = ($ratingFilter === $rKey);
-                        $activeClass = $isActive ? 'btn-dark' : 'btn-outline-secondary';
-                        $param = "reviews&rating=$rKey" . ($mode !== 'table' ? "&mode=$mode" : '') . ($search !== '' ? "&search=" . urlencode($search) : '');
-                    ?>
-                        <button type="button" onclick="loadView('<?= $param ?>')" class="btn <?= $activeClass ?>">
-                            <?= $rData['label'] ?> <span class="badge <?= $isActive ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?> ms-1" style="font-size: 0.68rem;"><?= $rData['count'] ?></span>
-                        </button>
-                    <?php endforeach; ?>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -1426,7 +1777,7 @@ elseif ($view == 'reviews') {
                                     </div>
                                 </div>
 
-                                <!-- Product Info Strip (No Card-in-Card) -->
+                                <!-- Product Info Strip -->
                                 <div class="d-flex align-items-center gap-2 py-2 px-2 mb-3 bg-light rounded border" style="font-size: 0.78rem;">
                                     <img src="../assets/images/<?= htmlspecialchars($r['product_image'] ?: 'default.jpg') ?>" onerror="this.src='../assets/images/default.jpg'" style="width: 28px; height: 28px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; flex-shrink: 0;" alt="prod">
                                     <span class="fw-semibold text-dark text-truncate"><?= htmlspecialchars($r['product_name']) ?></span>
@@ -1443,7 +1794,7 @@ elseif ($view == 'reviews') {
                                 <span class="badge bg-light text-muted border" style="font-family: monospace; font-size: 0.68rem;">
                                     #<?= str_pad($r['id'], 4, '0', STR_PAD_LEFT) ?>
                                 </span>
-                                <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size: 0.75rem;" onclick="return confirm('Delete this review by <?= htmlspecialchars(addslashes($r['full_name'])) ?>?');" title="Delete review">
+                                <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger admin-touch-action-btn" onclick="return confirm('Delete this review by <?= htmlspecialchars(addslashes($r['full_name'])) ?>?');" title="Delete review">
                                     <i class="bi bi-trash me-1"></i>Remove
                                 </a>
                             </div>
@@ -1463,7 +1814,8 @@ elseif ($view == 'reviews') {
     <?php else: ?>
         <!-- Default High-Density Table View -->
         <div class="admin-card p-0 overflow-hidden">
-            <div class="table-responsive">
+            <!-- Desktop Table View -->
+            <div class="table-responsive d-none d-md-block">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light border-bottom">
                         <tr>
@@ -1549,6 +1901,57 @@ elseif ($view == 'reviews') {
                     </tbody>
                 </table>
             </div>
+
+            <!-- Mobile Touch Card Feed -->
+            <div class="d-md-none admin-touch-feed p-2 p-sm-3">
+                <?php if (!empty($reviews)): ?>
+                    <?php foreach ($reviews as $r): ?>
+                        <div class="admin-touch-card">
+                            <div class="admin-touch-card-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="admin-avatar-initial" style="width: 34px; height: 34px; font-size: 0.85rem; flex-shrink: 0; background-color: #0f172a; color: #ffffff; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center;">
+                                        <?= strtoupper(substr($r['full_name'], 0, 1)) ?>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark text-truncate" style="font-size: 0.88rem; max-width: 140px;"><?= htmlspecialchars($r['full_name']) ?></div>
+                                        <span class="text-muted" style="font-size: 0.7rem;"><?= date('M d, Y', strtotime($r['created_at'])) ?></span>
+                                    </div>
+                                </div>
+                                <div class="d-inline-flex align-items-center gap-1">
+                                    <div class="d-inline-flex" style="color: #f59e0b;">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <i class="bi <?= $i <= $r['rating'] ? 'bi-star-fill' : 'bi-star' ?>" style="font-size: 0.75rem; color: <?= $i <= $r['rating'] ? '#f59e0b' : '#cbd5e1' ?>;"></i>
+                                        <?php endfor; ?>
+                                    </div>
+                                    <span class="badge bg-light text-dark border ms-1 fw-bold" style="font-size: 0.7rem;"><?= number_format((float)$r['rating'], 1) ?></span>
+                                </div>
+                            </div>
+                            <div class="admin-touch-card-body">
+                                <div class="d-flex align-items-center gap-2 py-1 px-2 mb-2 bg-light rounded border" style="font-size: 0.78rem;">
+                                    <img src="../assets/images/<?= htmlspecialchars($r['product_image'] ?: 'default.jpg') ?>" onerror="this.src='../assets/images/default.jpg'" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; flex-shrink: 0;" alt="prod">
+                                    <span class="fw-semibold text-dark text-truncate"><?= htmlspecialchars($r['product_name']) ?></span>
+                                </div>
+                                <p class="text-dark small mb-0" style="line-height: 1.45; font-size: 0.82rem;">
+                                    &ldquo;<?= htmlspecialchars($r['comment']) ?>&rdquo;
+                                </p>
+                            </div>
+                            <div class="admin-touch-card-footer">
+                                <span class="badge bg-light text-muted border font-monospace" style="font-size: 0.7rem;">
+                                    #<?= str_pad($r['id'], 4, '0', STR_PAD_LEFT) ?>
+                                </span>
+                                <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger admin-touch-action-btn d-flex align-items-center gap-1" onclick="return confirm('Permanently remove this review?');" title="Remove Review">
+                                    <i class="bi bi-trash"></i> <span>Remove</span>
+                                </a>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-chat-square-text text-muted opacity-50 fs-2 d-block mb-2"></i>
+                        <div>No reviews found matching criteria.</div>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
     <?php endif; ?>
     <?php
@@ -1597,23 +2000,23 @@ elseif ($view == 'customer_details') {
     }
     $avgOrder = $totalOrders > 0 ? $lifetimeSpend / $totalOrders : 0.0;
     ?>
-    <!-- Back Button -->
-    <div class="mb-3">
-        <button type="button" onclick="loadView('users')" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
-            <i class="bi bi-arrow-left"></i> <span>Back to Customers</span>
-        </button>
-    </div>
-
     <!-- View Header -->
     <div class="admin-view-header">
-        <div>
+        <div class="admin-view-header-main">
             <span class="admin-kicker">Client Record &bull; ID #<?= str_pad($user['id'], 4, '0', STR_PAD_LEFT) ?></span>
-            <h1 class="admin-view-title"><?= htmlspecialchars($user['full_name'] ?? 'Customer Profile') ?></h1>
+            <div class="admin-view-heading-group">
+                <h1 class="admin-view-title"><?= htmlspecialchars($user['full_name'] ?? 'Customer Profile') ?></h1>
+            </div>
             <p class="admin-view-subtitle"><?= htmlspecialchars($user['email'] ?? '') ?> &bull; Registered <?= date('F d, Y', strtotime($user['created_at'])) ?></p>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <a href="actions/user_delete.php?id=<?= $user['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1" onclick="return confirm('Delete user account <?= htmlspecialchars(addslashes($user['full_name'] ?? '')) ?>? This cannot be undone.');" title="Delete User Account">
-                <i class="bi bi-trash"></i> <span>Delete Account</span>
+        <div class="admin-view-header-actions">
+            <button type="button" class="admin-header-btn" onclick="loadView('users')" title="Back to Customer Directory" aria-label="Back to Customer Directory">
+                <i class="bi bi-arrow-left"></i>
+                <span>Customers</span>
+            </button>
+            <a href="actions/user_delete.php?id=<?= $user['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="admin-header-btn admin-header-btn-danger" onclick="return confirm('Delete user account <?= htmlspecialchars(addslashes($user['full_name'] ?? '')) ?>? This cannot be undone.');" title="Delete User Account">
+                <i class="bi bi-trash"></i>
+                <span>Delete Account</span>
             </a>
         </div>
     </div>
@@ -1827,14 +2230,21 @@ elseif ($view == 'orders') {
     $allOrders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     ?>
     <div class="admin-view-header">
-        <div>
+        <div class="admin-view-header-main">
             <span class="admin-kicker">Fulfillment &amp; Logistics</span>
-            <h1 class="admin-view-title">Order Management</h1>
+            <div class="admin-view-heading-group">
+                <h1 class="admin-view-title">Order Management</h1>
+                <span class="admin-count-badge"><?= number_format($statusCounts['All']) ?> Orders</span>
+            </div>
             <p class="admin-view-subtitle">Track customer orders, fulfillment pipelines, and delivery records.</p>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <a href="export_orders.php" class="btn btn-sm btn-outline-secondary">
-                <i class="bi bi-download me-1"></i> Export Orders (CSV)
+        <div class="admin-view-header-actions">
+            <button type="button" class="admin-header-btn admin-header-btn-icon" onclick="loadView('orders')" title="Refresh Orders" aria-label="Refresh Orders">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <a href="export_orders.php" class="admin-header-btn" title="Export Orders (CSV)">
+                <i class="bi bi-download"></i>
+                <span>Export CSV</span>
             </a>
         </div>
     </div>
@@ -1893,41 +2303,90 @@ elseif ($view == 'orders') {
     </div>
 
     <!-- 2. Search & Status Filter Bar -->
-    <div class="admin-card p-3 mb-4">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <!-- Search Form -->
-            <form onsubmit="event.preventDefault(); loadView('orders&status=<?= urlencode($statusFilter) ?>&search=' + encodeURIComponent(this.search.value));" class="d-flex align-items-center gap-2 flex-grow-1" style="max-width: 380px;">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by customer, address, or ID..." value="<?= htmlspecialchars($search) ?>">
+    <div class="admin-card admin-toolbar-card mb-4">
+        <!-- Mobile 1-Line Search & Filter Bar -->
+        <div class="d-lg-none">
+            <form onsubmit="event.preventDefault(); loadView('orders&status=<?= urlencode($statusFilter) ?>&search=' + encodeURIComponent(this.search.value));" class="admin-search-filter-row">
+                <div class="admin-search-box">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" name="search" placeholder="Search orders..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
                 </div>
-                <button type="submit" class="btn btn-sm btn-outline-secondary px-3">Search</button>
-                <?php if ($search !== ''): ?>
-                    <button type="button" onclick="loadView('orders&status=<?= urlencode($statusFilter) ?>')" class="btn btn-sm btn-link text-muted text-decoration-none">Clear</button>
-                <?php endif; ?>
+                <button type="submit" class="admin-search-submit-btn" title="Search Orders" aria-label="Search">
+                    <i class="bi bi-search"></i>
+                </button>
+                <div class="dropdown">
+                    <button class="btn admin-filter-dropdown-btn dropdown-toggle <?= ($statusFilter !== 'All') ? 'active' : '' ?>" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="filter-text">Status: <strong><?= htmlspecialchars($statusFilter) ?></strong></span>
+                        <i class="bi bi-chevron-down ms-1"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end admin-dropdown-menu shadow">
+                        <li class="admin-dropdown-header">Filter by Status</li>
+                        <?php
+                        $statuses = ['All', 'Pending', 'Shipped', 'Delivered', 'Cancelled'];
+                        foreach ($statuses as $s):
+                            $isActive = ($statusFilter === $s);
+                            $countLabel = $statusCounts[$s] ?? 0;
+                            $searchParam = ($search !== '') ? '&search=' . urlencode($search) : '';
+                            $param = ($s == 'All') ? 'orders' . $searchParam : "orders&status=$s" . $searchParam;
+                        ?>
+                            <li>
+                                <button type="button" onclick="loadView('<?= $param ?>')" class="admin-dropdown-item <?= $isActive ? 'active' : '' ?>">
+                                    <span class="item-label">
+                                        <?php if ($isActive): ?>
+                                            <i class="bi bi-check2 text-success"></i>
+                                        <?php endif; ?>
+                                        <?= $s ?>
+                                    </span>
+                                    <span class="badge"><?= $countLabel ?></span>
+                                </button>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
             </form>
+            <?php if ($search !== ''): ?>
+                <div class="mt-2 text-end">
+                    <button type="button" onclick="loadView('orders&status=<?= urlencode($statusFilter) ?>')" class="admin-search-clear-btn">
+                        <i class="bi bi-x-circle me-1"></i>Clear search "<?= htmlspecialchars($search) ?>"
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
 
-            <!-- Status Tabs -->
-            <div class="btn-group btn-group-sm" role="group" aria-label="Order Status Filter">
+        <!-- Desktop Search & Expanded Chip Tabs Bar -->
+        <div class="d-none d-lg-flex align-items-center justify-content-between gap-3 admin-desktop-toolbar">
+            <div class="admin-chip-rail" role="group" aria-label="Order Status Filter">
                 <?php
-                $statuses = ['All', 'Pending', 'Shipped', 'Delivered', 'Cancelled'];
                 foreach ($statuses as $s):
-                    $activeClass = ($statusFilter == $s) ? 'btn-dark' : 'btn-outline-secondary';
+                    $isActive = ($statusFilter === $s);
+                    $activeClass = $isActive ? 'active' : '';
                     $countLabel = $statusCounts[$s] ?? 0;
                     $searchParam = ($search !== '') ? '&search=' . urlencode($search) : '';
                     $param = ($s == 'All') ? 'orders' . $searchParam : "orders&status=$s" . $searchParam;
                 ?>
-                    <button type="button" onclick="loadView('<?= $param ?>')" class="btn <?= $activeClass ?>">
-                        <?= $s ?> <span class="badge <?= ($statusFilter == $s) ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?> ms-1" style="font-size: 0.68rem;"><?= $countLabel ?></span>
+                    <button type="button" onclick="loadView('<?= $param ?>')" class="admin-chip-btn <?= $activeClass ?>">
+                        <span><?= $s ?></span> <span class="badge <?= $isActive ? 'bg-light text-dark' : 'bg-secondary-subtle text-secondary' ?> ms-1" style="font-size: 0.68rem;"><?= $countLabel ?></span>
                     </button>
                 <?php endforeach; ?>
             </div>
+
+            <form onsubmit="event.preventDefault(); loadView('orders&status=<?= urlencode($statusFilter) ?>&search=' + encodeURIComponent(this.search.value));" class="admin-desktop-search-form">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search customer, address, ID..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                </div>
+                <button type="submit" class="admin-desktop-search-btn">Search</button>
+                <?php if ($search !== ''): ?>
+                    <button type="button" onclick="loadView('orders&status=<?= urlencode($statusFilter) ?>')" class="admin-desktop-clear-btn" title="Clear search">Clear</button>
+                <?php endif; ?>
+            </form>
         </div>
     </div>
 
     <!-- 3. Orders Master Table -->
     <div class="admin-card p-0 overflow-hidden">
-        <div class="table-responsive">
+        <!-- Desktop Table View -->
+        <div class="table-responsive d-none d-lg-block">
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light border-bottom">
                     <tr>
@@ -2004,6 +2463,54 @@ elseif ($view == 'orders') {
                     <?php endif; ?>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Mobile Touch Card Feed -->
+        <div class="d-lg-none admin-touch-feed p-2 p-sm-3">
+            <?php if (!empty($allOrders)): ?>
+                <?php foreach ($allOrders as $order): 
+                    $s = $order['status'];
+                    $pillClass = match($s) {
+                        'Delivered' => 'status-delivered',
+                        'Shipped' => 'status-shipped',
+                        'Pending' => 'status-pending',
+                        default => 'status-cancelled'
+                    };
+                    $itemCount = (int)($order['item_count'] ?? 0);
+                ?>
+                    <div class="admin-touch-card">
+                        <div class="admin-touch-card-header">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.78rem;">#<?= str_pad($order['id'], 5, '0', STR_PAD_LEFT) ?></span>
+                                <span class="fw-bold text-dark text-truncate" style="font-size: 0.92rem; max-width: 150px;"><?= htmlspecialchars($order['customer_name']) ?></span>
+                            </div>
+                            <span class="admin-status-pill <?= $pillClass ?>"><?= $s ?></span>
+                        </div>
+                        <div class="admin-touch-card-body">
+                            <div class="text-muted small d-flex align-items-center gap-1 mb-2">
+                                <i class="bi bi-geo-alt text-secondary flex-shrink-0" style="font-size: 0.75rem;"></i>
+                                <span class="text-truncate"><?= htmlspecialchars($order['address']) ?></span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center py-1 px-2 bg-light rounded small">
+                                <span class="text-muted"><?= date('M d, Y', strtotime($order['created_at'])) ?> &bull; <?= $itemCount ?> <?= $itemCount === 1 ? 'item' : 'items' ?></span>
+                                <span class="fw-bold text-dark fs-6" style="font-variant-numeric: tabular-nums;">
+                                    $<?= number_format((float)$order['total_amount'], 2) ?>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="admin-touch-card-footer">
+                            <a href="order_details.php?order_id=<?= $order['id'] ?>" class="btn btn-sm btn-outline-secondary w-100 admin-touch-action-btn d-flex align-items-center justify-content-center gap-1">
+                                <span>Manage Order</span> <i class="bi bi-chevron-right small"></i>
+                            </a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox text-muted opacity-50 fs-2 d-block mb-2"></i>
+                    <div>No orders found matching criteria.</div>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
     <?php

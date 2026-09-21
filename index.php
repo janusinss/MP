@@ -298,7 +298,7 @@ $firstKey = array_key_first($aisleReels);
             </div>
 
             <div class="promo-modal-actions">
-                <a href="#harvest-catalog" class="btn btn-primary promo-claim-btn" onclick="dismissPromoModal()">
+                <a href="login" class="btn btn-primary promo-claim-btn" onclick="dismissPromoModal()">
                     Claim Offer &amp; Start Shopping
                 </a>
                 <button type="button" class="promo-modal-dismiss-link" onclick="dismissPromoModal()">
@@ -616,51 +616,69 @@ $firstKey = array_key_first($aisleReels);
                         <!-- Desktop Department Rail (Hidden on Mobile) -->
                         <div class="d-none d-lg-block">
                             <div class="d-flex align-items-center justify-content-between mb-2" id="desktopDeptHeader">
-                                <div class="text-uppercase text-muted" style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;">
-                                    Browse by Food Department
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="text-uppercase text-muted m-0" style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;">
+                                        Browse by Food Department
+                                    </span>
+                                    <span class="badge rounded-pill bg-white text-secondary border px-2 py-1 shadow-sm" style="font-size: 0.68rem; font-weight: 600;">
+                                        <?= count($categories) ?> Aisles
+                                    </span>
                                 </div>
                                 <?php if (!empty($category) || !empty($search)): ?>
-                                    <a href="./" class="small text-success text-decoration-none fw-bold" id="showAllFoodsBtn">Show All (<?= $totalFoodCount ?>)</a>
+                                    <a href="./" class="small text-success text-decoration-none fw-bold d-inline-flex align-items-center gap-1" id="showAllFoodsBtn">
+                                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Show All (<?= $totalFoodCount ?>)
+                                    </a>
                                 <?php endif; ?>
                             </div>
 
-                            <div class="food-aisles-scroller">
-                                <a href="./" class="food-aisle-pill <?= (empty($category) && empty($search)) ? 'active' : '' ?>" data-category="">
-                                    <i class="bi bi-grid-fill"></i>
-                                    <span>All</span>
-                                    <span class="aisle-count"><?= $totalFoodCount ?></span>
-                                </a>
+                            <!-- Redesigned Desktop Food Aisle Hub with Left & Right Smooth Navigation Controls -->
+                            <div class="desktop-food-aisles-wrapper">
+                                <button type="button" class="aisle-scroll-arrow prev" id="aisleScrollLeft" aria-label="Scroll aisles left" title="Scroll left">
+                                    <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                                </button>
 
-                                <!-- Desktop Search Pill beside All Departments -->
-                                <form action="./" method="GET" class="food-aisle-search-form">
-                                    <div class="food-aisle-search-pill <?= !empty($search) ? 'has-value' : '' ?>">
-                                        <i class="bi bi-search search-icon" aria-hidden="true"></i>
-                                        <input type="text" name="search" class="food-aisle-search-input" placeholder="Search foods..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
-                                        <?php if (!empty($category)): ?>
-                                            <input type="hidden" name="category" value="<?= htmlspecialchars($category) ?>">
-                                        <?php endif; ?>
-                                        <?php if (!empty($sort)): ?>
-                                            <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
-                                        <?php endif; ?>
-                                        <?php if (!empty($search)): ?>
-                                            <a href="<?= catalog_url(1, '', $category, $sort) ?>" class="search-clear-pill-btn" aria-label="Clear search" title="Clear search">
-                                                <i class="bi bi-x"></i>
-                                            </a>
-                                        <?php endif; ?>
-                                    </div>
-                                </form>
-
-                                <?php foreach ($categories as $catName): 
-                                    $catCount = $categoryCounts[$catName] ?? 0;
-                                    $iconClass = $categoryIcons[$catName] ?? 'bi-basket2';
-                                    $isCatActive = ($category === $catName);
-                                ?>
-                                    <a href="?category=<?= urlencode($catName) ?>" class="food-aisle-pill <?= $isCatActive ? 'active' : '' ?>" data-category="<?= htmlspecialchars($catName) ?>">
-                                        <i class="bi <?= $iconClass ?>"></i>
-                                        <span><?= htmlspecialchars($catName) ?></span>
-                                        <span class="aisle-count"><?= $catCount ?></span>
+                                <div class="food-aisles-scroller" id="desktopFoodAislesScroller">
+                                    <a href="./" class="food-aisle-pill <?= (empty($category) && empty($search)) ? 'active' : '' ?>" data-category="">
+                                        <i class="bi bi-grid-fill"></i>
+                                        <span>All</span>
+                                        <span class="aisle-count"><?= $totalFoodCount ?></span>
                                     </a>
-                                <?php endforeach; ?>
+
+                                    <!-- Desktop Search Pill beside All Departments -->
+                                    <form action="./" method="GET" class="food-aisle-search-form">
+                                        <div class="food-aisle-search-pill <?= !empty($search) ? 'has-value' : '' ?>">
+                                            <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                                            <input type="text" name="search" class="food-aisle-search-input" placeholder="Search foods..." value="<?= htmlspecialchars($search) ?>" autocomplete="off" aria-label="Search foods in aisles">
+                                            <?php if (!empty($category)): ?>
+                                                <input type="hidden" name="category" value="<?= htmlspecialchars($category) ?>">
+                                            <?php endif; ?>
+                                            <?php if (!empty($sort)): ?>
+                                                <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
+                                            <?php endif; ?>
+                                            <?php if (!empty($search)): ?>
+                                                <a href="<?= catalog_url(1, '', $category, $sort) ?>" class="search-clear-pill-btn" aria-label="Clear search" title="Clear search">
+                                                    <i class="bi bi-x"></i>
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
+                                    </form>
+
+                                    <?php foreach ($categories as $catName): 
+                                        $catCount = $categoryCounts[$catName] ?? 0;
+                                        $iconClass = $categoryIcons[$catName] ?? 'bi-basket2';
+                                        $isCatActive = ($category === $catName);
+                                    ?>
+                                        <a href="?category=<?= urlencode($catName) ?>" class="food-aisle-pill <?= $isCatActive ? 'active' : '' ?>" data-category="<?= htmlspecialchars($catName) ?>">
+                                            <i class="bi <?= $iconClass ?>"></i>
+                                            <span><?= htmlspecialchars($catName) ?></span>
+                                            <span class="aisle-count"><?= $catCount ?></span>
+                                        </a>
+                                    <?php endforeach; ?>
+                                </div>
+
+                                <button type="button" class="aisle-scroll-arrow next" id="aisleScrollRight" aria-label="Scroll aisles right" title="Scroll right">
+                                    <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -939,7 +957,7 @@ $firstKey = array_key_first($aisleReels);
                     <?php endif; ?>
 
                     <div class="hero-cta-group">
-                        <a href="#harvest-catalog" class="hero-btn-primary">
+                        <a href="login" class="hero-btn-primary">
                             <span>Start Shopping</span>
                             <i class="bi bi-arrow-right" aria-hidden="true"></i>
                         </a>
@@ -949,7 +967,7 @@ $firstKey = array_key_first($aisleReels);
                                 <span>My Orders</span>
                             </a>
                         <?php else: ?>
-                            <a href="#categories" class="hero-btn-secondary">
+                            <a href="#categories" class="hero-btn-secondary d-none d-md-inline-flex">
                                 <i class="bi bi-compass" aria-hidden="true"></i>
                                 <span>Browse Aisles</span>
                             </a>
@@ -2126,6 +2144,35 @@ $firstKey = array_key_first($aisleReels);
 
         let activeController = null;
 
+        const scrollLeftBtn = document.getElementById('aisleScrollLeft');
+        const scrollRightBtn = document.getElementById('aisleScrollRight');
+
+        function updateScrollArrowStates() {
+            if (!aislesScroller || !scrollLeftBtn || !scrollRightBtn) return;
+            const atStart = aislesScroller.scrollLeft <= 5;
+            const atEnd = aislesScroller.scrollLeft + aislesScroller.clientWidth >= aislesScroller.scrollWidth - 5;
+            scrollLeftBtn.disabled = atStart;
+            scrollRightBtn.disabled = atEnd;
+            scrollLeftBtn.style.opacity = atStart ? '0.35' : '1';
+            scrollRightBtn.style.opacity = atEnd ? '0.35' : '1';
+            scrollLeftBtn.style.pointerEvents = atStart ? 'none' : 'auto';
+            scrollRightBtn.style.pointerEvents = atEnd ? 'none' : 'auto';
+        }
+
+        if (scrollLeftBtn && scrollRightBtn && aislesScroller) {
+            scrollLeftBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                aislesScroller.scrollBy({ left: -260, behavior: 'smooth' });
+            });
+            scrollRightBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                aislesScroller.scrollBy({ left: 260, behavior: 'smooth' });
+            });
+            aislesScroller.addEventListener('scroll', updateScrollArrowStates, { passive: true });
+            window.addEventListener('resize', updateScrollArrowStates, { passive: true });
+            setTimeout(updateScrollArrowStates, 100);
+        }
+
         function updateAislePillState(targetUrl) {
             const parsed = new URL(targetUrl, window.location.origin);
             const targetCat = parsed.searchParams.get('category') || '';
@@ -2142,6 +2189,14 @@ $firstKey = array_key_first($aisleReels);
                     pill.classList.remove('active');
                 }
             });
+
+            setTimeout(() => {
+                const activePill = aislesScroller.querySelector('.food-aisle-pill.active');
+                if (activePill && typeof activePill.scrollIntoView === 'function') {
+                    activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+                updateScrollArrowStates();
+            }, 60);
         }
 
         function loadCategoryAsync(targetUrl, pushState = true) {

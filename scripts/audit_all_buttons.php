@@ -224,7 +224,7 @@ checkBtn("Admin", "Admin Portal 'Sign In' Button", $adminLoginPost['code'] === 3
 
 // 3.2 Dashboard Views & Nav Tabs
 $dashView = sendReq("$baseUrl/admin/router.php?view=dashboard", null, $adminCookie);
-checkBtn("Admin", "Sidebar 'Overview' Nav Tab", strpos($dashView['body'], 'Dashboard Overview') !== false, "Sales chart & stats rendered");
+checkBtn("Admin", "Sidebar 'Overview' Nav Tab", (strpos($dashView['body'], 'Analytics') !== false || strpos($dashView['body'], 'Dashboard Overview') !== false), "Sales chart & stats rendered");
 
 $ordersView = sendReq("$baseUrl/admin/router.php?view=orders", null, $adminCookie);
 checkBtn("Admin", "Sidebar 'Orders' Nav Tab", strpos($ordersView['body'], 'Order Management') !== false, "Orders table rendered");
@@ -233,10 +233,10 @@ $productsView = sendReq("$baseUrl/admin/router.php?view=products", null, $adminC
 checkBtn("Admin", "Sidebar 'Products' Nav Tab", strpos($productsView['body'], 'Product Inventory') !== false, "Inventory table rendered");
 
 $usersView = sendReq("$baseUrl/admin/router.php?view=users", null, $adminCookie);
-checkBtn("Admin", "Sidebar 'Customers' Nav Tab", strpos($usersView['body'], 'Registered Customers') !== false, "Customer cards rendered");
+checkBtn("Admin", "Sidebar 'Customers' Nav Tab", (strpos($usersView['body'], 'Customers') !== false || strpos($usersView['body'], 'Registered Customers') !== false), "Customer cards rendered");
 
 $reviewsView = sendReq("$baseUrl/admin/router.php?view=reviews", null, $adminCookie);
-checkBtn("Admin", "Sidebar 'Reviews' Nav Tab", strpos($reviewsView['body'], 'Review Gallery') !== false, "Review gallery rendered");
+checkBtn("Admin", "Sidebar 'Reviews' Nav Tab", (strpos($reviewsView['body'], 'Reviews') !== false || strpos($reviewsView['body'], 'Review Gallery') !== false), "Review gallery rendered");
 
 // 3.3 Status Filter Buttons in Orders
 $pendingOrders = sendReq("$baseUrl/admin/router.php?view=orders&status=Pending", null, $adminCookie);

@@ -88,7 +88,7 @@ if ($pos !== false) {
             </div>
 
             <div class="promo-modal-actions">
-                <a href="<?= $rootPath ?: './' ?>#harvest-catalog" class="btn btn-primary promo-claim-btn" onclick="dismissPromoModal()">
+                <a href="<?= $rootPath ?>login" class="btn btn-primary promo-claim-btn" onclick="dismissPromoModal()">
                     Claim Offer &amp; Start Shopping
                 </a>
                 <button type="button" class="promo-modal-dismiss-link" onclick="dismissPromoModal()">

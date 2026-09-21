@@ -70,15 +70,20 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
 
     <!-- Mobile Admin Topbar -->
     <header class="admin-mobile-topbar d-lg-none">
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSidebar()" aria-label="Toggle Navigation">
-            <i class="bi bi-list fs-5"></i>
-        </button>
-        <div class="fw-bold font-serif fs-5 text-dark">
-            FreshCart<span class="text-success">.</span> <span class="text-muted fw-normal fs-6">Admin</span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="admin-logo-mark"><i class="bi bi-basket3-fill text-success fs-5"></i></span>
+            <div class="fw-bold fs-6 text-dark" style="letter-spacing: -0.02em;">
+                FreshCart<span class="text-success">.</span> <span class="badge bg-dark-subtle text-dark border ms-1" style="font-size: 0.65rem; font-weight: 700;">ADMIN</span>
+            </div>
         </div>
-        <a href="../" class="btn btn-sm btn-outline-secondary" title="View Storefront">
-            <i class="bi bi-box-arrow-up-right"></i>
-        </a>
+        <div class="d-flex align-items-center gap-2">
+            <a href="../" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" style="min-height: 40px; font-weight: 600; font-size: 0.8rem; padding: 0 12px;" title="View Live Storefront">
+                <i class="bi bi-shop"></i> <span>Store</span>
+            </a>
+            <a href="logout.php" class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="Sign out" aria-label="Logout">
+                <i class="bi bi-box-arrow-left"></i>
+            </a>
+        </div>
     </header>
 
     <!-- Mobile Sidebar Backdrop -->
@@ -94,7 +99,7 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
                         <div class="admin-sidebar-title">FreshCart<span class="text-success">.</span></div>
                         <div class="admin-sidebar-subtitle">Operations Console</div>
                     </div>
-                    <button type="button" class="btn btn-sm btn-light border-0 d-lg-none" onclick="toggleSidebar()" aria-label="Close menu">
+                    <button type="button" class="btn btn-sm btn-light border-0 d-lg-none" onclick="toggleSidebar()" aria-label="Close menu" style="width: 40px; height: 40px;">
                         <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
@@ -131,10 +136,10 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
                 </div>
 
                 <div class="d-flex gap-2">
-                    <a href="../" class="btn btn-sm btn-outline-secondary w-50 d-flex align-items-center justify-content-center gap-1" title="View Storefront">
+                    <a href="../" class="btn btn-sm btn-outline-secondary w-50 d-flex align-items-center justify-content-center gap-1" style="min-height: 40px;" title="View Storefront">
                         <i class="bi bi-shop"></i> <span>Store</span>
                     </a>
-                    <a href="logout.php" class="btn btn-sm btn-outline-danger w-50 d-flex align-items-center justify-content-center gap-1" title="Sign out">
+                    <a href="logout.php" class="btn btn-sm btn-outline-danger w-50 d-flex align-items-center justify-content-center gap-1" style="min-height: 40px;" title="Sign out">
                         <i class="bi bi-box-arrow-left"></i> <span>Logout</span>
                     </a>
                 </div>
@@ -152,6 +157,42 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
 
     </div>
 
+    <!-- Admin Mobile Bottom Navigation Bar (Fixed 5-Tab Touch Rail) -->
+    <nav class="admin-mobile-bottom-nav d-lg-none" aria-label="Admin Mobile Navigation">
+        <ul class="admin-mobile-nav-grid">
+            <li class="admin-mobile-nav-item">
+                <button type="button" id="mob-nav-dashboard" class="admin-mobile-nav-btn active" onclick="loadView('dashboard')">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span>Analytics</span>
+                </button>
+            </li>
+            <li class="admin-mobile-nav-item">
+                <button type="button" id="mob-nav-orders" class="admin-mobile-nav-btn" onclick="loadView('orders')">
+                    <i class="bi bi-receipt-cutoff"></i>
+                    <span>Orders</span>
+                </button>
+            </li>
+            <li class="admin-mobile-nav-item">
+                <button type="button" id="mob-nav-products" class="admin-mobile-nav-btn" onclick="loadView('products')">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Products</span>
+                </button>
+            </li>
+            <li class="admin-mobile-nav-item">
+                <button type="button" id="mob-nav-users" class="admin-mobile-nav-btn" onclick="loadView('users')">
+                    <i class="bi bi-people"></i>
+                    <span>Customers</span>
+                </button>
+            </li>
+            <li class="admin-mobile-nav-item">
+                <button type="button" id="mob-nav-reviews" class="admin-mobile-nav-btn" onclick="loadView('reviews')">
+                    <i class="bi bi-star"></i>
+                    <span>Reviews</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('adminSidebar');
@@ -168,11 +209,19 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
 
         function loadView(viewName) {
             const baseView = viewName.split('&')[0]; 
-            document.querySelectorAll('.admin-nav-link').forEach(el => el.classList.remove('active'));
             
+            // Sync Desktop Sidebar
+            document.querySelectorAll('.admin-nav-link').forEach(el => el.classList.remove('active'));
             const activeLink = document.getElementById('nav-' + baseView);
             if (activeLink) {
                 activeLink.classList.add('active');
+            }
+
+            // Sync Mobile Bottom Navigation
+            document.querySelectorAll('.admin-mobile-nav-btn').forEach(el => el.classList.remove('active'));
+            const mobActiveLink = document.getElementById('mob-nav-' + baseView);
+            if (mobActiveLink) {
+                mobActiveLink.classList.add('active');
             }
 
             // Close mobile sidebar on navigation
@@ -180,6 +229,9 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
             const backdrop = document.getElementById('sidebarBackdrop');
             if (sidebar) sidebar.classList.remove('mobile-open');
             if (backdrop) backdrop.classList.remove('active');
+
+            // Scroll window to top
+            window.scrollTo({ top: 0, behavior: 'instant' });
 
             const main = document.getElementById('mainContent');
 

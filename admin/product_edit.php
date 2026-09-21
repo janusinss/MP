@@ -137,16 +137,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body class="admin-body">
 
-    <!-- Mobile Admin Topbar -->
-    <header class="admin-mobile-topbar d-lg-none">
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSidebar()" aria-label="Toggle Navigation">
-            <i class="bi bi-list fs-5"></i>
-        </button>
-        <div class="fw-bold font-serif fs-5 text-dark">
-            FreshCart<span class="text-success">.</span> <span class="text-muted fw-normal fs-6">Admin</span>
+    <!-- Native Mobile App Topbar (375px+ touch optimized) -->
+    <header class="admin-mobile-topbar d-lg-none" role="banner">
+        <div class="d-flex align-items-center gap-2">
+            <span class="admin-logo-mark"><i class="bi bi-basket3-fill text-success fs-5"></i></span>
+            <div class="fw-bold fs-6 text-dark" style="letter-spacing: -0.02em;">
+                FreshCart<span class="text-success">.</span> <span class="badge bg-dark-subtle text-dark border ms-1" style="font-size: 0.65rem; font-weight: 700;">ADMIN</span>
+            </div>
         </div>
-        <a href="../" class="btn btn-sm btn-outline-secondary" title="View Storefront">
-            <i class="bi bi-box-arrow-up-right"></i>
+        <a href="../" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" style="min-height: 40px; font-weight: 600; font-size: 0.8rem; padding: 0 12px;" title="View Public Storefront" aria-label="View Public Storefront">
+            <i class="bi bi-shop"></i> <span>Store</span>
         </a>
     </header>
 
@@ -224,9 +224,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <!-- View Header -->
             <div class="admin-view-header mb-4">
-                <div>
+                <div class="admin-view-header-main">
                     <span class="admin-kicker">Catalog &amp; Stock Operations</span>
-                    <h1 class="admin-view-title mb-1">Edit Product #<?= str_pad($id, 4, '0', STR_PAD_LEFT) ?></h1>
+                    <div class="admin-view-heading-group">
+                        <h1 class="admin-view-title mb-1">Edit Product #<?= str_pad($id, 4, '0', STR_PAD_LEFT) ?></h1>
+                    </div>
                     <p class="admin-view-subtitle mb-0">Update retail pricing, warehouse on-hand stock units, aisle placement, and catalog photography.</p>
                 </div>
             </div>
@@ -344,6 +346,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </main>
 
     </div>
+
+    <!-- Native Mobile Bottom Tab Rail (Fixed 5-Tab) -->
+    <nav class="admin-mobile-bottom-nav d-lg-none" aria-label="Mobile Navigation">
+        <ul class="admin-mobile-nav-grid">
+            <li class="admin-mobile-nav-item">
+                <a href="index.php?view=dashboard" class="admin-mobile-nav-btn">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span>Analytics</span>
+                </a>
+            </li>
+            <li class="admin-mobile-nav-item">
+                <a href="index.php?view=orders" class="admin-mobile-nav-btn">
+                    <i class="bi bi-receipt-cutoff"></i>
+                    <span>Orders</span>
+                </a>
+            </li>
+            <li class="admin-mobile-nav-item">
+                <a href="index.php?view=products" class="admin-mobile-nav-btn active">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Inventory</span>
+                </a>
+            </li>
+            <li class="admin-mobile-nav-item">
+                <a href="index.php?view=users" class="admin-mobile-nav-btn">
+                    <i class="bi bi-people"></i>
+                    <span>Customers</span>
+                </a>
+            </li>
+            <li class="admin-mobile-nav-item">
+                <a href="index.php?view=reviews" class="admin-mobile-nav-btn">
+                    <i class="bi bi-star"></i>
+                    <span>Reviews</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 
     <script>
         function toggleSidebar() {
