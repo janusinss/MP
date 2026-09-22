@@ -234,10 +234,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
 
             <?php if ($error): ?>
-                <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
-                    <i class="bi bi-exclamation-octagon-fill fs-5 flex-shrink-0"></i>
-                    <div><?= htmlspecialchars($error) ?></div>
-                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        if (window.FreshToast) {
+                            FreshToast.error(<?= json_encode($error) ?>, 'Notice');
+                        }
+                    });
+                </script>
             <?php endif; ?>
 
             <!-- Main Edit Bento Card -->
@@ -409,5 +412,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             });
         }
     </script>
+    <div class="fresh-toast-container" id="freshToastContainer" aria-live="polite" aria-atomic="true"></div>
+    <script src="../assets/js/toast.js?v=<?= time() ?>"></script>
 </body>
 </html>

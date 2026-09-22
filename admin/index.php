@@ -46,27 +46,6 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
     </script>
 </head>
 <body class="admin-body">
-    
-    <?php if (isset($_GET['msg']) && in_array($_GET['msg'], ['updated', 'added'])): ?>
-    <div class="admin-alert-banner alert alert-success alert-dismissible fade show" role="alert" id="successModal">
-        <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-check-circle-fill fs-5"></i>
-            <div>
-                <strong>Operation Completed</strong>: The requested record has been saved successfully.
-            </div>
-        </div>
-        <button type="button" class="btn-close" onclick="closeModal()" aria-label="Close"></button>
-    </div>
-    <script>
-        function closeModal() {
-            const el = document.getElementById('successModal');
-            if (el) el.style.display = 'none';
-            const urlParams = new URLSearchParams(window.location.search);
-            const view = urlParams.get('view') || 'dashboard';
-            window.history.replaceState({}, document.title, 'index.php?view=' + view);
-        }
-    </script>
-    <?php endif; ?>
 
     <!-- Mobile Admin Topbar -->
     <header class="admin-mobile-topbar d-lg-none">
@@ -255,6 +234,54 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
         }
     </script>
 
+    <!-- Floating Notifications Container (Web: Bottom-Left, Mobile: UX-Friendly Docked) -->
+    <div class="fresh-toast-container" id="freshToastContainer" aria-live="polite" aria-atomic="true">
+        <?php if (isset($_GET['msg']) && in_array($_GET['msg'], ['updated', 'added', 'deleted'])): ?>
+            <?php
+                $msgKey = $_GET['msg'];
+                $toastTitle = 'Record Saved';
+                $toastMsg = 'The requested record has been saved successfully.';
+                if ($msgKey === 'added') {
+                    $toastTitle = 'Record Published';
+                    $toastMsg = 'The new record has been published successfully.';
+                } elseif ($msgKey === 'deleted') {
+                    $toastTitle = 'Record Removed';
+                    $toastMsg = 'The requested record has been deleted successfully.';
+                }
+            ?>
+            <div class="fresh-toast fresh-toast-success is-visible" role="alert" id="adminServerToast">
+                <div class="fresh-toast-icon">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                </div>
+                <div class="fresh-toast-body">
+                    <div class="fresh-toast-title"><?= htmlspecialchars($toastTitle) ?></div>
+                    <div class="fresh-toast-message"><?= htmlspecialchars($toastMsg) ?></div>
+                </div>
+                <button type="button" class="fresh-toast-close" onclick="dismissAdminToast()" aria-label="Dismiss notification">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+                <div class="fresh-toast-progress">
+                    <div class="fresh-toast-progress-bar" style="transform: scaleX(0); transition: transform 4500ms linear;"></div>
+                </div>
+            </div>
+            <script>
+                function dismissAdminToast() {
+                    const t = document.getElementById('adminServerToast');
+                    if (t) {
+                        t.classList.remove('is-visible');
+                        t.classList.add('is-hiding');
+                        setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 280);
+                    }
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('msg');
+                    window.history.replaceState({}, document.title, url.toString());
+                }
+                setTimeout(dismissAdminToast, 4500);
+            </script>
+        <?php endif; ?>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/toast.js?v=<?= time() ?>"></script>
 </body>
 </html>

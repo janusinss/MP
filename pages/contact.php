@@ -70,7 +70,7 @@ include __DIR__ . '/../includes/header.php';
                             <textarea class="input-modern" rows="5" placeholder="Write your message here..." required></textarea>
                         </div>
                         <div class="col-12 mt-4">
-                            <button type="button" class="btn btn-primary rounded-pill px-5 py-3 shadow-sm fw-bold" onclick="alert('Thank you for reaching out! We will reply to your inquiry shortly.');">
+                            <button type="button" class="btn btn-primary rounded-pill px-5 py-3 shadow-sm fw-bold" onclick="if(window.FreshToast){FreshToast.success('Thank you for reaching out! We will reply to your inquiry shortly.','Inquiry Received');}else{alert('Thank you for reaching out! We will reply to your inquiry shortly.');}">
                                 Send Message <i class="bi bi-arrow-right ms-2"></i>
                             </button>
                         </div>

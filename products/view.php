@@ -177,7 +177,13 @@ if (count($reviews) > 0) {
             <h3 class="mb-4" style="font-family: var(--font-serif);">Customer Feedback</h3>
             
             <?php if ($review_msg): ?>
-                <div class="alert alert-success border-0 shadow-sm mb-4 rounded-3"><i class="bi bi-check-circle me-2"></i> <?= htmlspecialchars($review_msg, ENT_QUOTES, 'UTF-8') ?></div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        if (window.FreshToast) {
+                            FreshToast.success(<?= json_encode($review_msg) ?>, 'Feedback Received');
+                        }
+                    });
+                </script>
             <?php endif; ?>
 
             <div class="review-form-card">
@@ -302,10 +308,15 @@ if (count($reviews) > 0) {
                 } else if (data.status === 'login_required') {
                     window.location.href = '../auth/login.php';
                 } else {
-                    alert(data.message);
+                    if (window.FreshToast) {
+                        FreshToast.error(data.message || 'Could not add product to cart.', 'Basket Notice');
+                    } else {
+                        alert(data.message);
+                    }
                 }
             });
         });
     </script>
+    <script src="../assets/js/toast.js?v=<?= time() ?>"></script>
 </body>
 </html>

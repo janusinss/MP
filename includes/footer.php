@@ -215,10 +215,17 @@ $isMinimalFooter = ($isCheckoutPage || $isSuccessPage || $isCartPage || $isOrder
                         const badge = document.getElementById('cart-badge');
                         if (badge) badge.innerText = data.cart_count;
                         else location.reload();
+                        if (window.FreshToast) {
+                            FreshToast.success('Item added to your basket', 'Basket Updated');
+                        }
                     } else if (data.status === 'login_required') {
                         window.location.href = '<?= $rootPath ?>auth/login.php';
                     } else {
-                        alert(data.message);
+                        if (window.FreshToast) {
+                            FreshToast.error(data.message || 'Could not add item to basket.', 'Basket Notice');
+                        } else {
+                            alert(data.message);
+                        }
                     }
                 })
                 .catch(err => {
@@ -227,5 +234,6 @@ $isMinimalFooter = ($isCheckoutPage || $isSuccessPage || $isCartPage || $isOrder
             }
         });
     </script>
+    <script src="<?= $rootPath ?>assets/js/toast.js?v=<?= time() ?>"></script>
 </body>
 </html>

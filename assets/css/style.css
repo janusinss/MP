@@ -17569,3 +17569,203 @@ body.modal-open-freeze {
         justify-content: space-between;
     }
 }
+
+/* ==========================================================================
+   FLOATING NOTIFICATION / TOAST SYSTEM (Web: Bottom-Left, Mobile: UX-Friendly)
+   ========================================================================== */
+.fresh-toast-container {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 12px;
+    pointer-events: none;
+    max-width: 420px;
+    width: auto;
+}
+
+.fresh-toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(0, 0, 0, 0.05);
+    color: #0f172a;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    transform: translateY(24px) scale(0.96);
+    opacity: 0;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease, margin 0.2s ease, max-height 0.2s ease;
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.fresh-toast.is-visible {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.fresh-toast.is-hiding {
+    transform: translateY(24px) scale(0.96);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Toast Status Icon */
+.fresh-toast-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.05rem;
+    margin-top: 1px;
+}
+
+.fresh-toast-success .fresh-toast-icon {
+    background: #ecfdf5;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.fresh-toast-danger .fresh-toast-icon,
+.fresh-toast-error .fresh-toast-icon {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.fresh-toast-warning .fresh-toast-icon {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.fresh-toast-info .fresh-toast-icon {
+    background: #f0fdf4;
+    color: #4a745b;
+    border: 1px solid #dcfce7;
+}
+
+/* Toast Body */
+.fresh-toast-body {
+    flex-grow: 1;
+    min-width: 0;
+    padding-right: 4px;
+}
+
+.fresh-toast-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+    margin-bottom: 3px;
+    letter-spacing: -0.01em;
+}
+
+.fresh-toast-message {
+    font-size: 0.8125rem;
+    color: #475569;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+/* Close Button (Touch Friendly 44x44px target) */
+.fresh-toast-close {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    width: 44px;
+    height: 44px;
+    margin: -10px -10px -10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: color 0.15s ease, background-color 0.15s ease;
+    flex-shrink: 0;
+    outline: none;
+}
+
+.fresh-toast-close:hover {
+    color: #0f172a;
+    background: #f1f5f9;
+}
+
+.fresh-toast-close:focus-visible {
+    outline: 2px solid #4a745b;
+    outline-offset: 2px;
+}
+
+/* Progress bar timer */
+.fresh-toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.fresh-toast-progress-bar {
+    height: 100%;
+    width: 100%;
+    transform-origin: left;
+    transition: transform linear;
+}
+
+.fresh-toast-success .fresh-toast-progress-bar {
+    background: #22c55e;
+}
+
+.fresh-toast-danger .fresh-toast-progress-bar,
+.fresh-toast-error .fresh-toast-progress-bar {
+    background: #ef4444;
+}
+
+.fresh-toast-warning .fresh-toast-progress-bar {
+    background: #f59e0b;
+}
+
+.fresh-toast-info .fresh-toast-progress-bar {
+    background: #4a745b;
+}
+
+/* Mobile Responsiveness (UI/UX Friendly) */
+@media (max-width: 767.98px) {
+    .fresh-toast-container {
+        bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+        left: 16px;
+        right: 16px;
+        max-width: calc(100vw - 32px);
+        width: auto;
+    }
+
+    .fresh-toast {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.18), 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+
+    .fresh-toast-title {
+        font-size: 0.85rem;
+    }
+
+    .fresh-toast-message {
+        font-size: 0.8rem;
+    }
+}

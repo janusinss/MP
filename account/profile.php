@@ -144,17 +144,23 @@ include __DIR__ . '/../includes/header.php';
                     </div>
 
                     <?php if ($msg): ?>
-                        <div class="alert alert-success d-flex align-items-center gap-2 border-0 shadow-sm rounded-3 mb-4 py-2 px-3" role="alert">
-                            <i class="bi bi-check-circle-fill fs-5 text-success"></i>
-                            <div><?= htmlspecialchars($msg) ?></div>
-                        </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                if (window.FreshToast) {
+                                    FreshToast.success(<?= json_encode($msg) ?>, 'Profile Updated');
+                                }
+                            });
+                        </script>
                     <?php endif; ?>
 
                     <?php if ($error): ?>
-                        <div class="alert alert-danger d-flex align-items-center gap-2 border-0 shadow-sm rounded-3 mb-4 py-2 px-3" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
-                            <div><?= htmlspecialchars($error) ?></div>
-                        </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                if (window.FreshToast) {
+                                    FreshToast.error(<?= json_encode($error) ?>, 'Notice');
+                                }
+                            });
+                        </script>
                     <?php endif; ?>
 
                     <form method="POST" action="profile" class="profile-edit-form">

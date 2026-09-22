@@ -144,16 +144,6 @@ if (empty($initials)) $initials = 'CU';
             </div>
         </header>
 
-        <!-- Status Updated Notification Flash -->
-        <?php if (isset($_GET['msg']) && $_GET['msg'] === 'updated'): ?>
-            <div class="alert alert-success d-flex align-items-center justify-content-between p-3 mb-4 rounded-3 border-0 shadow-sm no-print" role="alert" style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0 !important;">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-check-circle-fill text-success fs-5 flex-shrink-0" aria-hidden="true"></i>
-                    <span class="small"><strong>Fulfillment Status Updated:</strong> Order #<?= str_pad($order['id'], 5, '0', STR_PAD_LEFT) ?> is now set to <strong><?= htmlspecialchars($s) ?></strong>.</span>
-                </div>
-                <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        <?php endif; ?>
 
         <!-- Order View Header -->
         <section class="admin-order-header" aria-labelledby="orderTitle">
@@ -482,6 +472,42 @@ if (empty($initials)) $initials = 'CU';
         </ul>
     </nav>
 
+    <!-- Floating Notifications Container (Web: Bottom-Left, Mobile: UX-Friendly Docked) -->
+    <div class="fresh-toast-container" id="freshToastContainer" aria-live="polite" aria-atomic="true">
+        <?php if (isset($_GET['msg']) && $_GET['msg'] === 'updated'): ?>
+            <div class="fresh-toast fresh-toast-success is-visible no-print" role="alert" id="orderStatusToast">
+                <div class="fresh-toast-icon">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                </div>
+                <div class="fresh-toast-body">
+                    <div class="fresh-toast-title">Fulfillment Updated</div>
+                    <div class="fresh-toast-message">Order #<?= str_pad($order['id'], 5, '0', STR_PAD_LEFT) ?> is now marked as <strong><?= htmlspecialchars($s) ?></strong>.</div>
+                </div>
+                <button type="button" class="fresh-toast-close" onclick="dismissOrderStatusToast()" aria-label="Dismiss notification">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+                <div class="fresh-toast-progress">
+                    <div class="fresh-toast-progress-bar" style="transform: scaleX(0); transition: transform 4500ms linear;"></div>
+                </div>
+            </div>
+            <script>
+                function dismissOrderStatusToast() {
+                    const el = document.getElementById('orderStatusToast');
+                    if (el) {
+                        el.classList.remove('is-visible');
+                        el.classList.add('is-hiding');
+                        setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 280);
+                    }
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('msg');
+                    window.history.replaceState({}, document.title, url.toString());
+                }
+                setTimeout(dismissOrderStatusToast, 4500);
+            </script>
+        <?php endif; ?>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/toast.js?v=<?= time() ?>"></script>
 </body>
 </html>

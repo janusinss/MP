@@ -2119,10 +2119,18 @@ $firstKey = array_key_first($aisleReels);
 
                         const badge = document.getElementById('cart-badge');
                         if (badge) badge.innerText = data.cart_count;
+
+                        if (window.FreshToast) {
+                            FreshToast.success('Item added to your basket', 'Basket Updated');
+                        }
                     } else if (data.status === 'login_required') {
                         window.location.href = 'login';
                     } else {
-                        alert(data.message);
+                        if (window.FreshToast) {
+                            FreshToast.error(data.message || 'Could not add item to basket.', 'Basket Notice');
+                        } else {
+                            alert(data.message);
+                        }
                     }
                 })
                 .catch(err => {

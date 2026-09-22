@@ -81,12 +81,6 @@ include __DIR__ . '/../includes/header.php';
             </div>
         </div>
 
-        <?php if (isset($_GET['msg']) && $_GET['msg'] === 'cancelled'): ?>
-            <div class="alert alert-warning border-0 rounded-3 mb-4 d-flex align-items-center gap-2 py-2 px-3 small" role="alert">
-                <i class="bi bi-check-circle-fill text-warning flex-shrink-0" aria-hidden="true"></i>
-                <div>Your order has been cancelled.</div>
-            </div>
-        <?php endif; ?>
 
         <?php if (count($orders) > 0): ?>
             <!-- Quick Status Filter Chips -->

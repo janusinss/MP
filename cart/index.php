@@ -509,7 +509,11 @@ require_once __DIR__ . '/../includes/header.php';
             } else if (data.status === 'login_required') {
                 window.location.href = '<?= $rootPath ?>login';
             } else {
-                alert(data.message || 'Could not add product to cart.');
+                if (window.FreshToast) {
+                    FreshToast.error(data.message || 'Could not add product to cart.', 'Basket Notice');
+                } else {
+                    alert(data.message || 'Could not add product to cart.');
+                }
                 btn.disabled = false;
                 btn.innerHTML = originalContent;
             }

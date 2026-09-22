@@ -25,6 +25,67 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
 $view = $_GET['view'] ?? 'dashboard';
 
+/**
+ * Intelligent Multi-Token Search Builder for Admin Console
+ * Supports:
+ *  - ID numbers (raw: 4832, padded: 04832, prefixed: #4832, #04832, ORD-4832, SKU #0101)
+ *  - Text columns (case-insensitive substring LIKE %term%)
+ *  - Stripped prefixes (#, $, SKU, ORD, etc.)
+ */
+if (!function_exists('buildAdminSearchClause')) {
+    function buildAdminSearchClause($search, $idColumn, $textColumns = [], $padLength = 5) {
+        $search = trim($search);
+        if ($search === '') {
+            return ['', []];
+        }
+
+        $orConditions = [];
+        $params = [];
+
+        // 1. Text field searches with raw query
+        foreach ($textColumns as $col) {
+            $orConditions[] = "$col LIKE ?";
+            $params[] = "%$search%";
+        }
+
+        // 2. ID string matching (raw integer text)
+        $orConditions[] = "CAST($idColumn AS CHAR) LIKE ?";
+        $params[] = "%$search%";
+
+        // 3. ID string matching (zero-padded to standard length)
+        $orConditions[] = "LPAD(CAST($idColumn AS CHAR), $padLength, '0') LIKE ?";
+        $params[] = "%$search%";
+
+        // 4. Digits extraction for prefixed formats (e.g. #04832, #101, SKU #0101, ORD-4832)
+        $digitsOnly = preg_replace('/[^0-9]/', '', $search);
+        if ($digitsOnly !== '') {
+            $intVal = (int)ltrim($digitsOnly, '0');
+            if ($intVal > 0) {
+                $orConditions[] = "$idColumn = ?";
+                $params[] = $intVal;
+
+                $orConditions[] = "CAST($idColumn AS CHAR) LIKE ?";
+                $params[] = "%$intVal%";
+
+                $orConditions[] = "LPAD(CAST($idColumn AS CHAR), $padLength, '0') LIKE ?";
+                $params[] = "%$digitsOnly%";
+            }
+        }
+
+        // 5. Cleaned text query (stripping #, $, SKU, ORD, order, user prefixes)
+        $cleanText = trim(preg_replace('/^(order|ord|sku|user|acc|account|review|rev)[\s\-_:#]*/i', '', $search));
+        $cleanText = trim(preg_replace('/[#$:]/', '', $cleanText));
+        if ($cleanText !== '' && $cleanText !== $search) {
+            foreach ($textColumns as $col) {
+                $orConditions[] = "$col LIKE ?";
+                $params[] = "%$cleanText%";
+            }
+        }
+
+        return ['(' . implode(' OR ', $orConditions) . ')', $params];
+    }
+}
+
 // =========================================================================
 // VIEW 1: DASHBOARD / ANALYTICS
 // =========================================================================
@@ -696,33 +757,34 @@ elseif ($view == 'products') {
     $alertsCount = $outOfStockCount + $lowStockCount;
 
     // 2. Query filtered products
-    $sql = "SELECT * FROM products";
+    $sql = "SELECT p.* FROM products p";
     $where = [];
     $params = [];
 
     if ($search !== '') {
-        $where[] = "(name LIKE ? OR category LIKE ? OR CAST(id AS CHAR) LIKE ?)";
-        $params[] = "%$search%";
-        $params[] = "%$search%";
-        $params[] = "%$search%";
+        list($searchClause, $searchParams) = buildAdminSearchClause($search, 'p.id', ['p.name', 'p.category', 'CAST(p.price AS CHAR)'], 4);
+        if ($searchClause !== '') {
+            $where[] = $searchClause;
+            $params = array_merge($params, $searchParams);
+        }
     }
 
     if ($categoryFilter !== 'All' && $categoryFilter !== '') {
-        $where[] = "category = ?";
+        $where[] = "p.category = ?";
         $params[] = $categoryFilter;
     }
 
     if ($stockFilter === 'low') {
-        $where[] = "stock_qty > 0 AND stock_qty < 5";
+        $where[] = "p.stock_qty > 0 AND p.stock_qty < 5";
     } elseif ($stockFilter === 'out') {
-        $where[] = "stock_qty = 0";
+        $where[] = "p.stock_qty = 0";
     }
 
     if (!empty($where)) {
         $sql .= " WHERE " . implode(" AND ", $where);
     }
 
-    $sql .= " ORDER BY id DESC";
+    $sql .= " ORDER BY p.id DESC";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -733,7 +795,7 @@ elseif ($view == 'products') {
             <span class="admin-kicker">Catalog &amp; Stock Control</span>
             <div class="admin-view-heading-group">
                 <h1 class="admin-view-title">Product Inventory</h1>
-                <span class="admin-count-badge"><?= number_format($totalSkus) ?> SKUs</span>
+                <span class="admin-count-badge"><?= $search !== '' ? number_format(count($products)) . ' Found' : number_format($totalSkus) . ' SKUs' ?></span>
             </div>
             <p class="admin-view-subtitle">Live catalog stock tracking, pricing, and product records.</p>
         </div>
@@ -813,10 +875,10 @@ elseif ($view == 'products') {
     <div class="admin-card admin-toolbar-card mb-4">
         <!-- Mobile 1-Line Search & Filters Bar -->
         <div class="d-lg-none">
-            <form onsubmit="event.preventDefault(); loadView('products<?= ($categoryFilter !== 'All') ? '&category=' . urlencode($categoryFilter) : '' ?><?= ($stockFilter !== 'All') ? '&stock=' . urlencode($stockFilter) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="admin-search-filter-row">
+            <form onsubmit="event.preventDefault(); loadView('products<?= ($categoryFilter !== 'All') ? '&category=' . urlencode($categoryFilter) : '' ?><?= ($stockFilter !== 'All') ? '&stock=' . urlencode($stockFilter) : '' ?>&search=' + encodeURIComponent(this.search.value.trim()));" class="admin-search-filter-row">
                 <div class="admin-search-box">
                     <i class="bi bi-search search-icon"></i>
-                    <input type="text" name="search" placeholder="Search catalog..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                    <input type="text" name="search" placeholder="Search product name, SKU #ID, aisle, price..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
                 </div>
                 <button type="submit" class="admin-search-submit-btn" title="Search Catalog" aria-label="Search">
                     <i class="bi bi-search"></i>
@@ -951,10 +1013,10 @@ elseif ($view == 'products') {
                 </div>
             </div>
 
-            <form onsubmit="event.preventDefault(); loadView('products<?= ($categoryFilter !== 'All') ? '&category=' . urlencode($categoryFilter) : '' ?><?= ($stockFilter !== 'All') ? '&stock=' . urlencode($stockFilter) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="admin-desktop-search-form">
+            <form onsubmit="event.preventDefault(); loadView('products<?= ($categoryFilter !== 'All') ? '&category=' . urlencode($categoryFilter) : '' ?><?= ($stockFilter !== 'All') ? '&stock=' . urlencode($stockFilter) : '' ?>&search=' + encodeURIComponent(this.search.value.trim()));" class="admin-desktop-search-form">
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by name, SKU..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search product name, SKU #ID, aisle, price..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
                 </div>
                 <button type="submit" class="admin-desktop-search-btn">Search</button>
                 <?php if ($search !== ''): ?>
@@ -1164,10 +1226,11 @@ elseif ($view == 'users') {
     $params = [];
 
     if ($search !== '') {
-        $where[] = "(u.full_name LIKE ? OR u.email LIKE ? OR CAST(u.id AS CHAR) LIKE ?)";
-        $params[] = "%$search%";
-        $params[] = "%$search%";
-        $params[] = "%$search%";
+        list($searchClause, $searchParams) = buildAdminSearchClause($search, 'u.id', ['u.full_name', 'u.email', 'u.address', 'u.role'], 4);
+        if ($searchClause !== '') {
+            $where[] = $searchClause;
+            $params = array_merge($params, $searchParams);
+        }
     }
 
     $sql = "
@@ -1203,7 +1266,7 @@ elseif ($view == 'users') {
             <span class="admin-kicker">Client Accounts &amp; Profiles</span>
             <div class="admin-view-heading-group">
                 <h1 class="admin-view-title">Customers</h1>
-                <span class="admin-count-badge"><?= number_format($totalUsers) ?> Profiles</span>
+                <span class="admin-count-badge"><?= $search !== '' ? number_format(count($users)) . ' Found' : number_format($totalUsers) . ' Profiles' ?></span>
             </div>
             <p class="admin-view-subtitle">Verified customer accounts, transaction histories, and lifetime store value.</p>
         </div>
@@ -1279,10 +1342,10 @@ elseif ($view == 'users') {
                 'inactive' => ['label' => 'No Orders Yet', 'count' => max(0, $totalUsers - $activeBuyers)]
             ];
             ?>
-            <form onsubmit="event.preventDefault(); loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="admin-search-filter-row">
+            <form onsubmit="event.preventDefault(); loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>&search=' + encodeURIComponent(this.search.value.trim()));" class="admin-search-filter-row">
                 <div class="admin-search-box">
                     <i class="bi bi-search search-icon"></i>
-                    <input type="text" name="search" placeholder="Search accounts..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                    <input type="text" name="search" placeholder="Search customer name, email, Account #ID, address..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
                 </div>
                 <button type="submit" class="admin-search-submit-btn" title="Search Accounts" aria-label="Search">
                     <i class="bi bi-search"></i>
@@ -1334,11 +1397,12 @@ elseif ($view == 'users') {
                 <?php endforeach; ?>
             </div>
 
-            <form onsubmit="event.preventDefault(); loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="admin-desktop-search-form">
+            <form onsubmit="event.preventDefault(); loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>&search=' + encodeURIComponent(this.search.value.trim()));" class="admin-desktop-search-form">
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search name, email, ID..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search customer name, email, Account #ID, address..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
                 </div>
+
                 <button type="submit" class="admin-desktop-search-btn">Search</button>
                 <?php if ($search !== ''): ?>
                     <button type="button" onclick="loadView('users<?= ($filter !== 'all') ? '&filter=' . urlencode($filter) : '' ?>')" class="admin-desktop-clear-btn" title="Clear search">Clear</button>
@@ -1547,11 +1611,11 @@ elseif ($view == 'reviews') {
     $params = [];
 
     if ($search !== '') {
-        $where[] = "(u.full_name LIKE ? OR p.name LIKE ? OR r.comment LIKE ? OR CAST(r.id AS CHAR) LIKE ?)";
-        $params[] = "%$search%";
-        $params[] = "%$search%";
-        $params[] = "%$search%";
-        $params[] = "%$search%";
+        list($searchClause, $searchParams) = buildAdminSearchClause($search, 'r.id', ['u.full_name', 'u.email', 'p.name', 'r.comment', 'CAST(r.rating AS CHAR)'], 4);
+        if ($searchClause !== '') {
+            $where[] = $searchClause;
+            $params = array_merge($params, $searchParams);
+        }
     }
 
     if ($ratingFilter === '5') {
@@ -1567,8 +1631,8 @@ elseif ($view == 'reviews') {
     $sql = "
         SELECT r.*, u.full_name, u.email as user_email, p.name as product_name, p.image as product_image 
         FROM reviews r 
-        JOIN users u ON r.user_id = u.id 
-        JOIN products p ON r.product_id = p.id
+        LEFT JOIN users u ON r.user_id = u.id 
+        LEFT JOIN products p ON r.product_id = p.id
     ";
 
     if (!empty($where)) {
@@ -1587,7 +1651,7 @@ elseif ($view == 'reviews') {
             <span class="admin-kicker">Shopper Feedback &amp; Ratings</span>
             <div class="admin-view-heading-group">
                 <h1 class="admin-view-title">Reviews</h1>
-                <span class="admin-count-badge"><?= number_format($totalReviews) ?> Reviews</span>
+                <span class="admin-count-badge"><?= $search !== '' ? number_format($filteredCount) . ' Found' : number_format($totalReviews) . ' Reviews' ?></span>
             </div>
             <p class="admin-view-subtitle">Verified customer product feedback, star ratings, and sentiment records.</p>
         </div>
@@ -1682,10 +1746,10 @@ elseif ($view == 'reviews') {
                 'low' => ['label' => '1-2 Stars', 'count' => $lowStarCount]
             ];
             ?>
-            <form onsubmit="event.preventDefault(); loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="admin-search-filter-row">
+            <form onsubmit="event.preventDefault(); loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>&search=' + encodeURIComponent(this.search.value.trim()));" class="admin-search-filter-row">
                 <div class="admin-search-box">
                     <i class="bi bi-search search-icon"></i>
-                    <input type="text" name="search" placeholder="Search reviews..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                    <input type="text" name="search" placeholder="Search customer name, product, comment, Review #ID..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
                 </div>
                 <button type="submit" class="admin-search-submit-btn" title="Search Reviews" aria-label="Search">
                     <i class="bi bi-search"></i>
@@ -1737,11 +1801,12 @@ elseif ($view == 'reviews') {
                 <?php endforeach; ?>
             </div>
 
-            <form onsubmit="event.preventDefault(); loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>&search=' + encodeURIComponent(this.search.value));" class="admin-desktop-search-form">
+            <form onsubmit="event.preventDefault(); loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>&search=' + encodeURIComponent(this.search.value.trim()));" class="admin-desktop-search-form">
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search customer, product..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search customer name, product, comment, Review #ID..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
                 </div>
+
                 <button type="submit" class="admin-desktop-search-btn">Search</button>
                 <?php if ($search !== ''): ?>
                     <button type="button" onclick="loadView('reviews<?= ($ratingFilter !== 'all') ? '&rating=' . urlencode($ratingFilter) : '' ?><?= ($mode !== 'table') ? '&mode=' . urlencode($mode) : '' ?>')" class="admin-desktop-clear-btn" title="Clear search">Clear</button>
@@ -2199,11 +2264,14 @@ elseif ($view == 'orders') {
     $shippedCount = $statusCounts['Shipped'] ?? 0;
     $completionRate = ($statusCounts['All'] > 0) ? round(($deliveredCount / $statusCounts['All']) * 100) : 0;
 
-    // 2. Query filtered orders with item counts
+    // 2. Query filtered orders with item counts & customer user details
     $statusFilter = $_GET['status'] ?? 'All';
     $search = trim($_GET['search'] ?? '');
     
-    $sql = "SELECT o.*, (SELECT COUNT(*) FROM order_items oi WHERE oi.order_id = o.id) AS item_count FROM orders o";
+    $sql = "SELECT o.*, u.full_name AS user_full_name, u.email AS user_email, 
+            (SELECT COUNT(*) FROM order_items oi WHERE oi.order_id = o.id) AS item_count 
+            FROM orders o 
+            LEFT JOIN users u ON o.user_id = u.id";
     $where = [];
     $params = [];
 
@@ -2213,10 +2281,11 @@ elseif ($view == 'orders') {
     }
 
     if ($search !== '') {
-        $where[] = "(o.customer_name LIKE ? OR o.address LIKE ? OR CAST(o.id AS CHAR) LIKE ?)";
-        $params[] = "%$search%";
-        $params[] = "%$search%";
-        $params[] = "%$search%";
+        list($searchClause, $searchParams) = buildAdminSearchClause($search, 'o.id', ['o.customer_name', 'u.full_name', 'u.email', 'o.address'], 5);
+        if ($searchClause !== '') {
+            $where[] = $searchClause;
+            $params = array_merge($params, $searchParams);
+        }
     }
 
     if (!empty($where)) {
@@ -2234,7 +2303,7 @@ elseif ($view == 'orders') {
             <span class="admin-kicker">Fulfillment &amp; Logistics</span>
             <div class="admin-view-heading-group">
                 <h1 class="admin-view-title">Order Management</h1>
-                <span class="admin-count-badge"><?= number_format($statusCounts['All']) ?> Orders</span>
+                <span class="admin-count-badge"><?= $search !== '' ? number_format(count($allOrders)) . ' Found' : number_format($statusCounts['All']) . ' Orders' ?></span>
             </div>
             <p class="admin-view-subtitle">Track customer orders, fulfillment pipelines, and delivery records.</p>
         </div>
@@ -2306,10 +2375,10 @@ elseif ($view == 'orders') {
     <div class="admin-card admin-toolbar-card mb-4">
         <!-- Mobile 1-Line Search & Filter Bar -->
         <div class="d-lg-none">
-            <form onsubmit="event.preventDefault(); loadView('orders&status=<?= urlencode($statusFilter) ?>&search=' + encodeURIComponent(this.search.value));" class="admin-search-filter-row">
+            <form onsubmit="event.preventDefault(); loadView('orders&status=<?= urlencode($statusFilter) ?>&search=' + encodeURIComponent(this.search.value.trim()));" class="admin-search-filter-row">
                 <div class="admin-search-box">
                     <i class="bi bi-search search-icon"></i>
-                    <input type="text" name="search" placeholder="Search orders..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                    <input type="text" name="search" placeholder="Search customer name, Order #ID, address..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
                 </div>
                 <button type="submit" class="admin-search-submit-btn" title="Search Orders" aria-label="Search">
                     <i class="bi bi-search"></i>
@@ -2370,11 +2439,12 @@ elseif ($view == 'orders') {
                 <?php endforeach; ?>
             </div>
 
-            <form onsubmit="event.preventDefault(); loadView('orders&status=<?= urlencode($statusFilter) ?>&search=' + encodeURIComponent(this.search.value));" class="admin-desktop-search-form">
+            <form onsubmit="event.preventDefault(); loadView('orders&status=<?= urlencode($statusFilter) ?>&search=' + encodeURIComponent(this.search.value.trim()));" class="admin-desktop-search-form">
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search customer, address, ID..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search customer name, Order #ID, address..." value="<?= htmlspecialchars($search) ?>" autocomplete="off">
                 </div>
+
                 <button type="submit" class="admin-desktop-search-btn">Search</button>
                 <?php if ($search !== ''): ?>
                     <button type="button" onclick="loadView('orders&status=<?= urlencode($statusFilter) ?>')" class="admin-desktop-clear-btn" title="Clear search">Clear</button>
@@ -2416,7 +2486,10 @@ elseif ($view == 'orders') {
                                     #<?= str_pad($order['id'], 5, '0', STR_PAD_LEFT) ?>
                                 </td>
                                 <td class="py-3">
-                                    <div class="fw-semibold text-dark small"><?= htmlspecialchars($order['customer_name']) ?></div>
+                                    <div class="fw-semibold text-dark small"><?= htmlspecialchars($order['customer_name'] ?: ($order['user_full_name'] ?: 'Customer')) ?></div>
+                                    <?php if (!empty($order['user_email'])): ?>
+                                        <div class="text-muted" style="font-size: 0.72rem;"><?= htmlspecialchars($order['user_email']) ?></div>
+                                    <?php endif; ?>
                                     <div class="text-muted d-flex align-items-center gap-1" style="font-size: 0.72rem; max-width: 260px;">
                                         <i class="bi bi-geo-alt text-secondary" style="font-size: 0.7rem;"></i>
                                         <span class="text-truncate"><?= htmlspecialchars($order['address']) ?></span>
@@ -2482,7 +2555,7 @@ elseif ($view == 'orders') {
                         <div class="admin-touch-card-header">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.78rem;">#<?= str_pad($order['id'], 5, '0', STR_PAD_LEFT) ?></span>
-                                <span class="fw-bold text-dark text-truncate" style="font-size: 0.92rem; max-width: 150px;"><?= htmlspecialchars($order['customer_name']) ?></span>
+                                <span class="fw-bold text-dark text-truncate" style="font-size: 0.92rem; max-width: 150px;"><?= htmlspecialchars($order['customer_name'] ?: ($order['user_full_name'] ?: 'Customer')) ?></span>
                             </div>
                             <span class="admin-status-pill <?= $pillClass ?>"><?= $s ?></span>
                         </div>
