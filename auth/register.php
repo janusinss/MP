@@ -76,8 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'otp_expires' => time() + 600, // 10 minutes
                     'resend_available' => time() + 60, // 60s cooldown
                     'attempts' => 0,
-                    'dev_fallback' => $mailRes['dev_fallback'] ?? false,
-                    'dev_message' => $mailRes['message'] ?? '',
                 ];
 
                 $toastMessage = "Verification code dispatched to {$email}. Please enter the 6-digit code below.";
@@ -273,22 +271,6 @@ $appRoot = $appRoot ? $appRoot . '/' : '/';
                                 <strong class="text-dark"><?= htmlspecialchars($pendingEmail) ?></strong>
                             </p>
                         </div>
-
-                        <?php if (!empty($_SESSION['pending_reg']['dev_fallback'])): ?>
-                            <div class="otp-dev-hint" role="note">
-                                <i class="bi bi-info-circle-fill text-success fs-5 flex-shrink-0" aria-hidden="true"></i>
-                                <div>
-                                    <div class="fw-bold mb-1">Sandbox / Dev Verification Code</div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span>Use Code:</span>
-                                        <span class="otp-dev-code"><?= htmlspecialchars($_SESSION['pending_reg']['otp']) ?></span>
-                                    </div>
-                                    <div class="small text-muted mt-1" style="font-size: 0.75rem;">
-                                        (Resend sandbox delivers directly to account owner: janusdominic0@gmail.com)
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
 
                         <form method="POST" autocomplete="off" class="d-flex flex-column gap-3">
                             <?= csrf_input() ?>

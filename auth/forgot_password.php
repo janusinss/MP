@@ -78,14 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             // Anti-enumeration defense: Generate OTP if found, but always respond with success
-            $devFallback = false;
-            $devOtp = '';
-
             if ($user) {
                 $otp = str_pad((string)random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
                 $mailRes = send_password_reset_otp_email($user['email'], $user['full_name'], $otp);
-
-                $isDev = ($isLocal ?? false) || !empty($mailRes['dev_fallback']);
 
                 $_SESSION['reset_password'] = [
                     'user_id' => $user['id'],
@@ -96,14 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'resend_available' => time() + 60, // 60s cooldown
                     'attempts' => 0,
                     'verified' => false,
-                    'dev_fallback' => $isDev,
-                    'dev_message' => $mailRes['message'] ?? '',
                 ];
-
-                $devFallback = $isDev;
-                $devOtp = $devFallback ? $otp : '';
             } else {
-
                 // Fake session state to prevent timing attacks, clear reset session
                 unset($_SESSION['reset_password']);
                 usleep(random_int(200000, 400000)); // 200-400ms timing normalization
@@ -117,8 +106,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'step' => 2,
                     'email' => $email,
                     'message' => $successMsg,
-                    'dev_fallback' => $devFallback,
-                    'dev_otp' => $devOtp,
                     'seconds_left' => 600,
                     'resend_seconds' => 60
                 ]);
@@ -234,8 +221,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $reset['attempts'] = 0;
 
                 $mailRes = send_password_reset_otp_email($reset['email'], $reset['full_name'], $newOtp);
-                $reset['dev_fallback'] = $mailRes['dev_fallback'] ?? false;
-                $reset['dev_message'] = $mailRes['message'] ?? '';
 
                 $successMsg = "A fresh verification code has been dispatched to {$reset['email']}.";
                 if ($isAjax) {
@@ -243,8 +228,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo json_encode([
                         'success' => true,
                         'message' => $successMsg,
-                        'dev_fallback' => $reset['dev_fallback'],
-                        'dev_otp' => $reset['dev_fallback'] ? $newOtp : '',
                         'seconds_left' => 600,
                         'resend_seconds' => 60
                     ]);
@@ -481,22 +464,6 @@ $appRoot = $appRoot ? $appRoot . '/' : '/';
                                 <strong class="text-dark"><?= htmlspecialchars($resetEmail) ?></strong>
                             </p>
                         </div>
-
-                        <?php if (!empty($_SESSION['reset_password']['dev_fallback'])): ?>
-                            <div class="otp-dev-hint" role="note">
-                                <i class="bi bi-info-circle-fill text-success fs-5 flex-shrink-0" aria-hidden="true"></i>
-                                <div>
-                                    <div class="fw-bold mb-1">Sandbox / Dev Reset Code</div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span>Use Code:</span>
-                                        <span class="otp-dev-code"><?= htmlspecialchars($_SESSION['reset_password']['otp']) ?></span>
-                                    </div>
-                                    <div class="small text-muted mt-1" style="font-size: 0.75rem;">
-                                        (Resend sandbox delivers directly to account owner: janusdominic0@gmail.com)
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
 
                         <?php if ($error): ?>
                             <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-3 d-flex align-items-center gap-2 py-2 px-3 small" role="alert">

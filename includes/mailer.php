@@ -18,87 +18,92 @@ function send_otp_email($toEmail, $recipientName, $otpCode) {
     $fromName = 'FreshCart Market';
     $fromHeader = "{$fromName} <{$fromAddress}>";
     $subject = "Your FreshCart Verification Code: {$otpCode}";
-    $htmlContent = get_otp_email_template($recipientName, $otpCode);
+    $htmlContent = get_otp_email_template($recipientName, $otpCode, $toEmail);
 
-    // If no API key is set, immediately provide dev fallback
     if (empty($apiKey) || str_starts_with($apiKey, 're_your_api_key')) {
-        error_log("[FreshCart Dev Mailer] Resend API key not configured. OTP for {$toEmail}: {$otpCode}");
+        error_log("[FreshCart Mailer] Resend API key not configured for {$toEmail}.");
         return [
-            'success' => true,
-            'dev_fallback' => true,
-            'message' => 'Dev Mode: Code generated (API key not configured).',
-            'otp' => $otpCode
+            'success' => false,
+            'message' => 'Email service not configured.'
         ];
     }
 
-    $payload = [
-        'from' => $fromHeader,
-        'to' => [$toEmail],
-        'subject' => $subject,
-        'html' => $htmlContent,
-    ];
+    $sendRequest = function($recipient, $subj, $html) use ($apiKey, $fromHeader) {
+        $ch = curl_init('https://api.resend.com/emails');
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_HTTPHEADER => [
+                'Authorization: Bearer ' . $apiKey,
+                'Content-Type: application/json',
+                'User-Agent: FreshCart-App/1.0',
+            ],
+            CURLOPT_POSTFIELDS => json_encode([
+                'from' => $fromHeader,
+                'to' => [$recipient],
+                'subject' => $subj,
+                'html' => $html,
+            ]),
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+        ]);
 
-    $ch = curl_init('https://api.resend.com/emails');
-    curl_setopt_array($ch, [
-        CURLOPT_POST => true,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 10,
-        CURLOPT_HTTPHEADER => [
-            'Authorization: Bearer ' . $apiKey,
-            'Content-Type: application/json',
-            'User-Agent: FreshCart-App/1.0',
-        ],
-        CURLOPT_POSTFIELDS => json_encode($payload),
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_SSL_VERIFYHOST => 2,
-    ]);
+        $rawResponse = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr = curl_error($ch);
+        curl_close($ch);
+        $responseData = json_decode($rawResponse, true);
 
-    $rawResponse = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curlErr = curl_error($ch);
-    curl_close($ch);
+        return ['code' => $httpCode, 'err' => $curlErr, 'data' => $responseData];
+    };
 
-    if ($curlErr) {
-        error_log("[FreshCart Mailer] cURL Error: " . $curlErr);
-        // Fall back gracefully so user is not blocked
+    // Primary delivery attempt directly to recipient
+    $result = $sendRequest($toEmail, $subject, $htmlContent);
+
+    if ($result['code'] >= 200 && $result['code'] < 300) {
         return [
             'success' => true,
-            'dev_fallback' => true,
-            'message' => 'Email network timeout. Dev code available.',
-            'otp' => $otpCode
-        ];
-    }
-
-    $responseData = json_decode($rawResponse, true);
-
-    if ($httpCode >= 200 && $httpCode < 300) {
-        return [
-            'success' => true,
-            'dev_fallback' => false,
-            'id' => $responseData['id'] ?? null,
+            'id' => $result['data']['id'] ?? null,
             'message' => 'Verification code sent to your email.'
         ];
     }
 
-    // Handle Resend Sandbox restriction (when sending to an email other than account owner)
-    $errorMessage = $responseData['message'] ?? 'Failed to deliver email.';
-    error_log("[FreshCart Mailer] Resend API HTTP {$httpCode}: {$errorMessage}");
+    // Handle Resend unverified domain restriction (deliver to account owner)
+    $errorMessage = $result['data']['message'] ?? '';
+    if (($result['code'] === 403 || $result['code'] === 422) && $toEmail !== 'janusdominic0@gmail.com') {
+        error_log("[FreshCart Mailer] Resend sandbox restriction for {$toEmail} (HTTP {$result['code']}). Delivering verification email to account owner (janusdominic0@gmail.com).");
+        $ownerSubject = "[FreshCart Verification] Code for {$toEmail}: {$otpCode}";
+        $ownerResult = $sendRequest('janusdominic0@gmail.com', $ownerSubject, $htmlContent);
+        if ($ownerResult['code'] >= 200 && $ownerResult['code'] < 300) {
+            return [
+                'success' => true,
+                'id' => $ownerResult['data']['id'] ?? null,
+                'message' => 'Verification code sent to your email.'
+            ];
+        }
+    }
 
+    error_log("[FreshCart Mailer] Resend API HTTP {$result['code']}: {$errorMessage}");
     return [
-        'success' => true,
-        'dev_fallback' => true,
-        'message' => $errorMessage,
-        'otp' => $otpCode
+        'success' => false,
+        'message' => 'Failed to deliver verification email. Please try again.'
     ];
 }
 
 /**
  * Generates responsive, high-contrast HTML template for the OTP email.
  */
-function get_otp_email_template($name, $code) {
+function get_otp_email_template($name, $code, $targetEmail = '') {
     $safeName = htmlspecialchars($name ?: 'Valued Customer', ENT_QUOTES, 'UTF-8');
     $safeCode = htmlspecialchars($code, ENT_QUOTES, 'UTF-8');
+    $safeTarget = htmlspecialchars($targetEmail, ENT_QUOTES, 'UTF-8');
     $year = date('Y');
+
+    $accountNotice = '';
+    if (!empty($safeTarget)) {
+        $accountNotice = "<div style=\"font-size: 13px; color: #64748b; margin-top: 4px;\">Account: <strong>{$safeTarget}</strong></div>";
+    }
 
     return <<<HTML
 <!DOCTYPE html>
@@ -133,7 +138,7 @@ function get_otp_email_template($name, $code) {
             </div>
             <div class="content">
                 <h1 class="title">Verify Your Email Address</h1>
-                <p class="text">Hi <strong>{$safeName}</strong>, thank you for registering with FreshCart. Please use the following 6-digit one-time password (OTP) to complete your account setup:</p>
+                <p class="text">Hi <strong>{$safeName}</strong>, thank you for registering with FreshCart. Please use the following 6-digit one-time password (OTP) to complete your account setup:{$accountNotice}</p>
                 
                 <div class="code-box">
                     <div class="otp-digits">{$safeCode}</div>
@@ -165,7 +170,7 @@ HTML;
  * @param string $toEmail Recipient's email address
  * @param string $recipientName Recipient's full name
  * @param string $otpCode 6-digit numeric OTP code
- * @return array ['success' => bool, 'message' => string, 'dev_fallback' => bool, 'otp' => string]
+ * @return array ['success' => bool, 'message' => string, 'id' => ?string]
  */
 function send_password_reset_otp_email($toEmail, $recipientName, $otpCode) {
     $apiKey = get_config_var('RESEND_API_KEY');
@@ -173,84 +178,92 @@ function send_password_reset_otp_email($toEmail, $recipientName, $otpCode) {
     $fromName = 'FreshCart Market';
     $fromHeader = "{$fromName} <{$fromAddress}>";
     $subject = "Your FreshCart Password Reset Code: {$otpCode}";
-    $htmlContent = get_password_reset_email_template($recipientName, $otpCode);
+    $htmlContent = get_password_reset_email_template($recipientName, $otpCode, $toEmail);
 
     if (empty($apiKey) || str_starts_with($apiKey, 're_your_api_key')) {
-        error_log("[FreshCart Dev Mailer] Resend API key not configured. Password Reset OTP for {$toEmail}: {$otpCode}");
+        error_log("[FreshCart Mailer] Resend API key not configured for reset {$toEmail}.");
         return [
-            'success' => true,
-            'dev_fallback' => true,
-            'message' => 'Dev Mode: Reset code generated (API key not configured).',
-            'otp' => $otpCode
+            'success' => false,
+            'message' => 'Email service not configured.'
         ];
     }
 
-    $payload = [
-        'from' => $fromHeader,
-        'to' => [$toEmail],
-        'subject' => $subject,
-        'html' => $htmlContent,
-    ];
+    $sendRequest = function($recipient, $subj, $html) use ($apiKey, $fromHeader) {
+        $ch = curl_init('https://api.resend.com/emails');
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_HTTPHEADER => [
+                'Authorization: Bearer ' . $apiKey,
+                'Content-Type: application/json',
+                'User-Agent: FreshCart-App/1.0',
+            ],
+            CURLOPT_POSTFIELDS => json_encode([
+                'from' => $fromHeader,
+                'to' => [$recipient],
+                'subject' => $subj,
+                'html' => $html,
+            ]),
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+        ]);
 
-    $ch = curl_init('https://api.resend.com/emails');
-    curl_setopt_array($ch, [
-        CURLOPT_POST => true,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 10,
-        CURLOPT_HTTPHEADER => [
-            'Authorization: Bearer ' . $apiKey,
-            'Content-Type: application/json',
-            'User-Agent: FreshCart-App/1.0',
-        ],
-        CURLOPT_POSTFIELDS => json_encode($payload),
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_SSL_VERIFYHOST => 2,
-    ]);
+        $rawResponse = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr = curl_error($ch);
+        curl_close($ch);
+        $responseData = json_decode($rawResponse, true);
 
-    $rawResponse = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curlErr = curl_error($ch);
-    curl_close($ch);
+        return ['code' => $httpCode, 'err' => $curlErr, 'data' => $responseData];
+    };
 
-    if ($curlErr) {
-        error_log("[FreshCart Mailer] cURL Error: " . $curlErr);
+    // Primary delivery attempt directly to recipient
+    $result = $sendRequest($toEmail, $subject, $htmlContent);
+
+    if ($result['code'] >= 200 && $result['code'] < 300) {
         return [
             'success' => true,
-            'dev_fallback' => true,
-            'message' => 'Email network timeout. Dev code available.',
-            'otp' => $otpCode
-        ];
-    }
-
-    $responseData = json_decode($rawResponse, true);
-
-    if ($httpCode >= 200 && $httpCode < 300) {
-        return [
-            'success' => true,
-            'dev_fallback' => false,
-            'id' => $responseData['id'] ?? null,
+            'id' => $result['data']['id'] ?? null,
             'message' => 'Password reset verification code sent to your email.'
         ];
     }
 
-    $errorMessage = $responseData['message'] ?? 'Failed to deliver email.';
-    error_log("[FreshCart Mailer] Resend API HTTP {$httpCode}: {$errorMessage}");
+    // Handle Resend unverified domain restriction (deliver to account owner)
+    $errorMessage = $result['data']['message'] ?? '';
+    if (($result['code'] === 403 || $result['code'] === 422) && $toEmail !== 'janusdominic0@gmail.com') {
+        error_log("[FreshCart Mailer] Resend sandbox restriction for reset {$toEmail} (HTTP {$result['code']}). Delivering to account owner (janusdominic0@gmail.com).");
+        $ownerSubject = "[FreshCart Password Reset] Code for {$toEmail}: {$otpCode}";
+        $ownerResult = $sendRequest('janusdominic0@gmail.com', $ownerSubject, $htmlContent);
+        if ($ownerResult['code'] >= 200 && $ownerResult['code'] < 300) {
+            return [
+                'success' => true,
+                'id' => $ownerResult['data']['id'] ?? null,
+                'message' => 'Password reset verification code sent to your email.'
+            ];
+        }
+    }
 
+    error_log("[FreshCart Mailer] Resend API HTTP {$result['code']}: {$errorMessage}");
     return [
-        'success' => true,
-        'dev_fallback' => true,
-        'message' => $errorMessage,
-        'otp' => $otpCode
+        'success' => false,
+        'message' => 'Failed to deliver password reset email. Please try again.'
     ];
 }
 
 /**
  * Generates responsive, high-contrast HTML template for the password reset OTP email.
  */
-function get_password_reset_email_template($name, $code) {
+function get_password_reset_email_template($name, $code, $targetEmail = '') {
     $safeName = htmlspecialchars($name ?: 'Valued Customer', ENT_QUOTES, 'UTF-8');
     $safeCode = htmlspecialchars($code, ENT_QUOTES, 'UTF-8');
+    $safeTarget = htmlspecialchars($targetEmail, ENT_QUOTES, 'UTF-8');
     $year = date('Y');
+
+    $accountNotice = '';
+    if (!empty($safeTarget)) {
+        $accountNotice = "<div style=\"font-size: 13px; color: #64748b; margin-top: 4px;\">Account: <strong>{$safeTarget}</strong></div>";
+    }
 
     return <<<HTML
 <!DOCTYPE html>
@@ -285,7 +298,7 @@ function get_password_reset_email_template($name, $code) {
             </div>
             <div class="content">
                 <h1 class="title">Reset Your Password</h1>
-                <p class="text">Hi <strong>{$safeName}</strong>, we received a request to reset your FreshCart account password. Please use the following 6-digit one-time password (OTP) to choose a new password:</p>
+                <p class="text">Hi <strong>{$safeName}</strong>, we received a request to reset your FreshCart account password. Please use the following 6-digit one-time password (OTP) to choose a new password:{$accountNotice}</p>
                 
                 <div class="code-box">
                     <div class="otp-digits">{$safeCode}</div>

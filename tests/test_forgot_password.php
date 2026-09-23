@@ -79,16 +79,19 @@ try {
     $sendData = json_decode($sendRes['body'], true);
     assertTest("5. Send OTP Request succeeds (HTTP 200, step 2)", $sendRes['code'] === 200 && ($sendData['success'] ?? false) === true);
 
-    $otpCode = $sendData['dev_otp'] ?? '';
-    if (empty($otpCode)) {
-        $cookieContent = file_get_contents($cookieFile);
-        if (preg_match('/PHPSESSID\s+([a-zA-Z0-9,-]+)/', $cookieContent, $sessMatches)) {
-            $sessId = $sessMatches[1];
-            $sessFile = sys_get_temp_dir() . '/sess_' . $sessId;
+    $otpCode = '';
+    $cookieContent = file_get_contents($cookieFile);
+    if (preg_match('/PHPSESSID\s+([a-zA-Z0-9,-]+)/', $cookieContent, $sessMatches)) {
+        $sessId = $sessMatches[1];
+        $sessDirs = [session_save_path(), 'C:/xampp/tmp', sys_get_temp_dir()];
+        foreach ($sessDirs as $dir) {
+            if (empty($dir)) continue;
+            $sessFile = rtrim($dir, '/\\') . '/sess_' . $sessId;
             if (file_exists($sessFile)) {
                 $sessRaw = file_get_contents($sessFile);
                 if (preg_match('/"otp";s:6:"(\d{6})"/', $sessRaw, $otpMatches)) {
                     $otpCode = $otpMatches[1];
+                    break;
                 }
             }
         }

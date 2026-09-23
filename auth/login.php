@@ -242,17 +242,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <strong class="text-dark" id="displayResetEmail"></strong>
                     </p>
 
-                    <div id="modalDevHint" class="otp-dev-hint mb-3 d-none">
-                        <i class="bi bi-info-circle-fill text-success fs-5 flex-shrink-0" aria-hidden="true"></i>
-                        <div>
-                            <div class="fw-bold mb-1">Sandbox / Dev Code</div>
-                            <div class="d-flex align-items-center gap-2">
-                                <span>Code:</span>
-                                <span class="otp-dev-code" id="modalDevCode"></span>
-                            </div>
-                        </div>
-                    </div>
-
                     <div id="forgotAlert2" class="alert alert-danger py-2 px-3 small border-0 rounded-3 d-none mb-3"></div>
 
                     <form id="forgotForm2" class="d-flex flex-column gap-3">
@@ -380,8 +369,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         const modalEmailInput = document.getElementById('modalForgotEmail');
         const modalOtpInput = document.getElementById('modalOtpInput');
         const displayResetEmail = document.getElementById('displayResetEmail');
-        const modalDevHint = document.getElementById('modalDevHint');
-        const modalDevCode = document.getElementById('modalDevCode');
         const modalOtpCountdown = document.getElementById('modalOtpCountdown');
         const modalResendBtn = document.getElementById('modalResendBtn');
         const modalResendText = document.getElementById('modalResendText');
@@ -532,12 +519,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         });
                     }
                     displayResetEmail.textContent = email;
-                    if (data.dev_fallback && data.dev_otp) {
-                        modalDevCode.textContent = data.dev_otp;
-                        modalDevHint.classList.remove('d-none');
-                    } else {
-                        modalDevHint.classList.add('d-none');
-                    }
                     startOtpCountdown(data.seconds_left || 600);
                     startResendCooldown(data.resend_seconds || 60);
                     showStep(2);
@@ -623,10 +604,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             title: 'Code Resent',
                             message: data.message || 'A fresh code has been sent.'
                         });
-                    }
-                    if (data.dev_fallback && data.dev_otp) {
-                        modalDevCode.textContent = data.dev_otp;
-                        modalDevHint.classList.remove('d-none');
                     }
                     startOtpCountdown(data.seconds_left || 600);
                     startResendCooldown(data.resend_seconds || 60);

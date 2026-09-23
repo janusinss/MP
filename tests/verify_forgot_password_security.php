@@ -153,8 +153,25 @@ try {
         'csrf_token' => $csrfToken,
         'email' => $pentestEmail
     ], ['X-Requested-With' => 'XMLHttpRequest']);
-    $otpData2 = json_decode($otpReq2['body'], true);
-    $validOtp = $otpData2['dev_otp'] ?? '';
+    
+    // Extract OTP directly from server session file (zero client leakage)
+    $validOtp = '';
+    $cookieContent = file_get_contents($cookieFile);
+    if (preg_match('/PHPSESSID\s+([a-zA-Z0-9,-]+)/', $cookieContent, $sessMatches)) {
+        $sessId = $sessMatches[1];
+        $sessDirs = [session_save_path(), 'C:/xampp/tmp', sys_get_temp_dir()];
+        foreach ($sessDirs as $dir) {
+            if (empty($dir)) continue;
+            $sessFile = rtrim($dir, '/\\') . '/sess_' . $sessId;
+            if (file_exists($sessFile)) {
+                $sessRaw = file_get_contents($sessFile);
+                if (preg_match('/"otp";s:6:"(\d{6})"/', $sessRaw, $otpMatches)) {
+                    $validOtp = $otpMatches[1];
+                    break;
+                }
+            }
+        }
+    }
 
     // Verify correct OTP
     $verRes = pentest_req("$baseUrl/forgot-password?ajax=1", 'POST', [
