@@ -1,4 +1,6 @@
-
+-- FreshCart Cloud Database Schema & Initial Catalog
+-- Target Environment: InfinityFree MySQL Hosting
+-- Generated on: 2026-09-23 12:37:28
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -10,551 +12,30 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
-DROP TABLE IF EXISTS `api_cart`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `api_cart` (
+-- --------------------------------------------------------
+-- Table structure for table `users`
+-- --------------------------------------------------------
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
-  `quantity` int(11) DEFAULT 1,
+  `full_name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `address` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `api_token` varchar(64) DEFAULT NULL,
+  `role` varchar(20) DEFAULT 'customer',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_cart_item` (`user_id`,`product_id`),
-  KEY `product_id` (`product_id`),
-  CONSTRAINT `api_cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `api_cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-LOCK TABLES `api_cart` WRITE;
-/*!40000 ALTER TABLE `api_cart` DISABLE KEYS */;
-/*!40000 ALTER TABLE `api_cart` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `coupons`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `coupons` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(50) NOT NULL,
-  `discount_percent` int(11) NOT NULL,
-  `expiry_date` date NOT NULL,
-  `status` varchar(20) DEFAULT 'Active',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-LOCK TABLES `coupons` WRITE;
-/*!40000 ALTER TABLE `coupons` DISABLE KEYS */;
-INSERT INTO `coupons` VALUES
-(1,'WELCOME20',20,'2030-12-31','Active'),
-(2,'FRESH50',50,'2030-12-31','Active');
-/*!40000 ALTER TABLE `coupons` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `order_items`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `order_items` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `order_id` int(11) DEFAULT NULL,
-  `product_id` int(11) DEFAULT NULL,
-  `quantity` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `order_id` (`order_id`),
-  KEY `product_id` (`product_id`),
-  CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
-  CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14821 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+-- --------------------------------------------------------
+-- Table structure for table `products`
+-- --------------------------------------------------------
 
-LOCK TABLES `order_items` WRITE;
-/*!40000 ALTER TABLE `order_items` DISABLE KEYS */;
-INSERT INTO `order_items` VALUES
-(11,NULL,1,1),
-(12,NULL,2,1),
-(13,NULL,3,1),
-(14,NULL,4,1),
-(15,NULL,5,1),
-(14429,4832,1,1),
-(14432,4836,1,1),
-(14434,4838,1,1),
-(14437,4841,1,1),
-(14438,4842,1,1),
-(14439,4843,1,1),
-(14442,4846,1,1),
-(14443,4847,1,1),
-(14444,4848,1,1),
-(14445,4849,1,1),
-(14446,4850,1,1),
-(14447,4851,1,1),
-(14448,4852,1,1),
-(14449,4853,1,1),
-(14450,4854,1,1),
-(14451,4855,1,1),
-(14452,4856,1,1),
-(14453,4857,1,1),
-(14454,4858,1,1),
-(14455,4859,1,1),
-(14456,4860,1,1),
-(14457,4861,1,1),
-(14458,4862,1,1),
-(14459,4863,1,1),
-(14460,4864,1,1),
-(14461,4865,1,1),
-(14462,4866,1,1),
-(14463,4867,1,1),
-(14464,4868,1,1),
-(14465,4869,1,1),
-(14466,4870,1,1),
-(14467,4871,1,1),
-(14468,4872,1,1),
-(14469,4873,1,1),
-(14470,4874,1,1),
-(14471,4875,1,1),
-(14472,4876,1,1),
-(14473,4877,1,1),
-(14474,4878,1,1),
-(14475,4879,1,1),
-(14476,4880,1,1),
-(14477,4881,1,1),
-(14482,4886,1,1),
-(14485,4889,1,1),
-(14487,4891,1,1),
-(14488,4892,1,1),
-(14492,4896,1,1),
-(14493,4897,1,1),
-(14494,4898,1,1),
-(14495,4899,1,1),
-(14496,4900,1,1),
-(14497,4901,1,1),
-(14499,4903,1,1),
-(14500,4904,1,1),
-(14501,4905,1,1),
-(14502,4906,1,1),
-(14505,4909,1,1),
-(14506,4910,1,1),
-(14509,4913,1,1),
-(14510,4914,1,1),
-(14513,4917,1,1),
-(14514,4918,1,1),
-(14517,4921,1,1),
-(14518,4922,1,1),
-(14520,4924,1,1),
-(14521,4925,1,1),
-(14523,4927,1,1),
-(14524,4928,1,1),
-(14526,4930,1,1),
-(14527,4931,1,1),
-(14529,4933,1,1),
-(14530,4934,1,1),
-(14532,4936,1,1),
-(14533,4937,1,1),
-(14534,4938,1,1),
-(14536,4940,1,1),
-(14537,4941,1,1),
-(14538,4942,1,1),
-(14540,4944,1,1),
-(14541,4945,1,1),
-(14543,4947,1,1),
-(14544,4948,1,1),
-(14546,4950,1,1),
-(14547,4951,1,1),
-(14549,4953,1,1),
-(14550,4954,1,1),
-(14552,4956,1,1),
-(14553,4957,1,1),
-(14555,4959,1,1),
-(14556,4960,1,1),
-(14558,4962,1,1),
-(14559,4963,1,1),
-(14561,4965,1,1),
-(14562,4966,1,1),
-(14564,4968,1,1),
-(14565,4969,1,1),
-(14568,4972,1,1),
-(14569,4973,1,1),
-(14571,4975,1,1),
-(14572,4976,1,1),
-(14574,4978,1,1),
-(14575,4979,1,1),
-(14578,4982,1,1),
-(14579,4983,1,1),
-(14581,4985,1,1),
-(14582,4986,1,1),
-(14584,4988,1,1),
-(14585,4989,1,1),
-(14587,4991,1,1),
-(14588,4992,1,1),
-(14589,4993,1,1),
-(14591,4995,1,1),
-(14592,4996,1,1),
-(14593,4997,1,1),
-(14595,4999,1,1),
-(14596,5000,1,1),
-(14598,5002,1,1),
-(14599,5003,1,1),
-(14601,5005,1,1),
-(14602,5006,1,1),
-(14604,5008,1,1),
-(14605,5009,1,1),
-(14606,5010,1,1),
-(14608,5012,1,1),
-(14609,5013,1,1),
-(14611,5015,1,1),
-(14612,5016,1,1),
-(14614,5018,1,1),
-(14615,5019,1,1),
-(14617,5021,10,1),
-(14618,5022,10,1),
-(14619,5023,94,1),
-(14620,5024,1,1),
-(14621,5025,1,1),
-(14623,5027,1,1),
-(14624,5028,1,1),
-(14626,5030,1,1),
-(14627,5031,1,1),
-(14629,5033,1,1),
-(14630,5034,1,1),
-(14632,5036,1,1),
-(14633,5037,1,1),
-(14634,5038,1,1),
-(14636,5040,1,1),
-(14637,5041,1,1),
-(14640,5044,1,1),
-(14641,5045,1,1),
-(14644,5048,1,1),
-(14645,5049,1,1),
-(14647,5051,1,1),
-(14648,5052,1,1),
-(14651,5055,1,1),
-(14652,5056,1,1),
-(14655,5059,1,1),
-(14656,5060,1,1),
-(14659,5063,1,1),
-(14660,5064,1,1),
-(14663,5067,1,1),
-(14664,5068,1,1),
-(14667,5071,1,1),
-(14668,5072,1,1),
-(14671,5075,1,1),
-(14672,5076,1,1),
-(14675,5079,1,1),
-(14676,5080,1,1),
-(14679,5083,1,1),
-(14680,5084,1,1),
-(14683,5087,1,1),
-(14684,5088,1,1),
-(14687,5091,1,1),
-(14688,5092,1,1),
-(14690,5094,1,1),
-(14691,5095,1,1),
-(14693,5097,1,1),
-(14694,5098,1,1),
-(14696,5100,1,1),
-(14697,5101,1,1),
-(14699,5103,1,1),
-(14700,5104,1,1),
-(14702,5106,1,1),
-(14703,5107,1,1),
-(14705,5109,1,1),
-(14706,5110,1,1),
-(14708,5112,1,1),
-(14709,5113,1,1),
-(14713,5117,1,1),
-(14716,5120,1,2),
-(14717,5121,3,2),
-(14718,5121,101,1),
-(14719,5122,99,1),
-(14720,5123,3,1),
-(14731,5141,1,1),
-(14734,5144,1,1),
-(14735,5145,1,1),
-(14738,5148,1,1),
-(14740,5150,1,1),
-(14742,5152,1,1),
-(14744,5154,1,1),
-(14747,5157,1,1),
-(14750,5160,1,1),
-(14753,5163,1,1),
-(14756,5166,1,1),
-(14759,5169,1,1),
-(14762,5172,1,1),
-(14765,5175,1,1),
-(14768,5178,1,1),
-(14771,5181,1,1),
-(14774,5184,1,1),
-(14777,5187,1,1),
-(14780,5190,1,1),
-(14783,5193,1,1),
-(14785,5195,1,1),
-(14786,5196,1,1),
-(14788,5198,1,1),
-(14790,5200,1,1),
-(14792,5202,1,1),
-(14795,5205,1,1),
-(14798,5208,1,1),
-(14801,5211,1,1),
-(14804,5214,1,1),
-(14807,5217,1,1),
-(14810,5220,1,1),
-(14813,5223,1,1),
-(14816,5226,1,1),
-(14819,5229,1,1);
-/*!40000 ALTER TABLE `order_items` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `orders`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `orders` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) DEFAULT NULL,
-  `customer_name` varchar(100) NOT NULL,
-  `address` text NOT NULL,
-  `total_amount` decimal(10,2) NOT NULL,
-  `status` varchar(50) DEFAULT 'Pending',
-  `order_date` timestamp NULL DEFAULT current_timestamp(),
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `idx_orders_status` (`status`),
-  KEY `idx_orders_user_id` (`user_id`),
-  CONSTRAINT `fk_orders_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=5231 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `orders` WRITE;
-/*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES
-(4832,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 12:46:40','2026-09-19 12:46:40'),
-(4836,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 12:51:56','2026-09-19 12:51:56'),
-(4838,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 13:06:10','2026-09-19 13:06:10'),
-(4841,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 14:25:58','2026-09-19 14:25:58'),
-(4842,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 14:27:24','2026-09-19 14:27:24'),
-(4843,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 14:28:25','2026-09-19 14:28:25'),
-(4846,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 14:33:44','2026-09-19 14:33:44'),
-(4847,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 14:35:29','2026-09-19 14:35:29'),
-(4848,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 14:35:48','2026-09-19 14:35:48'),
-(4849,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 14:35:58','2026-09-19 14:35:58'),
-(4850,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 14:36:05','2026-09-19 14:36:05'),
-(4851,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 14:37:23','2026-09-19 14:37:23'),
-(4852,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 15:03:26','2026-09-19 15:03:26'),
-(4853,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 15:06:18','2026-09-19 15:06:18'),
-(4854,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 15:17:39','2026-09-19 15:17:39'),
-(4855,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 15:21:49','2026-09-19 15:21:49'),
-(4856,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 15:28:20','2026-09-19 15:28:20'),
-(4857,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 15:33:56','2026-09-19 15:33:56'),
-(4858,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 15:33:56','2026-09-19 15:33:56'),
-(4859,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 15:46:46','2026-09-19 15:46:46'),
-(4860,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 15:47:23','2026-09-19 15:47:23'),
-(4861,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 15:54:22','2026-09-19 15:54:22'),
-(4862,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 16:24:21','2026-09-19 16:24:21'),
-(4863,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 16:24:27','2026-09-19 16:24:27'),
-(4864,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 16:34:50','2026-09-19 16:34:50'),
-(4865,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 16:35:05','2026-09-19 16:35:05'),
-(4866,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 16:36:42','2026-09-19 16:36:42'),
-(4867,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 16:36:56','2026-09-19 16:36:56'),
-(4868,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 16:45:22','2026-09-19 16:45:22'),
-(4869,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 16:45:36','2026-09-19 16:45:36'),
-(4870,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 16:47:34','2026-09-19 16:47:34'),
-(4871,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 16:48:01','2026-09-19 16:48:01'),
-(4872,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 17:01:37','2026-09-19 17:01:37'),
-(4873,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 17:01:38','2026-09-19 17:01:38'),
-(4874,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 17:13:07','2026-09-19 17:13:07'),
-(4875,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 17:13:08','2026-09-19 17:13:08'),
-(4876,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 17:17:19','2026-09-19 17:17:19'),
-(4877,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 17:17:19','2026-09-19 17:17:19'),
-(4878,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-19 17:24:59','2026-09-19 17:24:59'),
-(4879,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-19 17:25:00','2026-09-19 17:25:00'),
-(4880,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 08:17:35','2026-09-20 08:17:35'),
-(4881,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 08:17:44','2026-09-20 08:17:44'),
-(4886,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 11:01:42','2026-09-20 11:01:42'),
-(4889,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 11:03:59','2026-09-20 11:03:59'),
-(4891,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 11:05:06','2026-09-20 11:05:06'),
-(4892,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 11:05:23','2026-09-20 11:05:23'),
-(4896,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 11:08:16','2026-09-20 11:08:16'),
-(4897,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 11:16:30','2026-09-20 11:16:30'),
-(4898,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 11:16:35','2026-09-20 11:16:35'),
-(4899,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 11:42:21','2026-09-20 11:42:21'),
-(4900,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 11:42:26','2026-09-20 11:42:26'),
-(4901,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 11:43:00','2026-09-20 11:43:00'),
-(4903,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 12:27:46','2026-09-20 12:27:46'),
-(4904,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 12:28:07','2026-09-20 12:28:07'),
-(4905,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 12:33:06','2026-09-20 12:33:06'),
-(4906,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 12:33:10','2026-09-20 12:33:10'),
-(4909,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 12:34:22','2026-09-20 12:34:22'),
-(4910,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 12:34:23','2026-09-20 12:34:23'),
-(4913,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 12:41:49','2026-09-20 12:41:49'),
-(4914,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 12:41:50','2026-09-20 12:41:50'),
-(4917,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 12:47:37','2026-09-20 12:47:37'),
-(4918,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 12:47:38','2026-09-20 12:47:38'),
-(4921,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 12:51:12','2026-09-20 12:51:12'),
-(4922,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 12:51:13','2026-09-20 12:51:13'),
-(4924,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 12:58:14','2026-09-20 12:58:14'),
-(4925,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 12:58:15','2026-09-20 12:58:15'),
-(4927,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 12:59:54','2026-09-20 12:59:54'),
-(4928,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 12:59:54','2026-09-20 12:59:54'),
-(4930,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:05:02','2026-09-20 13:05:02'),
-(4931,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 13:05:05','2026-09-20 13:05:05'),
-(4933,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:09:06','2026-09-20 13:09:06'),
-(4934,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 13:09:07','2026-09-20 13:09:07'),
-(4936,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:09:58','2026-09-20 13:09:58'),
-(4937,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Cancelled','2026-09-20 13:16:38','2026-09-20 13:16:38'),
-(4938,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 13:16:39','2026-09-20 13:16:39'),
-(4940,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:19:34','2026-09-20 13:19:34'),
-(4941,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:21:43','2026-09-20 13:21:43'),
-(4942,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 13:21:48','2026-09-20 13:21:48'),
-(4944,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:22:25','2026-09-20 13:22:25'),
-(4945,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 13:22:26','2026-09-20 13:22:26'),
-(4947,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:37:21','2026-09-20 13:37:21'),
-(4948,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 13:37:22','2026-09-20 13:37:22'),
-(4950,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:37:57','2026-09-20 13:37:57'),
-(4951,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 13:37:57','2026-09-20 13:37:57'),
-(4953,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:43:08','2026-09-20 13:43:08'),
-(4954,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 13:43:09','2026-09-20 13:43:09'),
-(4956,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:43:37','2026-09-20 13:43:37'),
-(4957,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 13:43:38','2026-09-20 13:43:38'),
-(4959,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:45:48','2026-09-20 13:45:48'),
-(4960,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 13:45:48','2026-09-20 13:45:48'),
-(4962,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:47:58','2026-09-20 13:47:58'),
-(4963,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 13:47:59','2026-09-20 13:47:59'),
-(4965,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 13:50:49','2026-09-20 13:50:49'),
-(4966,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 13:50:49','2026-09-20 13:50:49'),
-(4968,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 14:16:40','2026-09-20 14:16:40'),
-(4969,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 14:16:41','2026-09-20 14:16:41'),
-(4972,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 14:21:15','2026-09-20 14:21:15'),
-(4973,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 14:21:15','2026-09-20 14:21:15'),
-(4975,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 14:27:46','2026-09-20 14:27:46'),
-(4976,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 14:27:47','2026-09-20 14:27:47'),
-(4978,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 14:33:24','2026-09-20 14:33:24'),
-(4979,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 14:33:25','2026-09-20 14:33:25'),
-(4982,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 14:35:29','2026-09-20 14:35:29'),
-(4983,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 14:35:30','2026-09-20 14:35:30'),
-(4985,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 14:40:04','2026-09-20 14:40:04'),
-(4986,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 14:40:05','2026-09-20 14:40:05'),
-(4988,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 14:48:03','2026-09-20 14:48:03'),
-(4989,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 14:48:04','2026-09-20 14:48:04'),
-(4991,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 14:50:32','2026-09-20 14:50:32'),
-(4992,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 14:50:41','2026-09-20 14:50:41'),
-(4993,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 14:50:42','2026-09-20 14:50:42'),
-(4995,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 14:51:21','2026-09-20 14:51:21'),
-(4996,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 14:51:36','2026-09-20 14:51:36'),
-(4997,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 14:51:36','2026-09-20 14:51:36'),
-(4999,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 14:52:16','2026-09-20 14:52:16'),
-(5000,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 14:52:17','2026-09-20 14:52:17'),
-(5002,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 15:01:09','2026-09-20 15:01:09'),
-(5003,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 15:01:10','2026-09-20 15:01:10'),
-(5005,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 15:05:24','2026-09-20 15:05:24'),
-(5006,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 15:05:25','2026-09-20 15:05:25'),
-(5008,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 15:09:38','2026-09-20 15:09:38'),
-(5009,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 15:10:06','2026-09-20 15:10:06'),
-(5010,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 15:10:06','2026-09-20 15:10:06'),
-(5012,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 15:46:42','2026-09-20 15:46:42'),
-(5013,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 15:46:43','2026-09-20 15:46:43'),
-(5015,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 15:50:50','2026-09-20 15:50:50'),
-(5016,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 15:50:51','2026-09-20 15:50:51'),
-(5018,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 15:55:05','2026-09-20 15:55:05'),
-(5019,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 15:55:06','2026-09-20 15:55:06'),
-(5021,1519,'Janus Dominic','awd',4.50,'Pending','2026-09-20 15:55:35','2026-09-20 15:55:35'),
-(5022,1519,'Janus Dominic','awd',4.50,'Pending','2026-09-20 15:55:53','2026-09-20 15:55:53'),
-(5023,1519,'Janus Dominic','123',2.00,'Pending','2026-09-20 15:56:22','2026-09-20 15:56:22'),
-(5024,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 16:03:33','2026-09-20 16:03:33'),
-(5025,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 16:03:34','2026-09-20 16:03:34'),
-(5027,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 16:13:23','2026-09-20 16:13:23'),
-(5028,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 16:13:24','2026-09-20 16:13:24'),
-(5030,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 16:16:49','2026-09-20 16:16:49'),
-(5031,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 16:16:50','2026-09-20 16:16:50'),
-(5033,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 16:22:05','2026-09-20 16:22:05'),
-(5034,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 16:22:06','2026-09-20 16:22:06'),
-(5036,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 16:49:32','2026-09-20 16:49:32'),
-(5037,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 16:50:22','2026-09-20 16:50:22'),
-(5038,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 16:50:22','2026-09-20 16:50:22'),
-(5040,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 16:57:49','2026-09-20 16:57:49'),
-(5041,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 16:57:50','2026-09-20 16:57:50'),
-(5044,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 17:19:21','2026-09-20 17:19:21'),
-(5045,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 17:19:22','2026-09-20 17:19:22'),
-(5048,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 17:27:34','2026-09-20 17:27:34'),
-(5049,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 17:27:35','2026-09-20 17:27:35'),
-(5051,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 17:34:38','2026-09-20 17:34:38'),
-(5052,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 17:34:39','2026-09-20 17:34:39'),
-(5055,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 17:39:39','2026-09-20 17:39:39'),
-(5056,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 17:39:40','2026-09-20 17:39:40'),
-(5059,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 17:46:19','2026-09-20 17:46:19'),
-(5060,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 17:46:20','2026-09-20 17:46:20'),
-(5063,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 17:56:55','2026-09-20 17:56:55'),
-(5064,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 17:56:56','2026-09-20 17:56:56'),
-(5067,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 18:06:22','2026-09-20 18:06:22'),
-(5068,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 18:06:23','2026-09-20 18:06:23'),
-(5071,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 18:14:17','2026-09-20 18:14:17'),
-(5072,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 18:14:17','2026-09-20 18:14:17'),
-(5075,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 18:20:43','2026-09-20 18:20:43'),
-(5076,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 18:20:43','2026-09-20 18:20:43'),
-(5079,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 18:25:45','2026-09-20 18:25:45'),
-(5080,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 18:25:46','2026-09-20 18:25:46'),
-(5083,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 18:33:38','2026-09-20 18:33:38'),
-(5084,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 18:33:39','2026-09-20 18:33:39'),
-(5087,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 18:39:00','2026-09-20 18:39:00'),
-(5088,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 18:39:01','2026-09-20 18:39:01'),
-(5091,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 18:59:14','2026-09-20 18:59:14'),
-(5092,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 18:59:15','2026-09-20 18:59:15'),
-(5094,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 19:02:54','2026-09-20 19:02:54'),
-(5095,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 19:02:55','2026-09-20 19:02:55'),
-(5097,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 19:19:35','2026-09-20 19:19:35'),
-(5098,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 19:19:36','2026-09-20 19:19:36'),
-(5100,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 19:25:50','2026-09-20 19:25:50'),
-(5101,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 19:25:51','2026-09-20 19:25:51'),
-(5103,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 19:33:01','2026-09-20 19:33:01'),
-(5104,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 19:33:02','2026-09-20 19:33:02'),
-(5106,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 19:45:59','2026-09-20 19:45:59'),
-(5107,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 19:46:00','2026-09-20 19:46:00'),
-(5109,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 19:54:18','2026-09-20 19:54:18'),
-(5110,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 19:54:19','2026-09-20 19:54:19'),
-(5112,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-20 20:01:54','2026-09-20 20:01:54'),
-(5113,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-20 20:01:55','2026-09-20 20:01:55'),
-(5117,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 07:15:16','2026-09-21 07:15:16'),
-(5120,1519,'Janus Dominic','123 Test St',1.00,'Pending','2026-09-21 09:58:35','2026-09-21 09:58:35'),
-(5121,1519,'Janus Dominic','123 Test Street, Zamboanga',18.00,'Cancelled','2026-09-21 10:03:08','2026-09-21 10:03:08'),
-(5122,1519,'Janus Dominic','awd',4.00,'Pending','2026-09-21 10:06:21','2026-09-21 10:06:21'),
-(5123,1519,'Janus Dominic','123',3.50,'Pending','2026-09-21 10:13:09','2026-09-21 10:13:09'),
-(5141,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 10:51:54','2026-09-21 10:51:54'),
-(5144,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 10:54:22','2026-09-21 10:54:22'),
-(5145,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-21 10:55:54','2026-09-21 10:55:54'),
-(5148,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 11:06:03','2026-09-21 11:06:03'),
-(5150,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 12:04:17','2026-09-21 12:04:17'),
-(5152,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 12:22:47','2026-09-21 12:22:47'),
-(5154,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 12:35:33','2026-09-21 12:35:33'),
-(5157,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 13:07:08','2026-09-21 13:07:08'),
-(5160,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 13:07:26','2026-09-21 13:07:26'),
-(5163,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 13:07:57','2026-09-21 13:07:57'),
-(5166,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 13:08:35','2026-09-21 13:08:35'),
-(5169,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 13:14:35','2026-09-21 13:14:35'),
-(5172,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 13:19:27','2026-09-21 13:19:27'),
-(5175,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 13:51:37','2026-09-21 13:51:37'),
-(5178,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 14:20:48','2026-09-21 14:20:48'),
-(5181,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 14:38:23','2026-09-21 14:38:23'),
-(5184,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 14:49:02','2026-09-21 14:49:02'),
-(5187,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 14:52:10','2026-09-21 14:52:10'),
-(5190,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 15:05:45','2026-09-21 15:05:45'),
-(5193,1517,'John Customer','123 Main St, Test City',0.50,'Delivered','2026-09-21 15:18:03','2026-09-21 15:18:03'),
-(5195,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-21 15:18:12','2026-09-21 15:18:12'),
-(5196,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-21 15:18:35','2026-09-21 15:18:35'),
-(5198,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 15:28:56','2026-09-21 15:28:56'),
-(5200,1517,'Audited Customer','456 Test Blvd, Suite 101',0.50,'Delivered','2026-09-21 15:29:03','2026-09-21 15:29:03'),
-(5202,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 15:32:18','2026-09-21 15:32:18'),
-(5205,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 15:44:29','2026-09-21 15:44:29'),
-(5208,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-21 15:46:18','2026-09-21 15:46:18'),
-(5211,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-22 12:49:11','2026-09-22 12:49:11'),
-(5214,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-22 13:05:28','2026-09-22 13:05:28'),
-(5217,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-22 13:06:36','2026-09-22 13:06:36'),
-(5220,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-22 13:11:20','2026-09-22 13:11:20'),
-(5223,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-23 06:24:57','2026-09-23 06:24:57'),
-(5226,1517,'John Customer','123 Main St, Test City',0.50,'Pending','2026-09-23 06:35:32','2026-09-23 06:35:32'),
-(5229,1517,'John Customer','123 Main St, Test City',30.00,'Pending','2026-09-23 06:57:31','2026-09-23 06:57:31');
-/*!40000 ALTER TABLE `orders` ENABLE KEYS */;
-UNLOCK TABLES;
 DROP TABLE IF EXISTS `products`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `products` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
@@ -565,13 +46,12 @@ CREATE TABLE `products` (
   `category` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_products_category` (`category`)
-) ENGINE=InnoDB AUTO_INCREMENT=2020 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES
-(1,'Red Apple',30.00,'692a82c013aab.png',143,NULL,'Fruits'),
+INSERT INTO `products` (`id`, `name`, `price`, `image`, `stock_qty`, `image_url`, `category`) VALUES
+(1,'Red Apple',30.00,'692a82c013aab.png',97,NULL,'Fruits'),
 (2,'Banana Bundle',65.00,'692a82a036702.png',99,NULL,'Fruits'),
 (3,'Whole Milk',195.00,'692a8282ba25d.png',79,NULL,'Dairy'),
 (4,'Sourdough Bread',220.00,'692a8260a0462.png',94,NULL,'Bakery'),
@@ -620,7 +100,8 @@ INSERT INTO `products` VALUES
 (47,'Tortillas',140.00,'692a73a74db10.png',69,NULL,'Bakery'),
 (48,'Hamburger Buns',165.00,'692a73592f398.png',61,NULL,'Bakery'),
 (49,'Hotdog Buns',165.00,'692a7328759e0.png',89,NULL,'Bakery'),
-(50,'Chocolate Cake',660.00,'692a726e481b0.png',70,NULL,'Bakery'),
+(50,'Chocolate Cake',660.00,'692a726e481b0.png',70,NULL,'Bakery');
+INSERT INTO `products` (`id`, `name`, `price`, `image`, `stock_qty`, `image_url`, `category`) VALUES
 (51,'Chicken Breast',470.00,'692a7247e84b0.png',75,NULL,'Meat'),
 (52,'Ground Beef',385.00,'692a7223a5cfa.png',64,NULL,'Meat'),
 (53,'Steak',825.00,'692a71fd94474.png',86,NULL,'Meat'),
@@ -670,14 +151,82 @@ INSERT INTO `products` VALUES
 (97,'Oatmeal',165.00,'6929b9b3a676e.png',66,NULL,'Pantry'),
 (98,'Pancake Mix',195.00,'6929b97bb8039.png',75,NULL,'Pantry'),
 (99,'Syrup',220.00,'6929b92e2c243.png',78,NULL,'Pantry'),
-(100,'Soup Can',100.00,'6929b851cb2d7.png',69,NULL,'Pantry'),
+(100,'Soup Can',100.00,'6929b851cb2d7.png',69,NULL,'Pantry');
+INSERT INTO `products` (`id`, `name`, `price`, `image`, `stock_qty`, `image_url`, `category`) VALUES
 (101,'The Apple',605.00,'6929b7d567f89.png',90,NULL,'Fruits'),
 (2013,'SHEESH',150.00,'prod_6ab27a575508d.png',1,NULL,'Fruits');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
+
+
+-- --------------------------------------------------------
+-- Table structure for table `coupons`
+-- --------------------------------------------------------
+
+DROP TABLE IF EXISTS `coupons`;
+CREATE TABLE `coupons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) NOT NULL,
+  `discount_percent` int(11) NOT NULL,
+  `expiry_date` date NOT NULL,
+  `status` varchar(20) DEFAULT 'Active',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+LOCK TABLES `coupons` WRITE;
+/*!40000 ALTER TABLE `coupons` DISABLE KEYS */;
+INSERT INTO `coupons` (`id`, `code`, `discount_percent`, `expiry_date`, `status`) VALUES
+(1,'WELCOME20',20,'2030-12-31','Active'),
+(2,'FRESH50',50,'2030-12-31','Active');
+/*!40000 ALTER TABLE `coupons` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+-- --------------------------------------------------------
+-- Table structure for table `orders`
+-- --------------------------------------------------------
+
+DROP TABLE IF EXISTS `orders`;
+CREATE TABLE `orders` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `customer_name` varchar(100) NOT NULL,
+  `address` text NOT NULL,
+  `total_amount` decimal(10,2) NOT NULL,
+  `status` varchar(50) DEFAULT 'Pending',
+  `order_date` timestamp NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_orders_status` (`status`),
+  KEY `idx_orders_user_id` (`user_id`),
+  CONSTRAINT `fk_orders_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- --------------------------------------------------------
+-- Table structure for table `order_items`
+-- --------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_items`;
+CREATE TABLE `order_items` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_id` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `order_id` (`order_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
+  CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- --------------------------------------------------------
+-- Table structure for table `reviews`
+-- --------------------------------------------------------
+
 DROP TABLE IF EXISTS `reviews`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `reviews` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `product_id` int(11) NOT NULL,
@@ -690,144 +239,32 @@ CREATE TABLE `reviews` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=329 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-LOCK TABLES `reviews` WRITE;
-/*!40000 ALTER TABLE `reviews` DISABLE KEYS */;
-INSERT INTO `reviews` VALUES
-(230,1,1517,5,'Verified automated test review','2026-09-19 14:33:43'),
-(231,1,1517,5,'Verified automated test review','2026-09-19 14:35:29'),
-(232,1,1517,5,'Verified automated test review','2026-09-19 14:35:48'),
-(233,1,1517,5,'Verified automated test review','2026-09-19 14:35:58'),
-(234,1,1517,5,'Verified automated test review','2026-09-19 14:37:23'),
-(235,1,1517,5,'Verified automated test review','2026-09-19 15:03:26'),
-(236,1,1517,5,'Verified automated test review','2026-09-19 15:06:17'),
-(237,1,1517,5,'Verified automated test review','2026-09-19 15:17:39'),
-(238,1,1517,5,'Verified automated test review','2026-09-19 15:28:20'),
-(239,1,1517,5,'Verified automated test review','2026-09-19 15:33:56'),
-(240,1,1517,5,'Verified automated test review','2026-09-19 15:46:46'),
-(241,1,1517,5,'Verified automated test review','2026-09-19 15:54:22'),
-(242,1,1517,5,'Verified automated test review','2026-09-19 16:24:21'),
-(243,1,1517,5,'Verified automated test review','2026-09-19 16:34:50'),
-(244,1,1517,5,'Verified automated test review','2026-09-19 16:36:41'),
-(245,1,1517,5,'Verified automated test review','2026-09-19 16:45:22'),
-(246,1,1517,5,'Verified automated test review','2026-09-19 16:47:34'),
-(247,1,1517,5,'Verified automated test review','2026-09-19 17:01:36'),
-(248,1,1517,5,'Verified automated test review','2026-09-19 17:13:07'),
-(249,1,1517,5,'Verified automated test review','2026-09-19 17:17:18'),
-(250,1,1517,5,'Verified automated test review','2026-09-19 17:24:59'),
-(251,1,1517,5,'Verified automated test review','2026-09-20 08:17:34'),
-(252,1,1517,5,'Verified automated test review','2026-09-20 11:03:58'),
-(253,1,1517,5,'Verified automated test review','2026-09-20 11:05:06'),
-(254,1,1517,5,'Verified automated test review','2026-09-20 11:08:15'),
-(255,1,1517,5,'Verified automated test review','2026-09-20 11:16:35'),
-(256,1,1517,5,'Verified automated test review','2026-09-20 11:42:26'),
-(257,1,1517,5,'Verified automated test review','2026-09-20 12:31:49'),
-(258,1,1517,5,'Verified automated test review','2026-09-20 12:33:06'),
-(259,1,1517,5,'Verified automated test review','2026-09-20 12:34:23'),
-(260,1,1517,5,'Verified automated test review','2026-09-20 12:41:49'),
-(261,1,1517,5,'Verified automated test review','2026-09-20 12:47:37'),
-(262,1,1517,5,'Verified automated test review','2026-09-20 12:51:12'),
-(263,1,1517,5,'Verified automated test review','2026-09-20 12:58:14'),
-(264,1,1517,5,'Verified automated test review','2026-09-20 12:59:53'),
-(265,1,1517,5,'Verified automated test review','2026-09-20 13:05:02'),
-(266,1,1517,5,'Verified automated test review','2026-09-20 13:09:06'),
-(267,1,1517,5,'Verified automated test review','2026-09-20 13:09:58'),
-(268,1,1517,5,'Verified automated test review','2026-09-20 13:16:38'),
-(269,1,1517,5,'Verified automated test review','2026-09-20 13:19:34'),
-(270,1,1517,5,'Verified automated test review','2026-09-20 13:21:43'),
-(271,1,1517,5,'Verified automated test review','2026-09-20 13:22:25'),
-(272,1,1517,5,'Verified automated test review','2026-09-20 13:37:21'),
-(273,1,1517,5,'Verified automated test review','2026-09-20 13:37:57'),
-(274,1,1517,5,'Verified automated test review','2026-09-20 13:43:08'),
-(275,1,1517,5,'Verified automated test review','2026-09-20 13:43:37'),
-(276,1,1517,5,'Verified automated test review','2026-09-20 13:45:47'),
-(277,1,1517,5,'Verified automated test review','2026-09-20 13:47:58'),
-(278,1,1517,5,'Verified automated test review','2026-09-20 13:50:48'),
-(279,1,1517,5,'Verified automated test review','2026-09-20 14:16:40'),
-(280,1,1517,5,'Verified automated test review','2026-09-20 14:21:15'),
-(281,1,1517,5,'Verified automated test review','2026-09-20 14:27:46'),
-(282,1,1517,5,'Verified automated test review','2026-09-20 14:33:24'),
-(283,1,1517,5,'Verified automated test review','2026-09-20 14:35:29'),
-(284,1,1517,5,'Verified automated test review','2026-09-20 14:40:04'),
-(285,1,1517,5,'Verified automated test review','2026-09-20 14:48:03'),
-(286,1,1517,5,'Verified automated test review','2026-09-20 14:50:32'),
-(287,1,1517,5,'Verified automated test review','2026-09-20 14:50:41'),
-(288,1,1517,5,'Verified automated test review','2026-09-20 14:51:21'),
-(289,1,1517,5,'Verified automated test review','2026-09-20 14:51:35'),
-(290,1,1517,5,'Verified automated test review','2026-09-20 14:52:16'),
-(291,1,1517,5,'Verified automated test review','2026-09-20 15:01:09'),
-(292,1,1517,5,'Verified automated test review','2026-09-20 15:05:24'),
-(293,1,1517,5,'Verified automated test review','2026-09-20 15:09:37'),
-(294,1,1517,5,'Verified automated test review','2026-09-20 15:10:05'),
-(295,1,1517,5,'Verified automated test review','2026-09-20 15:46:42'),
-(296,1,1517,5,'Verified automated test review','2026-09-20 15:50:50'),
-(297,1,1517,5,'Verified automated test review','2026-09-20 15:55:05'),
-(298,1,1517,5,'Verified automated test review','2026-09-20 16:03:33'),
-(299,1,1517,5,'Verified automated test review','2026-09-20 16:13:23'),
-(300,1,1517,5,'Verified automated test review','2026-09-20 16:16:49'),
-(301,1,1517,5,'Verified automated test review','2026-09-20 16:22:05'),
-(302,1,1517,5,'Verified automated test review','2026-09-20 16:49:32'),
-(303,1,1517,5,'Verified automated test review','2026-09-20 16:50:22'),
-(304,1,1517,5,'Verified automated test review','2026-09-20 16:57:49'),
-(305,1,1517,5,'Verified automated test review','2026-09-20 17:19:21'),
-(306,1,1517,5,'Verified automated test review','2026-09-20 17:27:34'),
-(307,1,1517,5,'Verified automated test review','2026-09-20 17:34:38'),
-(308,1,1517,5,'Verified automated test review','2026-09-20 17:39:39'),
-(309,1,1517,5,'Verified automated test review','2026-09-20 17:46:19'),
-(310,1,1517,5,'Verified automated test review','2026-09-20 17:56:55'),
-(311,1,1517,5,'Verified automated test review','2026-09-20 18:06:22'),
-(312,1,1517,5,'Verified automated test review','2026-09-20 18:14:17'),
-(313,1,1517,5,'Verified automated test review','2026-09-20 18:20:43'),
-(314,1,1517,5,'Verified automated test review','2026-09-20 18:25:45'),
-(315,1,1517,5,'Verified automated test review','2026-09-20 18:33:38'),
-(316,1,1517,5,'Verified automated test review','2026-09-20 18:39:00'),
-(317,1,1517,5,'Verified automated test review','2026-09-20 18:59:14'),
-(318,1,1517,5,'Verified automated test review','2026-09-20 19:02:54'),
-(319,1,1517,5,'Verified automated test review','2026-09-20 19:19:35'),
-(320,1,1517,5,'Verified automated test review','2026-09-20 19:25:50'),
-(321,1,1517,5,'Verified automated test review','2026-09-20 19:33:01'),
-(322,1,1517,5,'Verified automated test review','2026-09-20 19:45:59'),
-(323,1,1517,5,'Verified automated test review','2026-09-20 19:54:18'),
-(324,1,1517,5,'Verified automated test review','2026-09-20 20:01:54'),
-(325,1,1517,5,'Verified automated test review','2026-09-21 10:55:53'),
-(326,1,1517,5,'Verified automated test review','2026-09-21 15:18:12'),
-(327,1,1517,5,'Verified automated test review','2026-09-21 15:18:35'),
-(328,1,1517,5,'Verified automated test review','2026-09-21 15:29:03');
-/*!40000 ALTER TABLE `reviews` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `users` (
+
+-- --------------------------------------------------------
+-- Table structure for table `api_cart`
+-- --------------------------------------------------------
+
+DROP TABLE IF EXISTS `api_cart`;
+CREATE TABLE `api_cart` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `full_name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `address` text DEFAULT NULL,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) DEFAULT 1,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `api_token` varchar(64) DEFAULT NULL,
-  `role` varchar(20) DEFAULT 'customer',
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=1546 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  UNIQUE KEY `unique_cart_item` (`user_id`,`product_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `api_cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `api_cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES
-(1517,'Audited Customer Verified','customer@example.com','$2y$10$wG/C32q.dGWYUoAvZXvfO.M3XkYwZYRUD9Zd91yHEFLNFHypt6f0G','789 Updated Lane','2026-09-19 12:25:09','9447b30cfabab1e03032de066cb3e904da50f3f2231575067197e6d4e6853059','customer'),
-(1519,'Janus Dominic','janusdominic0@gmail.com','$2y$10$MPIXjFdGmUP7FW0jRTTMi.IIxjxnwkrfRrMuTX4wvMQZtYMomVSWe','','2026-09-20 10:25:36',NULL,'customer'),
-(1520,'Customer Beta','customer2@example.com','$2y$10$78cnDzhL528ioBhApvmnOOleX/KDzfWrCdGgFaqxX0C4aBw8l4.L2',NULL,'2026-09-20 11:02:14',NULL,'customer');
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-

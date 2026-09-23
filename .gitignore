@@ -123,6 +123,7 @@ tmp/
 temp/
 .temp/
 scratch/
+database/backups/
 
 # Agent / Antigravity Local Runtime Data
 .agents/                    
