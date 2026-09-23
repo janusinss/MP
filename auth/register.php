@@ -125,6 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $pending['password_hash'],
                         $pending['address']
                     ])) {
+                        $verifiedEmail = $pending['email'];
                         unset($_SESSION['pending_reg']);
                         // Set flash message for login screen
                         $_SESSION['flash_toast'] = [
@@ -132,11 +133,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             'title' => 'Account Verified!',
                             'message' => 'Your account has been verified and created successfully. Please sign in.'
                         ];
-                        // Toast shown on register screen before transition
-                        $toastMessage = "Account verified successfully! Redirecting you to login...";
-                        $toastType = "success";
-                        $toastTitle = "Account Verified!";
-                        $redirectUrl = 'login';
+                        $_SESSION['prefill_email'] = $verifiedEmail;
+                        header("Location: " . $appRoot . "login");
+                        exit;
                     } else {
                         $error = "Registration failed to persist. Please try again.";
                         $toastMessage = $error;

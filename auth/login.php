@@ -14,6 +14,17 @@ if ($flashToast) {
     unset($_SESSION['flash_toast']);
 }
 
+$prefillEmail = $_SESSION['prefill_email'] ?? '';
+$prefillPassword = $_SESSION['prefill_password'] ?? '';
+if ($prefillEmail) {
+    unset($_SESSION['prefill_email']);
+    $email = $prefillEmail;
+}
+if ($prefillPassword) {
+    unset($_SESSION['prefill_password']);
+    $password = $prefillPassword;
+}
+
 $error_message = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email'] ?? '');
@@ -164,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </div>
                         <div class="auth-input-wrapper">
                             <span class="auth-input-icon"><i class="bi bi-lock" aria-hidden="true"></i></span>
-                            <input type="password" id="loginPassword" name="password" class="auth-input" placeholder="Enter your password" required autocomplete="current-password">
+                            <input type="password" id="loginPassword" name="password" class="auth-input" placeholder="Enter your password" value="<?= htmlspecialchars($password ?? '') ?>" required autocomplete="current-password">
                             <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPassword', this)" aria-label="Show password" title="Toggle password visibility">
                                 <i class="bi bi-eye" aria-hidden="true"></i>
                             </button>
@@ -556,16 +567,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 });
                 const data = await res.json();
                 if (data.success) {
+                    clearInterval(otpTimer);
+                    clearInterval(resendTimer);
+                    closeModal();
                     if (window.FreshToast) {
                         FreshToast.show({
                             type: 'success',
-                            title: 'Code Verified',
-                            message: data.message || 'Code verified successfully.'
+                            title: 'Code Verified!',
+                            message: 'Password reset successfully! Your temporary password is your 6-digit code. Please sign in.',
+                            duration: 6000
                         });
                     }
-                    clearInterval(otpTimer);
-                    clearInterval(resendTimer);
-                    showStep(3);
+                    const loginEmailEl = document.getElementById('loginEmail');
+                    if (loginEmailEl && data.email) {
+                        loginEmailEl.value = data.email;
+                    }
+                    const loginPassEl = document.getElementById('loginPassword');
+                    if (loginPassEl) {
+                        loginPassEl.value = otp;
+                        loginPassEl.focus();
+                    }
                 } else {
                     showAlert(alert2, data.message || 'Invalid verification code.');
                     if (data.locked || data.expired) {
