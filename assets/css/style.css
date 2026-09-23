@@ -18404,3 +18404,89 @@ body.modal-open-freeze {
     cursor: not-allowed;
     text-decoration: none;
 }
+
+/* ==========================================================================
+   Forgot Password Link & Pop-up Modal System
+   ========================================================================== */
+.auth-forgot-link {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-brand-dark, #375743);
+    text-decoration: none;
+    transition: color 0.15s ease, text-decoration 0.15s ease;
+}
+
+.auth-forgot-link:hover {
+    color: var(--color-brand, #4A745B);
+    text-decoration: underline;
+}
+
+.fc-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 1050;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 0.22s ease-in-out;
+}
+
+.fc-modal-backdrop.show {
+    display: flex;
+    opacity: 1;
+}
+
+.fc-modal-dialog {
+    background: #ffffff;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transform: scale(0.96) translateY(8px);
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fc-modal-backdrop.show .fc-modal-dialog {
+    transform: scale(1) translateY(0);
+}
+
+.fc-modal-header {
+    padding: 1.25rem 1.5rem 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.fc-modal-close {
+    background: #f1f5f9;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.fc-modal-close:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.fc-modal-body {
+    padding: 1.25rem 1.5rem 1.75rem 1.5rem;
+}

@@ -44,6 +44,9 @@ Options -Indexes -MultiViews
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/auth/register\.php([^\ ]*)\ +HTTP/ [NC]
     RewriteRule ^auth/register\.php$ %1/register [R=301,L,NE]
 
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/auth/forgot_password\.php([^\ ]*)\ +HTTP/ [NC]
+    RewriteRule ^auth/forgot_password\.php$ %1/forgot-password [R=301,L,NE]
+
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ +(.*)/auth/logout\.php([^\ ]*)\ +HTTP/ [NC]
     RewriteRule ^auth/logout\.php$ %1/logout [R=301,L,NE]
 
@@ -80,6 +83,7 @@ Options -Indexes -MultiViews
     # Route clean friendly URLs internally
     RewriteRule ^login/?$ auth/login.php [L,QSA]
     RewriteRule ^register/?$ auth/register.php [L,QSA]
+    RewriteRule ^forgot-password/?$ auth/forgot_password.php [L,QSA]
     RewriteRule ^logout/?$ auth/logout.php [L,QSA]
     RewriteRule ^cart/?$ cart/index.php [L,QSA]
     RewriteRule ^checkout/?$ orders/checkout.php [L,QSA]

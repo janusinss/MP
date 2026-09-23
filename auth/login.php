@@ -158,8 +158,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
 
                     <div class="auth-field-group">
-                        <div class="auth-field-label">
+                        <div class="auth-field-label d-flex align-items-center justify-content-between">
                             <label for="loginPassword" class="m-0">Password</label>
+                            <a href="forgot-password" class="auth-forgot-link" id="btnForgotPass">Forgot Password?</a>
                         </div>
                         <div class="auth-input-wrapper">
                             <span class="auth-input-icon"><i class="bi bi-lock" aria-hidden="true"></i></span>
@@ -195,10 +196,141 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </section>
     </main>
 
+    <!-- ============================================================ -->
+    <!-- FORGOT PASSWORD POP-UP MODAL (FreshCart Interactive Reset)   -->
+    <!-- ============================================================ -->
+    <div class="fc-modal-backdrop" id="forgotModal" role="dialog" aria-modal="true" aria-labelledby="modalForgotTitle" tabindex="-1">
+        <div class="fc-modal-dialog">
+            <div class="fc-modal-header">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="otp-icon-badge m-0" style="width: 38px; height: 38px; font-size: 1.15rem; border-radius: 10px;">
+                        <i class="bi bi-key-fill" aria-hidden="true"></i>
+                    </span>
+                    <h5 class="m-0 fw-bold text-dark fs-6" id="modalForgotTitle">Reset Password</h5>
+                </div>
+                <button type="button" class="fc-modal-close" id="btnCloseForgotModal" aria-label="Close dialog">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+            </div>
+            
+            <div class="fc-modal-body">
+                <!-- STEP 1: Enter Email -->
+                <div id="forgotStep1">
+                    <p class="text-muted small mb-3">
+                        Enter your registered email address. We will dispatch a 6-digit OTP verification code to reset your password.
+                    </p>
+                    <div id="forgotAlert1" class="alert alert-danger py-2 px-3 small border-0 rounded-3 d-none mb-3"></div>
+                    <form id="forgotForm1">
+                        <div class="auth-field-group mb-3">
+                            <label for="modalForgotEmail" class="auth-field-label">Email Address</label>
+                            <div class="auth-input-wrapper">
+                                <span class="auth-input-icon"><i class="bi bi-envelope" aria-hidden="true"></i></span>
+                                <input type="email" id="modalForgotEmail" name="email" class="auth-input" placeholder="you@example.com" required autocomplete="email" inputmode="email">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-auth-submit mt-2" id="btnSubmitEmail">
+                            <span>Send Verification Code</span>
+                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- STEP 2: Enter OTP Code -->
+                <div id="forgotStep2" class="d-none">
+                    <p class="text-muted small mb-2 text-center">
+                        Enter the 6-digit verification code dispatched to<br>
+                        <strong class="text-dark" id="displayResetEmail"></strong>
+                    </p>
+
+                    <div id="modalDevHint" class="otp-dev-hint mb-3 d-none">
+                        <i class="bi bi-info-circle-fill text-success fs-5 flex-shrink-0" aria-hidden="true"></i>
+                        <div>
+                            <div class="fw-bold mb-1">Sandbox / Dev Code</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span>Code:</span>
+                                <span class="otp-dev-code" id="modalDevCode"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="forgotAlert2" class="alert alert-danger py-2 px-3 small border-0 rounded-3 d-none mb-3"></div>
+
+                    <form id="forgotForm2" class="d-flex flex-column gap-3">
+                        <div>
+                            <label for="modalOtpInput" class="auth-field-label text-center d-block mb-1">6-Digit One-Time Code</label>
+                            <input type="text" id="modalOtpInput" name="otp_code" class="otp-input-field" placeholder="••••••" maxlength="6" pattern="[0-9]*" inputmode="numeric" autocomplete="one-time-code" required>
+                        </div>
+                        <div class="otp-timer-strip">
+                            <span class="d-flex align-items-center gap-1">
+                                <i class="bi bi-stopwatch" aria-hidden="true"></i>
+                                <span>Code expires in:</span>
+                            </span>
+                            <span id="modalOtpCountdown" class="otp-countdown-val">10:00</span>
+                        </div>
+                        <button type="submit" class="btn-auth-submit" id="btnSubmitOtp">
+                            <span>Verify Code</span>
+                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                        </button>
+                    </form>
+
+                    <div class="d-flex align-items-center justify-content-between pt-3 mt-3 border-top">
+                        <button type="button" id="modalResendBtn" class="otp-resend-btn" disabled>
+                            <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>
+                            <span id="modalResendText">Resend Code (60s)</span>
+                        </button>
+                        <button type="button" id="btnBackToEmail" class="btn btn-link p-0 small text-muted text-decoration-none">
+                            <i class="bi bi-pencil-square me-1" aria-hidden="true"></i>Change Email
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Set New Password -->
+                <div id="forgotStep3" class="d-none">
+                    <p class="text-muted small mb-3">
+                        Create a secure, new password for your account (at least 6 characters).
+                    </p>
+                    <div id="forgotAlert3" class="alert alert-danger py-2 px-3 small border-0 rounded-3 d-none mb-3"></div>
+                    <form id="forgotForm3" class="d-flex flex-column gap-3">
+                        <div class="auth-field-group">
+                            <div class="auth-field-label">
+                                <label for="modalNewPassword" class="m-0">New Password</label>
+                                <span class="text-muted fw-normal small">Min 6 characters</span>
+                            </div>
+                            <div class="auth-input-wrapper">
+                                <span class="auth-input-icon"><i class="bi bi-lock" aria-hidden="true"></i></span>
+                                <input type="password" id="modalNewPassword" name="new_password" class="auth-input" placeholder="Enter new password" minlength="6" required autocomplete="new-password">
+                                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('modalNewPassword', this)" aria-label="Show password">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="auth-field-group">
+                            <label for="modalConfirmPassword" class="auth-field-label">Confirm New Password</label>
+                            <div class="auth-input-wrapper">
+                                <span class="auth-input-icon"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
+                                <input type="password" id="modalConfirmPassword" name="confirm_password" class="auth-input" placeholder="Confirm new password" minlength="6" required autocomplete="new-password">
+                                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('modalConfirmPassword', this)" aria-label="Show password">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-auth-submit" id="btnSubmitReset">
+                            <span>Update Password</span>
+                            <i class="bi bi-check-lg" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="fresh-toast-container" id="freshToastContainer" aria-live="polite" aria-atomic="true"></div>
 
     <script src="<?= $appRoot ?>assets/js/toast.js?v=<?= time() ?>"></script>
     <script>
+    const csrfToken = <?= json_encode(get_csrf_token()) ?>;
+    const forgotUrl = '<?= $appRoot ?>forgot-password?ajax=1';
+
     function togglePasswordVisibility(inputId, btn) {
         const input = document.getElementById(inputId);
         if (!input) return;
@@ -231,8 +363,343 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             });
         }
         <?php endif; ?>
+
+        // Forgot Password Modal Controller
+        const forgotModal = document.getElementById('forgotModal');
+        const btnForgotPass = document.getElementById('btnForgotPass');
+        const btnCloseForgotModal = document.getElementById('btnCloseForgotModal');
+        const step1 = document.getElementById('forgotStep1');
+        const step2 = document.getElementById('forgotStep2');
+        const step3 = document.getElementById('forgotStep3');
+        const form1 = document.getElementById('forgotForm1');
+        const form2 = document.getElementById('forgotForm2');
+        const form3 = document.getElementById('forgotForm3');
+        const alert1 = document.getElementById('forgotAlert1');
+        const alert2 = document.getElementById('forgotAlert2');
+        const alert3 = document.getElementById('forgotAlert3');
+        const modalEmailInput = document.getElementById('modalForgotEmail');
+        const modalOtpInput = document.getElementById('modalOtpInput');
+        const displayResetEmail = document.getElementById('displayResetEmail');
+        const modalDevHint = document.getElementById('modalDevHint');
+        const modalDevCode = document.getElementById('modalDevCode');
+        const modalOtpCountdown = document.getElementById('modalOtpCountdown');
+        const modalResendBtn = document.getElementById('modalResendBtn');
+        const modalResendText = document.getElementById('modalResendText');
+        const btnBackToEmail = document.getElementById('btnBackToEmail');
+
+        let otpTimer = null;
+        let resendTimer = null;
+
+        function openModal() {
+            forgotModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            // Pre-fill email from login field if entered
+            const loginEmailVal = document.getElementById('loginEmail')?.value.trim();
+            if (loginEmailVal && loginEmailVal.includes('@')) {
+                modalEmailInput.value = loginEmailVal;
+            }
+            showStep(1);
+            modalEmailInput.focus();
+        }
+
+        function closeModal() {
+            forgotModal.classList.remove('show');
+            document.body.style.overflow = '';
+            clearInterval(otpTimer);
+            clearInterval(resendTimer);
+        }
+
+        function showStep(num) {
+            step1.classList.add('d-none');
+            step2.classList.add('d-none');
+            step3.classList.add('d-none');
+            alert1.classList.add('d-none');
+            alert2.classList.add('d-none');
+            alert3.classList.add('d-none');
+
+            if (num === 1) {
+                step1.classList.remove('d-none');
+                modalEmailInput.focus();
+            } else if (num === 2) {
+                step2.classList.remove('d-none');
+                modalOtpInput.value = '';
+                modalOtpInput.focus();
+            } else if (num === 3) {
+                step3.classList.remove('d-none');
+                document.getElementById('modalNewPassword')?.focus();
+            }
+        }
+
+        function showAlert(el, msg) {
+            el.textContent = msg;
+            el.classList.remove('d-none');
+        }
+
+        function startOtpCountdown(seconds) {
+            clearInterval(otpTimer);
+            let left = seconds;
+            function update() {
+                if (left <= 0) {
+                    clearInterval(otpTimer);
+                    modalOtpCountdown.textContent = 'Expired';
+                    modalOtpCountdown.classList.remove('text-success');
+                    modalOtpCountdown.classList.add('text-danger');
+                } else {
+                    left--;
+                    const m = Math.floor(left / 60);
+                    const s = left % 60;
+                    modalOtpCountdown.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+                }
+            }
+            update();
+            otpTimer = setInterval(update, 1000);
+        }
+
+        function startResendCooldown(seconds) {
+            clearInterval(resendTimer);
+            let left = seconds;
+            modalResendBtn.disabled = true;
+            function update() {
+                if (left <= 0) {
+                    clearInterval(resendTimer);
+                    modalResendBtn.disabled = false;
+                    modalResendText.textContent = 'Resend Code';
+                } else {
+                    modalResendText.textContent = 'Resend Code (' + left + 's)';
+                    left--;
+                }
+            }
+            update();
+            resendTimer = setInterval(update, 1000);
+        }
+
+        btnForgotPass?.addEventListener('click', function(e) {
+            e.preventDefault();
+            openModal();
+        });
+
+        btnCloseForgotModal?.addEventListener('click', closeModal);
+        forgotModal?.addEventListener('click', function(e) {
+            if (e.target === forgotModal) closeModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && forgotModal.classList.contains('show')) {
+                closeModal();
+            }
+        });
+
+        btnBackToEmail?.addEventListener('click', function() {
+            showStep(1);
+        });
+
+        // Clean numeric input on OTP field
+        modalOtpInput?.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length === 6) {
+                form2.requestSubmit();
+            }
+        });
+
+        // Step 1: Send OTP
+        form1?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            alert1.classList.add('d-none');
+            const submitBtn = document.getElementById('btnSubmitEmail');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Sending...';
+
+            const email = modalEmailInput.value.trim();
+            const formData = new FormData();
+            formData.append('auth_action', 'send_otp');
+            formData.append('csrf_token', csrfToken);
+            formData.append('email', email);
+
+            try {
+                const res = await fetch(forgotUrl, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (window.FreshToast) {
+                        FreshToast.show({
+                            type: 'success',
+                            title: 'Code Dispatched',
+                            message: data.message || 'Verification code sent to your email.'
+                        });
+                    }
+                    displayResetEmail.textContent = email;
+                    if (data.dev_fallback && data.dev_otp) {
+                        modalDevCode.textContent = data.dev_otp;
+                        modalDevHint.classList.remove('d-none');
+                    } else {
+                        modalDevHint.classList.add('d-none');
+                    }
+                    startOtpCountdown(data.seconds_left || 600);
+                    startResendCooldown(data.resend_seconds || 60);
+                    showStep(2);
+                } else {
+                    showAlert(alert1, data.message || 'Failed to send verification code.');
+                }
+            } catch (err) {
+                showAlert(alert1, 'Connection error. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+
+        // Step 2: Verify OTP
+        form2?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            alert2.classList.add('d-none');
+            const submitBtn = document.getElementById('btnSubmitOtp');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Verifying...';
+
+            const otp = modalOtpInput.value.trim();
+            const formData = new FormData();
+            formData.append('auth_action', 'verify_otp');
+            formData.append('csrf_token', csrfToken);
+            formData.append('otp_code', otp);
+
+            try {
+                const res = await fetch(forgotUrl, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (window.FreshToast) {
+                        FreshToast.show({
+                            type: 'success',
+                            title: 'Code Verified',
+                            message: data.message || 'Code verified successfully.'
+                        });
+                    }
+                    clearInterval(otpTimer);
+                    clearInterval(resendTimer);
+                    showStep(3);
+                } else {
+                    showAlert(alert2, data.message || 'Invalid verification code.');
+                    if (data.locked || data.expired) {
+                        setTimeout(() => showStep(1), 2000);
+                    }
+                }
+            } catch (err) {
+                showAlert(alert2, 'Connection error. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+
+        // Resend OTP
+        modalResendBtn?.addEventListener('click', async function() {
+            modalResendBtn.disabled = true;
+            const originalText = modalResendText.textContent;
+            modalResendText.textContent = 'Sending...';
+
+            const formData = new FormData();
+            formData.append('auth_action', 'resend_otp');
+            formData.append('csrf_token', csrfToken);
+
+            try {
+                const res = await fetch(forgotUrl, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (window.FreshToast) {
+                        FreshToast.show({
+                            type: 'success',
+                            title: 'Code Resent',
+                            message: data.message || 'A fresh code has been sent.'
+                        });
+                    }
+                    if (data.dev_fallback && data.dev_otp) {
+                        modalDevCode.textContent = data.dev_otp;
+                        modalDevHint.classList.remove('d-none');
+                    }
+                    startOtpCountdown(data.seconds_left || 600);
+                    startResendCooldown(data.resend_seconds || 60);
+                } else {
+                    showAlert(alert2, data.message || 'Failed to resend code.');
+                }
+            } catch (err) {
+                showAlert(alert2, 'Connection error. Please try again.');
+            }
+        });
+
+        // Step 3: Reset Password
+        form3?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            alert3.classList.add('d-none');
+            const submitBtn = document.getElementById('btnSubmitReset');
+            const newPass = document.getElementById('modalNewPassword').value;
+            const confirmPass = document.getElementById('modalConfirmPassword').value;
+
+            if (newPass.length < 6) {
+                showAlert(alert3, 'Password must be at least 6 characters.');
+                return;
+            }
+            if (newPass !== confirmPass) {
+                showAlert(alert3, 'Passwords do not match.');
+                return;
+            }
+
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Updating...';
+
+            const formData = new FormData();
+            formData.append('auth_action', 'reset_password');
+            formData.append('csrf_token', csrfToken);
+            formData.append('new_password', newPass);
+            formData.append('confirm_password', confirmPass);
+
+            try {
+                const res = await fetch(forgotUrl, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    closeModal();
+                    if (window.FreshToast) {
+                        FreshToast.show({
+                            type: 'success',
+                            title: 'Password Updated!',
+                            message: 'Your password was reset successfully. Please sign in.',
+                            duration: 6000
+                        });
+                    }
+                    if (data.email) {
+                        const loginEmailEl = document.getElementById('loginEmail');
+                        if (loginEmailEl) loginEmailEl.value = data.email;
+                    }
+                    document.getElementById('loginPassword')?.focus();
+                } else {
+                    showAlert(alert3, data.message || 'Failed to update password.');
+                }
+            } catch (err) {
+                showAlert(alert3, 'Connection error. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
     });
     </script>
 </body>
 </html>
+
 

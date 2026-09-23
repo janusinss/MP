@@ -14,8 +14,12 @@ $suites = [
     'Security Hardening & Penetration Defense' => "$scriptsDir/verify_security_suite.php",
     'Storefront Web Routing & Canonical Redirection' => "$scriptsDir/verify_web_flow.php",
     'RESTful API v1 Auth, Cart & Order Operations' => "$scriptsDir/verify_api.php",
-    'User Isolation & Session Boundary Enforcement' => "$scriptsDir/verify_user_isolation.php"
+    'User Isolation & Session Boundary Enforcement' => "$scriptsDir/verify_user_isolation.php",
+    'Password Reset & Email OTP Verification' => __DIR__ . "/test_forgot_password.php",
+    'Forgot Password Penetration & Exploit Defense' => __DIR__ . "/verify_forgot_password_security.php"
 ];
+
+
 
 $overallSuccess = true;
 $suiteResults = [];
