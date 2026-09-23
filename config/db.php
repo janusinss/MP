@@ -75,7 +75,7 @@ if (!$isLocal) {
 $defaultHost = $isLocal ? 'localhost' : 'sql105.infinityfree.com';
 $defaultDb   = $isLocal ? 'grocery_db' : 'if0_42958450_grocery_db';
 $defaultUser = $isLocal ? 'root' : 'if0_42958450';
-$defaultPass = $isLocal ? '' : 'LDK0QkYYT4jd';
+$defaultPass = '';
 $defaultPort = 3306;
 
 $host     = get_config_var('MYSQLHOST', $defaultHost);
@@ -92,15 +92,10 @@ try {
         PDO::ATTR_TIMEOUT => 5
     ]);
 } catch (PDOException $e) {
-    // Safely log error on server
+    // Safely log error on server (Zero sensitive error disclosure per security.md Phase 0)
     error_log("Database Connection Error: " . $e->getMessage());
 
-    // Provide detailed diagnostics if requested via ?debug_db=1
-    $showDebug = isset($_GET['debug_db']) || (isset($_GET['debug']) && $_GET['debug'] === '1');
     $errorMessage = "Service Unavailable: Database connection failed.";
-    if ($showDebug) {
-        $errorMessage .= " [Diagnostic: Host=$host, DB=$dbname, User=$username, Error=" . htmlspecialchars($e->getMessage()) . "]";
-    }
 
     if (strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false) {
         header('Content-Type: application/json');

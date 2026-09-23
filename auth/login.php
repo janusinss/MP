@@ -24,10 +24,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (!verify_csrf_token()) {
         $error_message = "Security validation failed. Please refresh the page.";
     } else {
-        $adminUser = function_exists('get_config_var') ? get_config_var('ADMIN_USERNAME', 'admin') : (getenv('ADMIN_USERNAME') ?: 'admin');
-        $adminPass = function_exists('get_config_var') ? get_config_var('ADMIN_PASSWORD', 'admin123') : (getenv('ADMIN_PASSWORD') ?: 'admin123');
+        $adminUser = function_exists('get_config_var') ? get_config_var('ADMIN_USERNAME') : getenv('ADMIN_USERNAME');
+        $adminPass = function_exists('get_config_var') ? get_config_var('ADMIN_PASSWORD') : getenv('ADMIN_PASSWORD');
 
-        if ($adminUser && $adminPass && hash_equals($adminUser, $email) && hash_equals($adminPass, $password)) {
+        // Only allow dev fallback in local environment when explicitly unset
+        if (($isLocal ?? false) && (empty($adminUser) || empty($adminPass))) {
+            $adminUser = $adminUser ?: 'admin';
+            $adminPass = $adminPass ?: 'admin123';
+        }
+
+        if (!empty($adminUser) && !empty($adminPass) && hash_equals($adminUser, $email) && hash_equals($adminPass, $password)) {
             session_regenerate_id(true);
             $_SESSION['admin_logged_in'] = true;
             $_SESSION['user_id'] = 1;
