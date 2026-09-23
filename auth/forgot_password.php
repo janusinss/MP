@@ -180,40 +180,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $toastType = "danger";
                     $toastTitle = "Incorrect Code";
                 } else {
-                    $resetUserId = (int)$reset['user_id'];
-                    $resetEmail = $reset['email'];
-                    $newPass = $_POST['new_password'] ?? '';
-                    $finalPass = !empty($newPass) ? $newPass : $inputOtp;
-                    $hashed = password_hash($finalPass, PASSWORD_DEFAULT);
-
-                    $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
-                    $stmt->execute([$hashed, $resetUserId]);
-
                     $reset['verified'] = true;
+                    $resetEmail = $reset['email'];
 
                     if ($isAjax) {
                         header('Content-Type: application/json');
                         echo json_encode([
                             'success' => true,
                             'step' => 3,
-                            'redirect' => $appRoot . 'login',
                             'email' => $resetEmail,
-                            'message' => 'Password reset successfully! Your temporary password is your 6-digit code. Please sign in.'
+                            'message' => 'Verification code confirmed. Please create your new password.'
                         ]);
                         exit;
                     }
 
-                    // Direct browser form submission -> redirect immediately to login
-                    unset($_SESSION['reset_password']);
-                    $_SESSION['flash_toast'] = [
-                        'type' => 'success',
-                        'title' => 'Password Reset!',
-                        'message' => 'Password reset successfully! Your temporary password is your 6-digit code. Please sign in.'
-                    ];
-                    $_SESSION['prefill_email'] = $resetEmail;
-                    $_SESSION['prefill_password'] = $finalPass;
-                    header("Location: " . $appRoot . "login");
-                    exit;
+                    $toastMessage = "Code verified! Please create your new password.";
+                    $toastType = "success";
+                    $toastTitle = "Code Verified";
                 }
             }
         }
@@ -313,6 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'title' => 'Password Reset!',
                         'message' => 'Your password has been updated successfully. Please sign in.'
                     ];
+                    $_SESSION['prefill_email'] = $userEmail;
 
                     $successMsg = "Password reset successfully! Redirecting to login...";
                     if ($isAjax) {
@@ -328,8 +312,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     $toastMessage = $successMsg;
                     $toastType = "success";
-                    $toastTitle = "Password Reset!";
-                    $redirectUrl = 'login';
+                    header("Location: " . $appRoot . "login");
+                    exit;
                 } else {
                     $msg = "Failed to update password. Please try again.";
                     if ($isAjax) {
