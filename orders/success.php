@@ -178,10 +178,10 @@ include __DIR__ . '/../includes/header.php';
                                                 <?= htmlspecialchars($item['name']) ?>
                                             </h4>
                                             <div class="success-item-rate">
-                                                <?= (int)$item['quantity'] ?> &times; $<?= number_format($item['price'], 2) ?>
+                                                <?= (int)$item['quantity'] ?> &times; ₱<?= number_format($item['price'], 2) ?>
                                             </div>
                                         </div>
-                                        <div class="success-item-total">$<?= number_format($lineTotal, 2) ?></div>
+                                        <div class="success-item-total">₱<?= number_format($lineTotal, 2) ?></div>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
@@ -190,7 +190,7 @@ include __DIR__ . '/../includes/header.php';
                             <div class="success-calc-table">
                                 <div class="success-calc-row">
                                     <span>Produce Subtotal</span>
-                                    <span class="success-calc-val">$<?= number_format($subtotal, 2) ?></span>
+                                    <span class="success-calc-val">₱<?= number_format($subtotal, 2) ?></span>
                                 </div>
 
                                 <?php 
@@ -201,7 +201,7 @@ include __DIR__ . '/../includes/header.php';
                                         <span>
                                             <i class="bi bi-tag-fill me-1" aria-hidden="true"></i> Promotional Discount
                                         </span>
-                                        <span class="success-calc-val">-$<?= number_format($discount, 2) ?></span>
+                                        <span class="success-calc-val">-₱<?= number_format($discount, 2) ?></span>
                                     </div>
                                 <?php endif; ?>
 
@@ -215,7 +215,7 @@ include __DIR__ . '/../includes/header.php';
                                         <span class="success-total-label">Total Paid / Due</span>
                                         <small class="d-block text-muted" style="font-size: 0.75rem;">Includes all taxes &amp; packaging</small>
                                     </div>
-                                    <div class="success-total-amount">$<?= number_format($order['total_amount'], 2) ?></div>
+                                    <div class="success-total-amount">₱<?= number_format($order['total_amount'], 2) ?></div>
                                 </div>
                             </div>
                         </div>

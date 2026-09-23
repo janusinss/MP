@@ -243,7 +243,7 @@ include __DIR__ . '/../includes/header.php';
                                     <div class="details-item-info">
                                         <h3 class="details-item-name"><?= htmlspecialchars($item['name']) ?></h3>
                                         <div class="details-item-meta">
-                                            <span>$<?= number_format($item['price'], 2) ?> each</span>
+                                            <span>₱<?= number_format($item['price'], 2) ?> each</span>
                                             <span class="details-item-qty">Qty: <?= $item['quantity'] ?></span>
                                             <?php if (!empty($item['category'])): ?>
                                                 <span class="text-muted small d-none d-sm-inline">&bull; <?= htmlspecialchars($item['category']) ?></span>
@@ -252,7 +252,7 @@ include __DIR__ . '/../includes/header.php';
                                     </div>
                                 </div>
                                 <div class="details-item-total">
-                                    $<?= number_format($item['price'] * $item['quantity'], 2) ?>
+                                    ₱<?= number_format($item['price'] * $item['quantity'], 2) ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -262,7 +262,7 @@ include __DIR__ . '/../includes/header.php';
                     <div class="details-summary-card">
                         <div class="details-summary-row">
                             <span>Subtotal</span>
-                            <span class="font-monospace fw-semibold">$<?= number_format($itemsSubtotal, 2) ?></span>
+                            <span class="font-monospace fw-semibold">₱<?= number_format($itemsSubtotal, 2) ?></span>
                         </div>
                         <div class="details-summary-row">
                             <span>Delivery</span>
@@ -271,13 +271,13 @@ include __DIR__ . '/../includes/header.php';
                         <?php if ($discountAmount > 0.005): ?>
                             <div class="details-summary-row discount-row">
                                 <span>Promo Savings</span>
-                                <span class="font-monospace fw-bold">-$<?= number_format($discountAmount, 2) ?></span>
+                                <span class="font-monospace fw-bold">-₱<?= number_format($discountAmount, 2) ?></span>
                             </div>
                         <?php endif; ?>
                         <div class="details-summary-divider"></div>
                         <div class="details-total-row">
                             <span class="details-total-label">Grand Total</span>
-                            <span class="details-total-value">$<?= number_format($order['total_amount'], 2) ?></span>
+                            <span class="details-total-value">₱<?= number_format($order['total_amount'], 2) ?></span>
                         </div>
                     </div>
                 </section>

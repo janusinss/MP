@@ -93,8 +93,8 @@ if (isset($_SESSION['discount'])) {
     $finalTotal = max(0, $subTotal - $discountAmount);
 }
 
-// Free Cold-Chain Delivery threshold ($50.00)
-$freeShippingThreshold = 50.00;
+// Free Cold-Chain Delivery threshold (₱500.00)
+$freeShippingThreshold = 500.00;
 $freeShippingUnlocked = ($subTotal >= $freeShippingThreshold);
 $shippingNeeded = max(0, $freeShippingThreshold - $subTotal);
 $shippingProgress = ($subTotal > 0) ? min(100, round(($subTotal / $freeShippingThreshold) * 100)) : 0;
@@ -229,7 +229,7 @@ require_once __DIR__ . '/../includes/header.php';
                                             <?= htmlspecialchars($qp['name']) ?>
                                         </a>
                                         <div class="cart-quick-item-actions">
-                                            <span class="cart-quick-item-price">$<?= number_format($qp['price'], 2) ?></span>
+                                            <span class="cart-quick-item-price">₱<?= number_format($qp['price'], 2) ?></span>
                                             <button type="button" class="btn-quick-add-basket" onclick="quickAddToCart(<?= (int)$qp['id'] ?>, this)" aria-label="Add <?= htmlspecialchars($qp['name']) ?> to basket">
                                                 <i class="bi bi-plus" aria-hidden="true"></i>
                                                 <span>Add</span>
@@ -258,7 +258,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 <?php if ($freeShippingUnlocked): ?>
                                     <span>Free refrigerated farm delivery unlocked</span>
                                 <?php else: ?>
-                                    <span>Add <strong>$<?= number_format($shippingNeeded, 2) ?></strong> more for free refrigerated delivery</span>
+                                    <span>Add <strong>₱<?= number_format($shippingNeeded, 2) ?></strong> more for free refrigerated delivery</span>
                                 <?php endif; ?>
                             </div>
                             <span class="cart-threshold-pct"><?= $shippingProgress ?>%</span>
@@ -291,7 +291,7 @@ require_once __DIR__ . '/../includes/header.php';
                                             <a href="<?= $rootPath ?>product/<?= $productSlug ?>" class="cart-product-title" title="<?= htmlspecialchars($item['name']) ?>">
                                                 <?= htmlspecialchars($item['name']) ?>
                                             </a>
-                                            <div class="cart-unit-rate-mobile d-md-none">$<?= number_format($item['price'], 2) ?> <span class="text-muted">/ unit</span></div>
+                                            <div class="cart-unit-rate-mobile d-md-none">₱<?= number_format($item['price'], 2) ?> <span class="text-muted">/ unit</span></div>
                                             <?php if ($item['stock_qty'] <= 5): ?>
                                                 <span class="cart-stock-hint"><i class="bi bi-exclamation-circle-fill me-1"></i>Only <?= $item['stock_qty'] ?> remaining</span>
                                             <?php endif; ?>
@@ -299,7 +299,7 @@ require_once __DIR__ . '/../includes/header.php';
                                     </div>
 
                                     <div class="cart-price-cell d-none d-md-block">
-                                        $<?= number_format($item['price'], 2) ?>
+                                        ₱<?= number_format($item['price'], 2) ?>
                                     </div>
 
                                     <div class="cart-row-controls">
@@ -327,7 +327,7 @@ require_once __DIR__ . '/../includes/header.php';
 
                                         <div class="cart-subtotal-cell text-end">
                                             <span class="cart-subtotal-label d-md-none">Subtotal</span>
-                                            <span class="cart-subtotal-val">$<?= number_format($item['subtotal'], 2) ?></span>
+                                            <span class="cart-subtotal-val">₱<?= number_format($item['subtotal'], 2) ?></span>
                                         </div>
                                     </div>
 
@@ -429,7 +429,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <!-- Cost Breakdown Rows -->
                         <div class="cart-calc-row">
                             <span>Produce Subtotal (<?= $totalQty ?> items)</span>
-                            <span class="cart-calc-val">$<?= number_format($subTotal, 2) ?></span>
+                            <span class="cart-calc-val">₱<?= number_format($subTotal, 2) ?></span>
                         </div>
 
                         <?php if (isset($_SESSION['discount'])): ?>
@@ -443,7 +443,7 @@ require_once __DIR__ . '/../includes/header.php';
                                         </button>
                                     </form>
                                 </div>
-                                <span class="cart-calc-val text-success">-$<?= number_format($discountAmount, 2) ?></span>
+                                <span class="cart-calc-val text-success">-₱<?= number_format($discountAmount, 2) ?></span>
                             </div>
                         <?php endif; ?>
 
@@ -458,7 +458,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 <div class="cart-grand-label">Estimated Total</div>
                                 <small class="text-muted d-block" style="font-size: 0.75rem;">Includes all farm taxes &amp; packaging</small>
                             </div>
-                            <div class="cart-grand-amount">$<?= number_format($finalTotal, 2) ?></div>
+                            <div class="cart-grand-amount">₱<?= number_format($finalTotal, 2) ?></div>
                         </div>
 
                         <!-- Proceed to Checkout Button -->

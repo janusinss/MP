@@ -92,6 +92,10 @@ if (count($reviews) > 0) {
 <html lang="en">
 <head>
     <title><?= htmlspecialchars($product['name']) ?> | FreshCart</title>
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../assets/images/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
@@ -136,7 +140,7 @@ if (count($reviews) > 0) {
                     </div>
 
                     <div class="product-price-large">
-                        $<?= number_format($product['price'], 2) ?>
+                        ₱<?= number_format($product['price'], 2) ?>
                         <?php if($product['stock_qty'] > 0): ?>
                             <span class="stock-badge"><i class="bi bi-check-circle-fill me-1"></i> In Stock</span>
                         <?php else: ?>
@@ -159,7 +163,7 @@ if (count($reviews) > 0) {
                             <?= csrf_input() ?>
                             <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                             <button type="submit" class="btn-add-large">
-                                Add to Cart — $<?= number_format($product['price'], 2) ?>
+                                Add to Cart — ₱<?= number_format($product['price'], 2) ?>
                             </button>
                         </form>
                     <?php else: ?>
@@ -257,7 +261,7 @@ if (count($reviews) > 0) {
                             <div class="mini-details">
                                 <span class="badge bg-light text-secondary border mb-1" style="font-size: 0.6rem;"><?= htmlspecialchars($rp['category'], ENT_QUOTES, 'UTF-8') ?></span>
                                 <h6 class="text-truncate" style="max-width: 150px;"><?= htmlspecialchars($rp['name']) ?></h6>
-                                <div class="mini-price">$<?= number_format($rp['price'], 2) ?></div>
+                                <div class="mini-price">₱<?= number_format($rp['price'], 2) ?></div>
                             </div>
                             <div class="ms-auto">
                                 <button class="btn btn-sm btn-light rounded-circle border" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">

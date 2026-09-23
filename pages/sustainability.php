@@ -1,85 +1,167 @@
 <?php 
+// pages/sustainability.php - FreshCart Market
 require_once __DIR__ . '/../config/db.php';
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 include __DIR__ . '/../includes/header.php'; 
 ?>
 
-<section class="sus-hero">
+<section class="content-page-hero">
     <div class="container">
-        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 mb-3">Our Mission</span>
-        <h1 class="sus-title animate-fade-in">Good for you.<br>Better for the planet.</h1>
-        <p class="sus-lead">
-            We believe that the food system shouldn't come at a cost to the earth. 
-            From soil to doorstep, we are redefining what it means to be fresh.
+        <span class="content-kicker">Environmental Responsibility</span>
+        <h1 class="content-hero-title">A shorter route between<br>the soil and your kitchen.</h1>
+        <p class="content-hero-lead">
+            Every mile eliminated from the food supply chain reduces diesel emissions, refrigerated storage cooling waste, and premature spoilage. Here is how our closed-loop operations protect regional ecosystems.
         </p>
+        <div class="content-hero-actions">
+            <a href="#lifecycle" class="btn-hero-primary">
+                <i class="bi bi-arrow-repeat"></i> The Closed-Loop System
+            </a>
+            <a href="#packaging" class="btn-hero-secondary">
+                <i class="bi bi-box-seam"></i> Packaging Breakdown
+            </a>
+        </div>
     </div>
 </section>
 
-<div class="container">
-    
-    <div class="row g-4 impact-grid">
-        <div class="col-md-4">
-            <div class="impact-card">
-                <div class="impact-icon-bg">
-                    <i class="bi bi-box-seam"></i>
-                </div>
-                <div class="impact-number">100%</div>
-                <div class="impact-label">Plastic-Free Packaging</div>
-                <p class="text-muted mt-3 small px-3">
-                    Every box, bag, and container is compostable or recyclable. No single-use plastics, ever.
-                </p>
+<div class="container py-5 my-2">
+    <!-- Verified Environmental Metrics -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-sm-6">
+            <div class="impact-metric-card">
+                <div class="impact-metric-num">100%</div>
+                <div class="impact-metric-label">Plastic-Free Packaging</div>
+                <p class="impact-metric-sub">Certified plant-starch liner bags and unbleached kraft boxes that decompose naturally within 90 days.</p>
             </div>
         </div>
-
-        <div class="col-md-4">
-            <div class="impact-card">
-                <div class="impact-icon-bg">
-                    <i class="bi bi-shop"></i>
-                </div>
-                <div class="impact-number">50+</div>
-                <div class="impact-label">Local Farm Partners</div>
-                <p class="text-muted mt-3 small px-3">
-                    We source within 100 miles of your city, reducing travel time and supporting family farms.
-                </p>
+        <div class="col-lg-3 col-sm-6">
+            <div class="impact-metric-card">
+                <div class="impact-metric-num">42 mi</div>
+                <div class="impact-metric-label">Average Farm Radius</div>
+                <p class="impact-metric-sub">Sourced strictly from regional grower clusters, cutting highway transit fuel consumption by 64%.</p>
             </div>
         </div>
-
-        <div class="col-md-4">
-            <div class="impact-card">
-                <div class="impact-icon-bg">
-                    <i class="bi bi-recycle"></i>
-                </div>
-                <div class="impact-number">0%</div>
-                <div class="impact-label">Food Waste in Transit</div>
-                <p class="text-muted mt-3 small px-3">
-                    Our AI-driven inventory means we only order what we sell. Nothing goes to the landfill.
-                </p>
+        <div class="col-lg-3 col-sm-6">
+            <div class="impact-metric-card">
+                <div class="impact-metric-num">0%</div>
+                <div class="impact-metric-label">Edible Landfill Waste</div>
+                <p class="impact-metric-sub">Over-harvested or cosmetically imperfect vegetables are routed to local soup kitchens or municipal compost.</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="impact-metric-card">
+                <div class="impact-metric-num">88%</div>
+                <div class="impact-metric-label">Route Electrification</div>
+                <p class="impact-metric-sub">High-density urban drop-offs are operated by electric vans and zero-emission delivery bicycles.</p>
             </div>
         </div>
     </div>
 
-    <div class="forest-section">
-        <div class="row g-0 align-items-center">
-            <div class="col-lg-6">
-                <div class="forest-content">
-                    <div class="d-flex align-items-center gap-2 mb-3 text-warning">
-                        <i class="bi bi-lightning-charge-fill"></i>
-                        <span class="text-uppercase small fw-bold tracking-wide">Vision 2026</span>
-                    </div>
-                    <h2 class="forest-title">Our Carbon Footprint Promise</h2>
-                    <p class="forest-text">
-                        We use electric vans for 90% of our city deliveries. We aren't just offsetting carbon; we are actively reducing it. 
-                        By 2026, FreshCart aims to be the first grocery delivery service to be completely carbon neutral.
-                    </p>
-                    <a href="https://www.repsol.com/en/sustainability/sustainability-pillars/climate-change/reducing-carbon-footprint/index.cshtml" target="_blank" class="btn btn-light rounded-pill px-4 mt-4 text-success fw-bold">Read about Carbon Footprint</a>
+    <!-- Closed-Loop Delivery Lifecycle -->
+    <div id="lifecycle" class="pt-4 mb-5">
+        <div class="text-center mb-4">
+            <span class="content-kicker">Lifecycle Operations</span>
+            <h2 class="content-card-title fs-2">How Our Closed-Loop Delivery Works</h2>
+            <p class="text-muted mx-auto" style="max-width: 60ch;">We treat containers and delivery materials as durable assets rather than single-use trash.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="lifecycle-step-card">
+                    <div class="lifecycle-step-num">1</div>
+                    <h3 class="h5 fw-bold text-dark mb-2">Demand-Matched Harvest</h3>
+                    <p class="text-muted small mb-0">Growers receive precise harvest orders generated by customer cart checkout data, eliminating field-level crop over-picking.</p>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="forest-img-side"></div>
+            <div class="col-lg-3 col-md-6">
+                <div class="lifecycle-step-card">
+                    <div class="lifecycle-step-num">2</div>
+                    <h3 class="h5 fw-bold text-dark mb-2">Sanitized Crate Intake</h3>
+                    <p class="text-muted small mb-0">Produce is placed directly into collapsible food-grade crates that are sanitized and reused up to 200 cycles each year.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="lifecycle-step-card">
+                    <div class="lifecycle-step-num">3</div>
+                    <h3 class="h5 fw-bold text-dark mb-2">Clustered Drop-Offs</h3>
+                    <p class="text-muted small mb-0">Our routing engine batches orders by neighborhood corridors, reducing delivery vehicle miles and traffic congestion.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="lifecycle-step-card">
+                    <div class="lifecycle-step-num">4</div>
+                    <h3 class="h5 fw-bold text-dark mb-2">Doorstep Crate Return</h3>
+                    <p class="text-muted small mb-0">Customers hand back previous bags, ice gel packs, and insulated totes upon their next delivery for professional sanitization.</p>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Packaging Materials Table -->
+    <div id="packaging" class="pt-4 mb-5">
+        <div class="p-4 p-md-5 bg-white rounded-4 shadow-sm" style="border: 1px solid #E5E0D5;">
+            <div class="mb-4">
+                <span class="content-kicker">Material Audit</span>
+                <h2 class="content-card-title fs-3 mb-2">Complete Packaging Transparency</h2>
+                <p class="text-muted mb-0">We believe you should know exactly what happens to every container that arrives at your doorstep.</p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="text-uppercase small fw-bold text-muted">
+                            <th scope="col" style="min-width: 180px;">Item Type</th>
+                            <th scope="col" style="min-width: 200px;">Material Composition</th>
+                            <th scope="col" style="min-width: 180px;">Recommended Disposal</th>
+                            <th scope="col" class="text-end" style="min-width: 140px;">Circular Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold text-dark">Fresh Produce Bags</td>
+                            <td class="text-muted">Certified Cornstarch PLA (Non-GMO)</td>
+                            <td><span class="badge bg-success bg-opacity-10 text-success fw-semibold">Home Compostable</span></td>
+                            <td class="text-end text-success fw-bold">90-Day Decomp</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-dark">Delivery Outer Box</td>
+                            <td class="text-muted">100% Post-Consumer Recycled Kraft</td>
+                            <td><span class="badge bg-primary bg-opacity-10 text-primary fw-semibold">Curbside Recycling</span></td>
+                            <td class="text-end text-success fw-bold">100% Recyclable</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-dark">Thermal Cold Liners</td>
+                            <td class="text-muted">Repurposed Cotton Denim Offcuts</td>
+                            <td><span class="badge bg-warning bg-opacity-15 text-dark fw-semibold">Return to Courier</span></td>
+                            <td class="text-end text-success fw-bold">Multi-Use Asset</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-dark">Non-Toxic Gel Ice Packs</td>
+                            <td class="text-muted">Plant-Soluble Polymer Gel & Water</td>
+                            <td><span class="badge bg-info bg-opacity-10 text-info-emphasis fw-semibold">Drain-Safe or Courier Return</span></td>
+                            <td class="text-end text-success fw-bold">Reusable</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action Banner -->
+    <div class="p-4 p-md-5 rounded-4 text-white text-center text-md-start" style="background: linear-gradient(135deg, #1e382b 0%, #2f5641 100%);">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <h3 class="fs-2 fw-bold text-white mb-2" style="font-family: var(--font-serif, serif);">Support Local, Regenerative Farming</h3>
+                <p class="text-white-50 mb-0 leading-relaxed">
+                    By choosing regional seasonal produce, you vote for resilient family farms and clean groundwater. Every order keeps food dollars within your community.
+                </p>
+            </div>
+            <div class="col-lg-4 text-md-end">
+                <a href="<?= $rootPath ?>index.php" class="btn btn-light rounded-pill px-4 py-3 fw-bold text-success shadow-sm" style="min-height: 44px; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-cart-check-fill"></i> Order Harvest Today
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

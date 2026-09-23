@@ -233,6 +233,10 @@ $firstKey = array_key_first($aisleReels);
 <html lang="en">
 <head>
     <title>FreshCart Market | Clean Organic Sourcing</title>
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="assets/images/logo.png">
     <meta name="description" content="Certified organic produce, local dairy, and pantry staples direct from family farms.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?= function_exists('get_csrf_token') ? htmlspecialchars(get_csrf_token(), ENT_QUOTES, 'UTF-8') : '' ?>">
@@ -374,10 +378,9 @@ $firstKey = array_key_first($aisleReels);
 
     <nav class="navbar navbar-expand-lg navbar-glass sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="./">
-                <h3 class="m-0" style="font-family: var(--font-serif); letter-spacing: -0.05em; font-weight: 800;">
-                    FreshCart<span style="color: var(--accent-color)">.</span>
-                </h3>
+            <a class="navbar-brand" href="./" aria-label="FreshCart Home">
+                <img src="assets/images/logo.png" alt="FreshCart Logo" class="brand-logo-img" width="34" height="34">
+                <h3 class="brand-wordmark">FreshCart<span style="color: var(--accent-color)">.</span></h3>
             </a>
             
             <div class="mobile-nav-actions d-flex align-items-center gap-2 d-lg-none">
@@ -743,7 +746,7 @@ $firstKey = array_key_first($aisleReels);
 
                                     <div class="spotlight-card-footer">
                                         <div class="spotlight-price">
-                                            $<?= number_format($sItem['price'], 2) ?>
+                                            ₱<?= number_format($sItem['price'], 2) ?>
                                             <small>/ unit</small>
                                         </div>
 
@@ -850,7 +853,7 @@ $firstKey = array_key_first($aisleReels);
                                         <div>
                                             <div class="food-card-price-row">
                                                 <div>
-                                                    <span class="food-card-price">$<?= number_format($prod['price'], 2) ?></span>
+                                                    <span class="food-card-price">₱<?= number_format($prod['price'], 2) ?></span>
                                                     <span class="food-card-unit">/ unit</span>
                                                 </div>
                                                 <span class="small text-muted" style="font-size: 0.72rem;"><?= htmlspecialchars($pMeta['telemetry']) ?></span>
@@ -923,7 +926,7 @@ $firstKey = array_key_first($aisleReels);
                 </div>
                 <div>
                     <div class="text-uppercase text-muted" style="font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em;">Your Basket</div>
-                    <div id="floatCartTotalText" class="floating-cart-total-text">$<?= number_format($cartSubtotal, 2) ?></div>
+                    <div id="floatCartTotalText" class="floating-cart-total-text">₱<?= number_format($cartSubtotal, 2) ?></div>
                 </div>
             </div>
             <div class="floating-cart-actions">
@@ -1483,6 +1486,273 @@ $firstKey = array_key_first($aisleReels);
             </div>
         </section>
 
+        <!-- =========================================================
+             21ST.DEV FAQ TABS SECTION (@vaib215/faq-tabs)
+             System-wide Knowledge Base & Frequently Asked Questions
+             ========================================================= -->
+        <section class="faq-tabs-section" id="faq">
+            <div class="faq-tabs-ambient-glow" aria-hidden="true"></div>
+            <div class="container">
+                <div class="faq-tabs-header">
+                    <span class="faq-tabs-kicker">Knowledge Base &bull; Clear Answers</span>
+                    <h2 class="faq-tabs-title">Frequently Asked Questions</h2>
+                    <p class="faq-tabs-subtitle">
+                        Everything you need to know about our dawn-harvest logistics, 100% organic farm verification, circular packaging, and household order management.
+                    </p>
+                </div>
+
+                <!-- Category Pills (Tabs) -->
+                <div class="faq-tabs-nav" role="tablist" aria-label="FAQ Categories">
+                    <button type="button" class="faq-tab-btn active" role="tab" aria-selected="true" aria-controls="faq-panel-ordering" id="tab-ordering" data-category="ordering" onclick="switchFaqCategory('ordering')">
+                        <i class="bi bi-truck me-1" aria-hidden="true"></i>
+                        <span>Ordering &amp; Delivery</span>
+                    </button>
+                    <button type="button" class="faq-tab-btn" role="tab" aria-selected="false" aria-controls="faq-panel-sourcing" id="tab-sourcing" data-category="sourcing" onclick="switchFaqCategory('sourcing')">
+                        <i class="bi bi-patch-check-fill me-1" aria-hidden="true"></i>
+                        <span>Farm Sourcing &amp; Quality</span>
+                    </button>
+                    <button type="button" class="faq-tab-btn" role="tab" aria-selected="false" aria-controls="faq-panel-sustainability" id="tab-sustainability" data-category="sustainability" onclick="switchFaqCategory('sustainability')">
+                        <i class="bi bi-recycle me-1" aria-hidden="true"></i>
+                        <span>Packaging &amp; Planet</span>
+                    </button>
+                    <button type="button" class="faq-tab-btn" role="tab" aria-selected="false" aria-controls="faq-panel-account" id="tab-account" data-category="account" onclick="switchFaqCategory('account')">
+                        <i class="bi bi-credit-card me-1" aria-hidden="true"></i>
+                        <span>Account &amp; Payments</span>
+                    </button>
+                </div>
+
+                <!-- Content Panels -->
+                <div class="faq-tabs-content-shell">
+                    <!-- Panel 1: Ordering & Delivery -->
+                    <div class="faq-tab-panel active" id="faq-panel-ordering" role="tabpanel" aria-labelledby="tab-ordering">
+                        <!-- Q1 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">How does dawn harvesting and same-day delivery work?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    Customer orders placed before 10:00 AM PHT are transmitted directly to partner family farms. Harvest crews pick ripe vegetables and fruits between 4:30 AM and 7:00 AM. Crates enter our refrigerated cold chain and arrive at your doorstep between 2:00 PM and 6:30 PM the same afternoon.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Q2 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">What is the delivery fee and minimum order amount?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    Orders of ₱500 or more qualify for free neighborhood delivery across our active municipal zones. For smaller orders below ₱500, a flat ₱45 cold-chain logistics fee applies to maintain refrigerated van transport.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Q3 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">How do I track my order status in real time?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    Visit your Account &rarr; Orders page at any time. Your order transitions atomically through three verified stages: 'Pending' (harvest allocation), 'Processing' (cold-chain sorting), and 'Shipped' (out for doorstep delivery). You receive live status updates with exact timestamps.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Q4 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">Can I cancel an order or modify delivery details?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    Yes. You can cancel any order directly from your Orders page while its status remains 'Pending'. Once canceled, reserved items are immediately restored to catalog inventory with zero cancellation penalty.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel 2: Farm Sourcing & Quality -->
+                    <div class="faq-tab-panel" id="faq-panel-sourcing" role="tabpanel" aria-labelledby="tab-sourcing">
+                        <!-- Q1 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">How does FreshCart verify 100% organic and pesticide-free standards?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    We partner exclusively with 42 independent family growers who follow organic practices. Every farm undergoes regular soil mineral testing, water purity analysis, and agrees to zero synthetic pesticides, petroleum fertilizers, or post-harvest artificial waxes.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Q2 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">How can I trace the origin of a specific product?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    Every item in our catalog and every delivery tote label displays parcel origin information, including the farm name, harvest municipality, picking timestamp, and grower profile. You can also explore full grower stories on our Our Farmers page.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Q3 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">What is your fresh-arrival guarantee if produce is damaged?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    If any vegetable, dairy carton, or fruit arrives bruised or wilted, message us a quick photo via our Contact page within 24 hours. Our local support team issues an immediate replacement or store credit.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Q4 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">Why does seasonal produce taste noticeably sweeter and crisper?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    Supermarket produce is harvested weeks early so it survives cross-country shipping in nitrogen chambers. FreshCart crops ripen naturally on the plant under full sunlight, developing peak sugar, polyphenol, and vitamin levels before being picked.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel 3: Packaging & Planet -->
+                    <div class="faq-tab-panel" id="faq-panel-sustainability" role="tabpanel" aria-labelledby="tab-sustainability">
+                        <!-- Q1 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">Are all delivery bags and packaging 100% plastic-free?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    Yes. All inner produce liners are made from certified non-GMO cornstarch PLA that breaks down in home compost within 90 days. Outer delivery boxes are made from 100% post-consumer recycled unbleached kraft cardboard.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Q2 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">How does the doorstep tote and chill pack return program work?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    During your next order delivery, hand back previous insulated totes, thermal cotton liners, and ice gel packs to your courier. All containers are sanitized and reused up to 200 cycles, preventing single-use landfill waste.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Q3 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">What happens to surplus vegetables that are not sold?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    FreshCart uses checkout-synchronized demand harvesting, so growers only cut what has been ordered. Any surplus produce is channeled to local soup kitchens, and organic trimmings are composted into natural fertilizer for our grower partners.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel 4: Account & Payments -->
+                    <div class="faq-tab-panel" id="faq-panel-account" role="tabpanel" aria-labelledby="tab-account">
+                        <!-- Q1 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">Which payment methods are supported at checkout?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    We accept Cash on Delivery (COD), GCash, Maya, and major credit/debit cards. All transactions are processed through encrypted, PCI-compliant payment gateways with zero plaintext card storage on our servers.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Q2 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">How do promotional discount coupon codes work?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    In your Cart or during Checkout, enter your promotional code into the coupon field and click Apply. Active discounts deduct immediately from your subtotal. Each coupon is verified for expiration date, minimum spend, and usage limits.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Q3 -->
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-accordion-trigger" aria-expanded="false" onclick="toggleFaqAccordion(this)">
+                                <span class="faq-question-text">How do I update my profile details and delivery address?</span>
+                                <span class="faq-icon-wrap" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+                            </button>
+                            <div class="faq-accordion-body">
+                                <p class="faq-answer-text">
+                                    Log in and tap your name or 'Account' in the navigation bar, then select 'Profile'. You can update your default recipient name, mobile contact number, and saved street address with CSRF-protected validation.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+        function switchFaqCategory(category) {
+            const tabs = document.querySelectorAll('.faq-tab-btn');
+            tabs.forEach(tab => {
+                const isActive = tab.getAttribute('data-category') === category;
+                tab.classList.toggle('active', isActive);
+                tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+
+            const panels = document.querySelectorAll('.faq-tab-panel');
+            panels.forEach(panel => {
+                const isTarget = panel.id === 'faq-panel-' + category;
+                panel.classList.toggle('active', isTarget);
+            });
+        }
+
+        function toggleFaqAccordion(btn) {
+            const item = btn.closest('.faq-accordion-item');
+            if (!item) return;
+
+            const isOpen = item.classList.contains('is-open');
+
+            const parentPanel = item.closest('.faq-tab-panel');
+            if (parentPanel) {
+                parentPanel.querySelectorAll('.faq-accordion-item.is-open').forEach(openItem => {
+                    if (openItem !== item) {
+                        openItem.classList.remove('is-open');
+                        const trigger = openItem.querySelector('.faq-accordion-trigger');
+                        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+
+            if (isOpen) {
+                item.classList.remove('is-open');
+                btn.setAttribute('aria-expanded', 'false');
+            } else {
+                item.classList.add('is-open');
+                btn.setAttribute('aria-expanded', 'true');
+            }
+        }
+        </script>
+
     </main>
     <?php endif; ?>
 
@@ -1524,6 +1794,7 @@ $firstKey = array_key_first($aisleReels);
                 <!-- Col 1: Brand & Sourcing Statement -->
                 <div class="col-lg-4 col-md-6 col-12 footer-brand-col">
                     <a href="./" class="footer-brand-anchor" aria-label="FreshCart Home">
+                        <img src="assets/images/logo.png" alt="FreshCart Logo" class="footer-brand-logo-img" width="36" height="36">
                         <span class="footer-brand">FreshCart<span class="footer-brand-dot">.</span></span>
                     </a>
                     <p class="footer-brand-desc">
@@ -1887,7 +2158,7 @@ $firstKey = array_key_first($aisleReels);
                 card.setAttribute('data-index', index);
                 
                 const imgName = item.image ? item.image : 'default.jpg';
-                const formattedPrice = '$' + parseFloat(item.price).toFixed(2);
+                const formattedPrice = '₱' + parseFloat(item.price).toFixed(2);
                 const safeName = item.name.replace(/"/g, '&quot;');
                 const productSlug = slugify(item.name);
                 const isOutOfStock = item.stock_qty <= 0;
@@ -2109,7 +2380,7 @@ $firstKey = array_key_first($aisleReels);
                         
                         const floatTotal = document.getElementById('floatCartTotalText');
                         if (floatTotal && data.cart_subtotal !== undefined) {
-                            floatTotal.innerText = '$' + parseFloat(data.cart_subtotal).toFixed(2);
+                            floatTotal.innerText = '₱' + parseFloat(data.cart_subtotal).toFixed(2);
                         }
 
                         const floatTray = document.getElementById('floatingCartTray');

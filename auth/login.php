@@ -9,6 +9,11 @@ if (session_status() === PHP_SESSION_NONE) {
 $appRoot = rtrim(str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
 $appRoot = $appRoot ? $appRoot . '/' : '/';
 
+$flashToast = $_SESSION['flash_toast'] ?? null;
+if ($flashToast) {
+    unset($_SESSION['flash_toast']);
+}
+
 $error_message = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email'] ?? '');
@@ -63,6 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Login - FreshCart Market</title>
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" href="<?= $appRoot ?>assets/images/favicon.png">
+    <link rel="shortcut icon" href="<?= $appRoot ?>favicon.ico">
+    <link rel="apple-touch-icon" href="<?= $appRoot ?>assets/images/logo.png">
     <meta name="description" content="Sign in to your FreshCart account to access your farm-fresh deliveries and subscriptions.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -75,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <section class="auth-showcase-panel" style="background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&auto=format&fit=crop&q=80');" aria-label="Farmstead Storytelling">
             <div class="auth-showcase-top">
                 <a href="<?= $appRoot ?>" class="auth-brand-logo" title="Return to FreshCart Home">
+                    <img src="<?= $appRoot ?>assets/images/logo.png" alt="FreshCart Logo" class="auth-brand-logo-img" width="36" height="36">
                     <span>FreshCart</span><span class="auth-brand-dot"></span>
                 </a>
             </div>
@@ -106,8 +116,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <i class="bi bi-arrow-left" aria-hidden="true"></i>
                         <span>Market</span>
                     </a>
-                    <a href="<?= $appRoot ?>" class="auth-mobile-logo">
-                        FreshCart<span>.</span>
+                    <a href="<?= $appRoot ?>" class="auth-mobile-logo d-inline-flex align-items-center gap-2" aria-label="FreshCart Home">
+                        <img src="<?= $appRoot ?>assets/images/logo.png" alt="FreshCart Logo" class="auth-mobile-logo-img" width="28" height="28">
+                        <span>FreshCart<span class="auth-mobile-logo-dot">.</span></span>
                     </a>
                 </div>
 
@@ -178,6 +189,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </section>
     </main>
 
+    <div class="fresh-toast-container" id="freshToastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="<?= $appRoot ?>assets/js/toast.js?v=<?= time() ?>"></script>
     <script>
     function togglePasswordVisibility(inputId, btn) {
         const input = document.getElementById(inputId);
@@ -190,6 +204,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        <?php if ($flashToast): ?>
+        if (window.FreshToast) {
+            FreshToast.show({
+                type: <?= json_encode($flashToast['type'] ?? 'success') ?>,
+                title: <?= json_encode($flashToast['title'] ?? 'Notice') ?>,
+                message: <?= json_encode($flashToast['message'] ?? '') ?>,
+                duration: 5000
+            });
+        }
+        <?php elseif (!empty($error_message)): ?>
+        if (window.FreshToast) {
+            FreshToast.show({
+                type: 'danger',
+                title: 'Sign In Notice',
+                message: <?= json_encode($error_message) ?>,
+                duration: 5000
+            });
+        }
+        <?php endif; ?>
+    });
     </script>
 </body>
 </html>
+

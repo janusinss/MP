@@ -205,7 +205,7 @@ if ($view == 'dashboard') {
         <div class="col-6 col-xl-3">
             <div class="admin-card h-100">
                 <div class="admin-kpi-label">Gross Revenue</div>
-                <div class="admin-kpi-value text-dark">$<?= number_format($totalRevenue, 2) ?></div>
+                <div class="admin-kpi-value text-dark">₱<?= number_format($totalRevenue, 2) ?></div>
                 <div class="admin-kpi-caption">
                     <span class="text-success fw-semibold">Net Sales</span> &bull; Checkouts
                 </div>
@@ -227,7 +227,7 @@ if ($view == 'dashboard') {
         <div class="col-6 col-xl-3">
             <div class="admin-card h-100">
                 <div class="admin-kpi-label">Avg. Order Value</div>
-                <div class="admin-kpi-value text-dark">$<?= number_format($aov, 2) ?></div>
+                <div class="admin-kpi-value text-dark">₱<?= number_format($aov, 2) ?></div>
                 <div class="admin-kpi-caption">
                     Mean basket value
                 </div>
@@ -362,7 +362,7 @@ if ($view == 'dashboard') {
                 <div>
                     <div class="d-flex justify-content-between align-items-baseline mb-1">
                         <h2 class="admin-card-heading">Department Share</h2>
-                        <span class="text-muted small fw-semibold">$<?= number_format($totalCatRevenue, 2) ?> Tracked</span>
+                        <span class="text-muted small fw-semibold">₱<?= number_format($totalCatRevenue, 2) ?> Tracked</span>
                     </div>
                     <p class="text-muted small mb-3">Gross revenue distribution by product aisle.</p>
 
@@ -375,7 +375,7 @@ if ($view == 'dashboard') {
                                     <div class="d-flex justify-content-between align-items-center small mb-1">
                                         <span class="fw-semibold text-dark"><?= htmlspecialchars($tc['category']) ?></span>
                                         <span class="text-muted" style="font-variant-numeric: tabular-nums;">
-                                            $<?= number_format((float)$tc['cat_revenue'], 2) ?> &bull; <?= $pct ?>%
+                                            ₱<?= number_format((float)$tc['cat_revenue'], 2) ?> &bull; <?= $pct ?>%
                                         </span>
                                     </div>
                                     <div class="progress" style="height: 6px; background-color: #f1f5f9;">
@@ -393,7 +393,7 @@ if ($view == 'dashboard') {
                     <div class="d-flex justify-content-between align-items-center small text-muted">
                         <span>Total Aisle Volume</span>
                         <span class="fw-bold text-dark fs-6" style="font-variant-numeric: tabular-nums;">
-                            $<?= number_format($totalCatRevenue, 2) ?>
+                            ₱<?= number_format($totalCatRevenue, 2) ?>
                         </span>
                     </div>
                 </div>
@@ -533,7 +533,7 @@ if ($view == 'dashboard') {
                                             <div class="text-muted" style="font-size: 0.72rem;"><?= date('M d, Y', strtotime($ro['created_at'])) ?></div>
                                         </td>
                                         <td class="text-end" style="padding: 8px; font-weight: 600; font-size: 0.85rem; font-variant-numeric: tabular-nums;">
-                                            $<?= number_format((float)$ro['total_amount'], 2) ?>
+                                            ₱<?= number_format((float)$ro['total_amount'], 2) ?>
                                         </td>
                                         <td class="text-center" style="padding: 8px;">
                                             <span class="admin-status-pill <?= $pillClass ?>"><?= $status ?></span>
@@ -570,7 +570,7 @@ if ($view == 'dashboard') {
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center my-2">
                                     <span class="text-muted small"><?= date('M d, Y', strtotime($ro['created_at'])) ?></span>
-                                    <span class="fw-bold text-dark fs-6" style="font-variant-numeric: tabular-nums;">$<?= number_format((float)$ro['total_amount'], 2) ?></span>
+                                    <span class="fw-bold text-dark fs-6" style="font-variant-numeric: tabular-nums;">₱<?= number_format((float)$ro['total_amount'], 2) ?></span>
                                 </div>
                                 <div class="admin-touch-card-footer">
                                     <a href="order_details.php?order_id=<?= $ro['id'] ?>" class="btn btn-sm btn-outline-secondary w-100 admin-touch-action-btn d-flex align-items-center justify-content-center gap-1">
@@ -647,7 +647,7 @@ if ($view == 'dashboard') {
                             callbacks: {
                                 label: function(context) {
                                     if (currentMetric === 'revenue') {
-                                        return 'Revenue: $' + Number(context.raw).toFixed(2);
+                                        return 'Revenue: ₱' + Number(context.raw).toFixed(2);
                                     } else {
                                         return 'Orders: ' + context.raw;
                                     }
@@ -663,7 +663,7 @@ if ($view == 'dashboard') {
                                 font: { size: 11 },
                                 color: '#64748b',
                                 callback: function(value) {
-                                    return currentMetric === 'revenue' ? '$' + value : value;
+                                    return currentMetric === 'revenue' ? '₱' + value : value;
                                 }
                             }
                         },
@@ -841,7 +841,7 @@ elseif ($view == 'products') {
             <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-sm-bottom-0">
                 <div class="admin-kpi-label mb-1">Catalog Asset Value</div>
                 <div class="d-flex align-items-baseline justify-content-between mb-1">
-                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format($totalValuation, 2) ?></span>
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">₱<?= number_format($totalValuation, 2) ?></span>
                     <span class="text-success small fw-semibold">Retail Total</span>
                 </div>
                 <div class="text-muted small">
@@ -1106,7 +1106,7 @@ elseif ($view == 'products') {
                                     <span class="text-dark small fw-medium"><?= htmlspecialchars($p['category']) ?></span>
                                 </td>
                                 <td class="py-2">
-                                    <span class="fw-semibold text-dark small" style="font-variant-numeric: tabular-nums;">$<?= number_format((float)$p['price'], 2) ?></span>
+                                    <span class="fw-semibold text-dark small" style="font-variant-numeric: tabular-nums;">₱<?= number_format((float)$p['price'], 2) ?></span>
                                 </td>
                                 <td class="py-2">
                                     <span class="fw-semibold small text-dark" style="font-variant-numeric: tabular-nums;">
@@ -1164,7 +1164,7 @@ elseif ($view == 'products') {
                             <div class="flex-grow-1 overflow-hidden">
                                 <div class="d-flex justify-content-between align-items-start gap-2">
                                     <div class="fw-bold text-dark text-truncate" style="font-size: 0.92rem;"><?= htmlspecialchars($p['name']) ?></div>
-                                    <div class="fw-bold text-dark fs-6" style="font-variant-numeric: tabular-nums;">$<?= number_format((float)$p['price'], 2) ?></div>
+                                    <div class="fw-bold text-dark fs-6" style="font-variant-numeric: tabular-nums;">₱<?= number_format((float)$p['price'], 2) ?></div>
                                 </div>
                                 <div class="d-flex align-items-center gap-2 mt-1">
                                     <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.72rem;">#<?= str_pad($p['id'], 4, '0', STR_PAD_LEFT) ?></span>
@@ -1309,7 +1309,7 @@ elseif ($view == 'users') {
             <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-sm-bottom-0">
                 <div class="admin-kpi-label mb-1">Customer Spend</div>
                 <div class="d-flex align-items-baseline justify-content-between mb-1">
-                    <span class="fw-bold text-success fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format($totalSpend, 2) ?></span>
+                    <span class="fw-bold text-success fs-5" style="font-variant-numeric: tabular-nums;">₱<?= number_format($totalSpend, 2) ?></span>
                     <span class="text-muted small">Gross Total</span>
                 </div>
                 <div class="text-muted small">
@@ -1321,7 +1321,7 @@ elseif ($view == 'users') {
             <div class="col-sm-6 col-xl-3 p-3 px-4">
                 <div class="admin-kpi-label mb-1">Avg. Value / Buyer</div>
                 <div class="d-flex align-items-baseline justify-content-between mb-1">
-                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format($avgSpendPerBuyer, 2) ?></span>
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">₱<?= number_format($avgSpendPerBuyer, 2) ?></span>
                     <span class="text-muted small">Per Buyer</span>
                 </div>
                 <div class="text-muted small">
@@ -1469,7 +1469,7 @@ elseif ($view == 'users') {
                                 </td>
                                 <td class="py-3">
                                     <span class="fw-semibold <?= $spend > 0 ? 'text-success' : 'text-muted' ?>" style="font-variant-numeric: tabular-nums; font-size: 0.88rem;">
-                                        $<?= number_format($spend, 2) ?>
+                                        ₱<?= number_format($spend, 2) ?>
                                     </span>
                                 </td>
                                 <td class="py-3">
@@ -1553,7 +1553,7 @@ elseif ($view == 'users') {
                             <div class="d-flex justify-content-between align-items-center small py-1 bg-light rounded px-2">
                                 <span class="text-muted"><?= $orderCount ?> <?= $orderCount === 1 ? 'Order' : 'Orders' ?> &bull; Joined <?= date('M Y', strtotime($u['created_at'])) ?></span>
                                 <span class="fw-bold <?= $spend > 0 ? 'text-success' : 'text-muted' ?>" style="font-variant-numeric: tabular-nums;">
-                                    $<?= number_format($spend, 2) ?>
+                                    ₱<?= number_format($spend, 2) ?>
                                 </span>
                             </div>
                         </div>
@@ -2093,7 +2093,7 @@ elseif ($view == 'customer_details') {
             <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-xl-bottom-0">
                 <div class="admin-kpi-label mb-1">Lifetime Spend</div>
                 <div class="d-flex align-items-baseline justify-content-between mb-1">
-                    <span class="fw-bold text-success fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format($lifetimeSpend, 2) ?></span>
+                    <span class="fw-bold text-success fs-5" style="font-variant-numeric: tabular-nums;">₱<?= number_format($lifetimeSpend, 2) ?></span>
                     <span class="text-muted small">Total Spent</span>
                 </div>
                 <div class="text-muted small">
@@ -2117,7 +2117,7 @@ elseif ($view == 'customer_details') {
             <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-sm-bottom-0">
                 <div class="admin-kpi-label mb-1">Average Order Value</div>
                 <div class="d-flex align-items-baseline justify-content-between mb-1">
-                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format($avgOrder, 2) ?></span>
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">₱<?= number_format($avgOrder, 2) ?></span>
                     <span class="text-muted small">Per Order</span>
                 </div>
                 <div class="text-muted small">
@@ -2203,7 +2203,7 @@ elseif ($view == 'customer_details') {
                                     <?= (int)($order['item_count'] ?? 0) ?> items
                                 </td>
                                 <td class="py-3 fw-semibold text-dark" style="font-variant-numeric: tabular-nums;">
-                                    $<?= number_format((float)$order['total_amount'], 2) ?>
+                                    ₱<?= number_format((float)$order['total_amount'], 2) ?>
                                 </td>
                                 <td class="py-3">
                                     <span class="admin-status-pill <?= $pillClass ?>">
@@ -2337,7 +2337,7 @@ elseif ($view == 'orders') {
             <div class="col-sm-6 col-xl-3 p-3 px-4 border-end border-bottom border-xl-bottom-0">
                 <div class="admin-kpi-label mb-1">Gross Order Volume</div>
                 <div class="d-flex align-items-baseline justify-content-between mb-1">
-                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">$<?= number_format($totalOrderRevenue, 2) ?></span>
+                    <span class="fw-bold text-dark fs-5" style="font-variant-numeric: tabular-nums;">₱<?= number_format($totalOrderRevenue, 2) ?></span>
                     <span class="text-success small fw-semibold">Net Active</span>
                 </div>
                 <div class="text-muted small">
@@ -2505,7 +2505,7 @@ elseif ($view == 'orders') {
                                     </span>
                                 </td>
                                 <td class="py-3 fw-bold text-dark small" style="font-variant-numeric: tabular-nums;">
-                                    $<?= number_format((float)$order['total_amount'], 2) ?>
+                                    ₱<?= number_format((float)$order['total_amount'], 2) ?>
                                 </td>
                                 <td class="py-3">
                                     <span class="admin-status-pill <?= $pillClass ?>">
@@ -2567,7 +2567,7 @@ elseif ($view == 'orders') {
                             <div class="d-flex justify-content-between align-items-center py-1 px-2 bg-light rounded small">
                                 <span class="text-muted"><?= date('M d, Y', strtotime($order['created_at'])) ?> &bull; <?= $itemCount ?> <?= $itemCount === 1 ? 'item' : 'items' ?></span>
                                 <span class="fw-bold text-dark fs-6" style="font-variant-numeric: tabular-nums;">
-                                    $<?= number_format((float)$order['total_amount'], 2) ?>
+                                    ₱<?= number_format((float)$order['total_amount'], 2) ?>
                                 </span>
                             </div>
                         </div>

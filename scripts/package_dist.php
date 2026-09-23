@@ -28,7 +28,8 @@ $foldersToInclude = [
 
 $filesToInclude = [
     'index.php',
-    '.htaccess'
+    '.htaccess',
+    'favicon.ico'
 ];
 
 $root = realpath(__DIR__ . '/..');

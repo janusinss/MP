@@ -111,7 +111,7 @@ include __DIR__ . '/../includes/header.php';
                         <i class="bi bi-chevron-down toggle-chevron" id="mobileSummaryChevron" aria-hidden="true"></i>
                     </div>
                     <div class="checkout-mobile-summary-right">
-                        <span class="checkout-mobile-summary-total">$<?= number_format($finalTotal, 2) ?></span>
+                        <span class="checkout-mobile-summary-total">₱<?= number_format($finalTotal, 2) ?></span>
                     </div>
                 </button>
                 <div class="checkout-mobile-summary-body" id="checkoutMobileSummaryBody" style="display: none;">
@@ -129,11 +129,11 @@ include __DIR__ . '/../includes/header.php';
                                     <div class="checkout-mobile-item-name" title="<?= htmlspecialchars($item['name']) ?>"><?= htmlspecialchars($item['name']) ?></div>
                                     <div class="checkout-mobile-item-meta">
                                         <span>Qty: <?= (int)$item['qty'] ?></span>
-                                        <span>&times; $<?= number_format($item['price'], 2) ?></span>
+                                        <span>&times; ₱<?= number_format($item['price'], 2) ?></span>
                                     </div>
                                 </div>
                                 <div class="checkout-mobile-item-total">
-                                    $<?= number_format($item['line_total'], 2) ?>
+                                    ₱<?= number_format($item['line_total'], 2) ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -141,12 +141,12 @@ include __DIR__ . '/../includes/header.php';
                     <div class="checkout-mobile-calc-breakdown">
                         <div class="d-flex justify-content-between mb-1">
                             <span class="text-muted small">Produce Subtotal</span>
-                            <span class="fw-semibold small">$<?= number_format($subTotal, 2) ?></span>
+                            <span class="fw-semibold small">₱<?= number_format($subTotal, 2) ?></span>
                         </div>
                         <?php if ($discountAmount > 0): ?>
                             <div class="d-flex justify-content-between mb-1 text-success">
                                 <span class="small"><i class="bi bi-tag-fill me-1" aria-hidden="true"></i>Coupon Discount</span>
-                                <span class="fw-semibold small">-$<?= number_format($discountAmount, 2) ?></span>
+                                <span class="fw-semibold small">-₱<?= number_format($discountAmount, 2) ?></span>
                             </div>
                         <?php endif; ?>
                         <div class="d-flex justify-content-between mb-2">
@@ -155,7 +155,7 @@ include __DIR__ . '/../includes/header.php';
                         </div>
                         <div class="d-flex justify-content-between pt-2 border-top">
                             <span class="fw-bold">Total Due</span>
-                            <span class="fw-bold text-brand fs-6">$<?= number_format($finalTotal, 2) ?></span>
+                            <span class="fw-bold text-brand fs-6">₱<?= number_format($finalTotal, 2) ?></span>
                         </div>
                     </div>
                 </div>
@@ -279,11 +279,11 @@ include __DIR__ . '/../includes/header.php';
                                         <h3 class="checkout-item-name" title="<?= htmlspecialchars($item['name']) ?>"><?= htmlspecialchars($item['name']) ?></h3>
                                         <div class="checkout-item-meta">
                                             <span class="checkout-item-qty">Qty: <?= (int)$item['qty'] ?></span>
-                                            <span class="checkout-item-rate">&times; $<?= number_format($item['price'], 2) ?></span>
+                                            <span class="checkout-item-rate">&times; ₱<?= number_format($item['price'], 2) ?></span>
                                         </div>
                                     </div>
                                     <div class="checkout-item-total">
-                                        $<?= number_format($item['line_total'], 2) ?>
+                                        ₱<?= number_format($item['line_total'], 2) ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -293,7 +293,7 @@ include __DIR__ . '/../includes/header.php';
                         <div class="checkout-calc-table">
                             <div class="checkout-calc-row">
                                 <span class="checkout-calc-label">Produce Subtotal</span>
-                                <span class="checkout-calc-val">$<?= number_format($subTotal, 2) ?></span>
+                                <span class="checkout-calc-val">₱<?= number_format($subTotal, 2) ?></span>
                             </div>
                             
                             <?php if ($discountAmount > 0): ?>
@@ -302,7 +302,7 @@ include __DIR__ . '/../includes/header.php';
                                         <i class="bi bi-tag-fill me-1" aria-hidden="true"></i>
                                         Coupon Discount (<?= htmlspecialchars($_SESSION['discount']['code'] ?? 'PROMO') ?>)
                                     </span>
-                                    <span class="checkout-calc-val">-$<?= number_format($discountAmount, 2) ?></span>
+                                    <span class="checkout-calc-val">-₱<?= number_format($discountAmount, 2) ?></span>
                                 </div>
                             <?php endif; ?>
 
@@ -319,7 +319,7 @@ include __DIR__ . '/../includes/header.php';
                                     <small class="checkout-total-subtext">Includes all seasonal produce &amp; taxes</small>
                                 </div>
                                 <div class="checkout-total-amount">
-                                    $<?= number_format($finalTotal, 2) ?>
+                                    ₱<?= number_format($finalTotal, 2) ?>
                                 </div>
                             </div>
                         </div>

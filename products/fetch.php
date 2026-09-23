@@ -94,7 +94,7 @@ if (count($products) > 0) {
                         <?= htmlspecialchars($product['name']) ?>
                     </a>
                     <div class="d-flex align-items-center justify-content-between">
-                        <span class="product-price">$<?= number_format($product['price'], 2) ?></span>
+                        <span class="product-price">₱<?= number_format($product['price'], 2) ?></span>
                         <span class="product-unit">per unit</span>
                     </div>
                 </div>

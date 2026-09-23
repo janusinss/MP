@@ -20,6 +20,10 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshCart Admin Console</title>
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../assets/images/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
@@ -50,7 +54,7 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
     <!-- Mobile Admin Topbar -->
     <header class="admin-mobile-topbar d-lg-none">
         <div class="d-flex align-items-center gap-2">
-            <span class="admin-logo-mark"><i class="bi bi-basket3-fill text-success fs-5"></i></span>
+            <img src="../assets/images/logo.png" alt="FreshCart Logo" class="admin-topbar-logo" width="28" height="28">
             <div class="fw-bold fs-6 text-dark" style="letter-spacing: -0.02em;">
                 FreshCart<span class="text-success">.</span> <span class="badge bg-dark-subtle text-dark border ms-1" style="font-size: 0.65rem; font-weight: 700;">ADMIN</span>
             </div>
@@ -74,9 +78,12 @@ $adminName = $_SESSION['user_name'] ?? 'Administrator';
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="admin-sidebar-brand-box">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="admin-sidebar-title">FreshCart<span class="text-success">.</span></div>
-                        <div class="admin-sidebar-subtitle">Operations Console</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <img src="../assets/images/logo.png" alt="FreshCart Logo" class="admin-sidebar-logo" width="34" height="34">
+                        <div>
+                            <div class="admin-sidebar-title">FreshCart<span class="text-success">.</span></div>
+                            <div class="admin-sidebar-subtitle">Operations Console</div>
+                        </div>
                     </div>
                     <button type="button" class="btn btn-sm btn-light border-0 d-lg-none" onclick="toggleSidebar()" aria-label="Close menu" style="width: 40px; height: 40px;">
                         <i class="bi bi-x-lg"></i>

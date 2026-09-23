@@ -9,4 +9,6 @@ return [
     'MYSQLPASSWORD' => 'LDK0QkYYT4jd',
     'ADMIN_USERNAME' => 'admin',
     'ADMIN_PASSWORD' => 'admin123',
+    'RESEND_API_KEY' => '',
+    'MAIL_FROM' => 'onboarding@resend.dev',
 ];

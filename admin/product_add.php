@@ -91,6 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Product - FreshCart Admin Console</title>
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../assets/images/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css?v=<?= time(); ?>">
@@ -120,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <!-- Native Mobile App Topbar (375px+ touch optimized) -->
     <header class="admin-mobile-topbar d-lg-none" role="banner">
         <div class="d-flex align-items-center gap-2">
-            <span class="admin-logo-mark"><i class="bi bi-basket3-fill text-success fs-5"></i></span>
+            <img src="../assets/images/logo.png" alt="FreshCart Logo" class="admin-topbar-logo" width="28" height="28">
             <div class="fw-bold fs-6 text-dark" style="letter-spacing: -0.02em;">
                 FreshCart<span class="text-success">.</span> <span class="badge bg-dark-subtle text-dark border ms-1" style="font-size: 0.65rem; font-weight: 700;">ADMIN</span>
             </div>
@@ -139,9 +143,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="admin-sidebar-brand-box">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="admin-sidebar-title">FreshCart<span class="text-success">.</span></div>
-                        <div class="admin-sidebar-subtitle">Operations Console</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <img src="../assets/images/logo.png" alt="FreshCart Logo" class="admin-sidebar-logo" width="34" height="34">
+                        <div>
+                            <div class="admin-sidebar-title">FreshCart<span class="text-success">.</span></div>
+                            <div class="admin-sidebar-subtitle">Operations Console</div>
+                        </div>
                     </div>
                     <button type="button" class="btn btn-sm btn-light border-0 d-lg-none" onclick="toggleSidebar()" aria-label="Close menu">
                         <i class="bi bi-x-lg"></i>
@@ -282,10 +289,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="row g-3 mb-4">
                                 <div class="col-sm-6">
                                     <label for="prodPrice" class="form-label text-dark fw-bold small text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.06em;">
-                                        Unit Retail Price ($) <span class="text-danger">*</span>
+                                        Unit Retail Price (₱) <span class="text-danger">*</span>
                                     </label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-light text-muted fw-semibold">$</span>
+                                        <span class="input-group-text bg-light text-muted fw-semibold">₱</span>
                                         <input type="number" id="prodPrice" step="0.01" min="0" name="price" class="form-control" placeholder="0.00" required style="font-size: 0.95rem; min-height: 44px;">
                                     </div>
                                 </div>

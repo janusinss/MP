@@ -25,6 +25,7 @@ $isMinimalFooter = ($isCheckoutPage || $isSuccessPage || $isCartPage || $isOrder
         <div class="container">
             <div class="footer-minimal-inner">
                 <div class="footer-minimal-brand">
+                    <img src="<?= $rootPath ?>assets/images/logo.png" alt="FreshCart Logo" class="footer-minimal-logo-img" width="22" height="22">
                     <span class="footer-minimal-copy">&copy; <?= date('Y') ?> FreshCart Market.</span>
                     <span class="footer-minimal-trust d-none d-sm-inline">
                         <i class="bi bi-shield-check text-brand me-1" aria-hidden="true"></i>256-Bit SSL Secured
@@ -80,6 +81,7 @@ $isMinimalFooter = ($isCheckoutPage || $isSuccessPage || $isCartPage || $isOrder
                 <!-- Col 1: Brand & Sourcing Statement -->
                 <div class="col-lg-4 col-md-6 col-12 footer-brand-col">
                     <a href="<?= $rootPath ?: './' ?>" class="footer-brand-anchor" aria-label="FreshCart Home">
+                        <img src="<?= $rootPath ?>assets/images/logo.png" alt="FreshCart Logo" class="footer-brand-logo-img" width="36" height="36">
                         <span class="footer-brand">FreshCart<span class="footer-brand-dot">.</span></span>
                     </a>
                     <p class="footer-brand-desc">

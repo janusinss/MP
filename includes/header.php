@@ -26,6 +26,10 @@ if ($pos !== false) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?= function_exists('get_csrf_token') ? htmlspecialchars(get_csrf_token(), ENT_QUOTES, 'UTF-8') : '' ?>">
     <title>FreshCart Market</title>
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" href="<?= $rootPath ?>assets/images/favicon.png">
+    <link rel="shortcut icon" href="<?= $rootPath ?>favicon.ico">
+    <link rel="apple-touch-icon" href="<?= $rootPath ?>assets/images/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="<?= $rootPath ?>assets/css/style.css?v=<?php echo time(); ?>">
@@ -164,10 +168,9 @@ if ($pos !== false) {
 
     <nav class="navbar navbar-expand-lg navbar-glass sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="<?= $rootPath ?: './' ?>">
-                <h3 class="m-0" style="font-family: var(--font-serif); letter-spacing: -0.05em; font-weight: 800;">
-                    FreshCart<span style="color: var(--accent-color)">.</span>
-                </h3>
+            <a class="navbar-brand" href="<?= $rootPath ?: './' ?>" aria-label="FreshCart Home">
+                <img src="<?= $rootPath ?>assets/images/logo.png" alt="FreshCart Logo" class="brand-logo-img" width="34" height="34">
+                <h3 class="brand-wordmark">FreshCart<span style="color: var(--accent-color)">.</span></h3>
             </a>
             
             <div class="mobile-nav-actions d-flex align-items-center gap-2 d-lg-none">

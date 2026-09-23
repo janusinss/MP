@@ -104,6 +104,10 @@ if (empty($initials)) $initials = 'CU';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order #<?= str_pad($order['id'], 5, '0', STR_PAD_LEFT) ?> | Admin Portal</title>
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../assets/images/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css?v=<?= time(); ?>">
@@ -134,9 +138,15 @@ if (empty($initials)) $initials = 'CU';
 
         <!-- Top Navigation & Actions Bar -->
         <header class="admin-order-topbar no-print" aria-label="Order Navigation">
-            <a href="index.php?view=orders" class="admin-order-back-btn" aria-label="Back to Orders Directory">
-                <i class="bi bi-arrow-left" aria-hidden="true"></i> <span>Back to Orders</span>
-            </a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="index.php?view=orders" class="admin-order-back-btn" aria-label="Back to Orders Directory">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i> <span>Back to Orders</span>
+                </a>
+                <span class="d-none d-sm-inline-flex align-items-center gap-2 text-decoration-none">
+                    <img src="../assets/images/logo.png" alt="FreshCart Logo" class="admin-topbar-logo" width="24" height="24">
+                    <span class="fw-bold fs-6 text-dark" style="font-family: var(--font-serif); letter-spacing: -0.03em;">FreshCart<span class="text-success">.</span></span>
+                </span>
+            </div>
             <div class="d-flex align-items-center gap-2">
                 <button type="button" onclick="window.print()" class="admin-order-action-btn" aria-label="Print Order Invoice">
                     <i class="bi bi-printer" aria-hidden="true"></i> <span>Print Invoice</span>

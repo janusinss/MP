@@ -172,7 +172,7 @@ include __DIR__ . '/../includes/header.php';
 
                                 <div class="order-card-detail-group">
                                     <span class="order-col-label">Total Amount</span>
-                                    <div class="order-total-val">$<?= number_format($order['total_amount'], 2) ?></div>
+                                    <div class="order-total-val">₱<?= number_format($order['total_amount'], 2) ?></div>
                                 </div>
                             </div>
 
