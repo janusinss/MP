@@ -355,7 +355,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 </div>
                             </div>
                             <div class="cart-clear-wrap">
-                                <form method="POST" action="<?= $rootPath ?>cart/" class="d-inline m-0 p-0" onsubmit="return confirm('Empty your harvest basket? All reserved items will be removed.');">
+                                <form method="POST" action="<?= $rootPath ?>cart/" class="d-inline m-0 p-0" data-confirm="Empty your harvest basket? All reserved items will be removed." data-confirm-title="Empty Basket?" data-confirm-btn="Empty Basket" data-confirm-type="danger">
                                     <?= csrf_input() ?>
                                     <button type="submit" name="clear_cart" value="1" class="btn-clear-basket border-0 bg-transparent" aria-label="Empty Entire Basket">
                                         <i class="bi bi-trash3 me-1"></i>

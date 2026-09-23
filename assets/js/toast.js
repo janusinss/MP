@@ -195,4 +195,231 @@
         }
     });
 
+    // ============================================================
+    // FRESHCONFIRM - GLOBAL CONFIRMATION MODAL SYSTEM
+    // ============================================================
+    var confirmBackdrop = null;
+    var activeResolver = null;
+
+    function getConfirmModal() {
+        if (!confirmBackdrop || !document.body.contains(confirmBackdrop)) {
+            confirmBackdrop = document.createElement('div');
+            confirmBackdrop.className = 'fc-confirm-backdrop';
+            confirmBackdrop.setAttribute('role', 'dialog');
+            confirmBackdrop.setAttribute('aria-modal', 'true');
+            confirmBackdrop.setAttribute('tabindex', '-1');
+
+            confirmBackdrop.innerHTML = 
+                '<div class="fc-confirm-dialog" role="document">' +
+                    '<div class="fc-confirm-content">' +
+                        '<div class="fc-confirm-icon fc-confirm-icon-danger" id="fcConfirmIcon">' +
+                            '<i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>' +
+                        '</div>' +
+                        '<h4 class="fc-confirm-title" id="fcConfirmTitle">Confirmation Required</h4>' +
+                        '<p class="fc-confirm-message" id="fcConfirmMessage">Are you sure you want to proceed?</p>' +
+                    '</div>' +
+                    '<div class="fc-confirm-actions">' +
+                        '<button type="button" class="fc-confirm-btn fc-confirm-btn-cancel" id="fcConfirmBtnCancel">Cancel</button>' +
+                        '<button type="button" class="fc-confirm-btn fc-confirm-btn-danger" id="fcConfirmBtnConfirm">Confirm</button>' +
+                    '</div>' +
+                '</div>';
+
+            document.body.appendChild(confirmBackdrop);
+
+            var cancelBtn = confirmBackdrop.querySelector('#fcConfirmBtnCancel');
+            var confirmBtn = confirmBackdrop.querySelector('#fcConfirmBtnConfirm');
+
+            cancelBtn.addEventListener('click', function() {
+                closeConfirm(false);
+            });
+
+            confirmBtn.addEventListener('click', function() {
+                closeConfirm(true);
+            });
+
+            confirmBackdrop.addEventListener('click', function(e) {
+                if (e.target === confirmBackdrop) {
+                    closeConfirm(false);
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (!confirmBackdrop || !confirmBackdrop.classList.contains('is-open')) return;
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeConfirm(false);
+                }
+            });
+        }
+        return confirmBackdrop;
+    }
+
+    function closeConfirm(result) {
+        if (!confirmBackdrop) return;
+        confirmBackdrop.classList.remove('is-open');
+        document.body.style.overflow = '';
+        if (typeof activeResolver === 'function') {
+            var res = activeResolver;
+            activeResolver = null;
+            res(result);
+        }
+    }
+
+    var CONFIRM_ICONS = {
+        danger: '<i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>',
+        warning: '<i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>',
+        info: '<i class="bi bi-info-circle-fill" aria-hidden="true"></i>',
+        success: '<i class="bi bi-check-circle-fill" aria-hidden="true"></i>'
+    };
+
+    function confirmDialog(options) {
+        if (typeof options === 'string') {
+            options = { message: options };
+        }
+        options = options || {};
+        var type = options.type || 'danger';
+        var title = options.title || (type === 'danger' ? 'Confirm Action' : 'Are you sure?');
+        var message = options.message || 'Are you sure you want to proceed?';
+        var confirmText = options.confirmText || 'Confirm';
+        var cancelText = options.cancelText || 'Cancel';
+        var confirmClass = options.confirmClass || ('fc-confirm-btn-' + (type === 'danger' ? 'danger' : 'primary'));
+
+        var modal = getConfirmModal();
+        var iconEl = modal.querySelector('#fcConfirmIcon');
+        var titleEl = modal.querySelector('#fcConfirmTitle');
+        var msgEl = modal.querySelector('#fcConfirmMessage');
+        var confirmBtn = modal.querySelector('#fcConfirmBtnConfirm');
+        var cancelBtn = modal.querySelector('#fcConfirmBtnCancel');
+
+        iconEl.className = 'fc-confirm-icon fc-confirm-icon-' + type;
+        iconEl.innerHTML = CONFIRM_ICONS[type] || CONFIRM_ICONS.danger;
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+
+        confirmBtn.textContent = confirmText;
+        confirmBtn.className = 'fc-confirm-btn ' + confirmClass;
+        cancelBtn.textContent = cancelText;
+
+        document.body.style.overflow = 'hidden';
+        modal.classList.add('is-open');
+        confirmBtn.focus();
+
+        return new Promise(function(resolve) {
+            activeResolver = resolve;
+        });
+    }
+
+    window.FreshConfirm = confirmDialog;
+
+    // Upgrades any legacy onsubmit="return confirm(...)" or onclick="return confirm(...)"
+    function upgradeNativeConfirms(root) {
+        var scope = root || document;
+        var forms = scope.querySelectorAll('form[onsubmit*="confirm("]');
+        forms.forEach(function(f) {
+            var attr = f.getAttribute('onsubmit');
+            var m = attr.match(/confirm\(\s*(['"])(.*?)\1\s*\)/);
+            if (m && m[2]) {
+                f.removeAttribute('onsubmit');
+                f.setAttribute('data-confirm', m[2]);
+            }
+        });
+
+        var elements = scope.querySelectorAll('[onclick*="confirm("]');
+        elements.forEach(function(el) {
+            var attr = el.getAttribute('onclick');
+            var m = attr.match(/confirm\(\s*(['"])(.*?)\1\s*\)/);
+            if (m && m[2]) {
+                el.removeAttribute('onclick');
+                el.setAttribute('data-confirm', m[2]);
+            }
+        });
+    }
+
+    // Global Delegated Click Handler for [data-confirm]
+    document.addEventListener('click', function(e) {
+        var trigger = e.target.closest('[data-confirm]');
+        if (!trigger) return;
+
+        // If it is a submit button inside a form, let form submit handler manage it
+        if (trigger.tagName === 'BUTTON' && trigger.type === 'submit' && trigger.form) {
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var msg = trigger.getAttribute('data-confirm');
+        var title = trigger.getAttribute('data-confirm-title') || 'Confirm Action';
+        var confirmText = trigger.getAttribute('data-confirm-btn') || 'Confirm';
+        var type = trigger.getAttribute('data-confirm-type') || 'danger';
+
+        confirmDialog({
+            message: msg,
+            title: title,
+            confirmText: confirmText,
+            type: type
+        }).then(function(approved) {
+            if (approved) {
+                if (trigger.tagName === 'A' && trigger.href) {
+                    window.location.href = trigger.href;
+                } else if (typeof trigger.onclick === 'function') {
+                    trigger.onclick();
+                }
+            }
+        });
+    }, true);
+
+    // Global Delegated Submit Handler for forms with [data-confirm]
+    document.addEventListener('submit', function(e) {
+        var form = e.target;
+        if (!form || !form.hasAttribute('data-confirm')) return;
+
+        if (form.__freshConfirmApproved) {
+            delete form.__freshConfirmApproved;
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var msg = form.getAttribute('data-confirm');
+        var title = form.getAttribute('data-confirm-title') || 'Confirm Action';
+        var confirmText = form.getAttribute('data-confirm-btn') || 'Confirm';
+        var type = form.getAttribute('data-confirm-type') || 'danger';
+
+        confirmDialog({
+            message: msg,
+            title: title,
+            confirmText: confirmText,
+            type: type
+        }).then(function(approved) {
+            if (approved) {
+                form.__freshConfirmApproved = true;
+                form.submit();
+            }
+        });
+    }, true);
+
+    // Initialize auto-upgrade on load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { upgradeNativeConfirms(); });
+    } else {
+        upgradeNativeConfirms();
+    }
+
+    // Auto-upgrade inside any dynamic mutations (e.g. admin AJAX container updates)
+    if (window.MutationObserver) {
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mut) {
+                if (mut.addedNodes && mut.addedNodes.length > 0) {
+                    mut.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1) upgradeNativeConfirms(node);
+                    });
+                }
+            });
+        });
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+    }
+
 })(window);

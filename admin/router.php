@@ -1120,7 +1120,7 @@ elseif ($view == 'products') {
                                     <a href="product_edit.php?id=<?= $p['id'] ?>" class="btn btn-sm btn-outline-secondary py-1 px-2 me-1" title="Edit Product">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <a href="actions/product_delete.php?id=<?= $p['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger py-1 px-2" title="Delete Product" onclick="return confirm('Delete <?= htmlspecialchars(addslashes($p['name'])) ?> from catalog?');">
+                                    <a href="actions/product_delete.php?id=<?= $p['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger py-1 px-2" title="Delete Product" data-confirm="Permanently delete <?= htmlspecialchars($p['name']) ?> from the catalog?" data-confirm-title="Delete Product?" data-confirm-btn="Delete Product" data-confirm-type="danger">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                 </td>
@@ -1179,7 +1179,7 @@ elseif ($view == 'products') {
                             <a href="product_edit.php?id=<?= $p['id'] ?>" class="btn btn-sm btn-outline-secondary flex-grow-1 admin-touch-action-btn d-flex align-items-center justify-content-center gap-1">
                                 <i class="bi bi-pencil me-1"></i> <span>Edit Product</span>
                             </a>
-                            <a href="actions/product_delete.php?id=<?= $p['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger admin-touch-action-btn d-flex align-items-center justify-content-center px-3" onclick="return confirm('Delete <?= htmlspecialchars(addslashes($p['name'])) ?>?');" title="Delete Product" aria-label="Delete">
+                            <a href="actions/product_delete.php?id=<?= $p['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger admin-touch-action-btn d-flex align-items-center justify-content-center px-3" data-confirm="Permanently delete <?= htmlspecialchars($p['name']) ?> from the catalog?" data-confirm-title="Delete Product?" data-confirm-btn="Delete Product" data-confirm-type="danger" title="Delete Product" aria-label="Delete">
                                 <i class="bi bi-trash"></i>
                             </a>
                         </div>
@@ -1488,7 +1488,7 @@ elseif ($view == 'users') {
                                         <button type="button" onclick="loadView('customer_details&id=<?= $u['id'] ?>')" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 py-1 px-2" style="font-size: 0.78rem;" title="View Customer Profile &amp; Orders">
                                             <i class="bi bi-eye"></i> <span>View</span>
                                         </button>
-                                        <a href="actions/user_delete.php?id=<?= $u['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size: 0.78rem;" onclick="return confirm('Delete user <?= htmlspecialchars(addslashes($u['full_name'])) ?>? This cannot be undone.');" title="Delete Account">
+                                        <a href="actions/user_delete.php?id=<?= $u['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size: 0.78rem;" data-confirm="Permanently delete user account for <?= htmlspecialchars($u['full_name']) ?>? This cannot be undone." data-confirm-title="Delete User Account?" data-confirm-btn="Delete Account" data-confirm-type="danger" title="Delete Account">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                     </div>
@@ -1561,7 +1561,7 @@ elseif ($view == 'users') {
                             <button type="button" onclick="loadView('customer_details&id=<?= $u['id'] ?>')" class="btn btn-sm btn-outline-secondary flex-grow-1 admin-touch-action-btn d-flex align-items-center justify-content-center gap-1">
                                 <i class="bi bi-eye me-1"></i> <span>View Profile &amp; Orders</span>
                             </button>
-                            <a href="actions/user_delete.php?id=<?= $u['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger admin-touch-action-btn d-flex align-items-center justify-content-center px-3" onclick="return confirm('Delete user <?= htmlspecialchars(addslashes($u['full_name'])) ?>?');" title="Delete Account" aria-label="Delete">
+                            <a href="actions/user_delete.php?id=<?= $u['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger admin-touch-action-btn d-flex align-items-center justify-content-center px-3" data-confirm="Permanently delete user account for <?= htmlspecialchars($u['full_name']) ?>? This cannot be undone." data-confirm-title="Delete User Account?" data-confirm-btn="Delete Account" data-confirm-type="danger" title="Delete Account" aria-label="Delete">
                                 <i class="bi bi-trash"></i>
                             </a>
                         </div>
@@ -1859,7 +1859,7 @@ elseif ($view == 'reviews') {
                                 <span class="badge bg-light text-muted border" style="font-family: monospace; font-size: 0.68rem;">
                                     #<?= str_pad($r['id'], 4, '0', STR_PAD_LEFT) ?>
                                 </span>
-                                <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger admin-touch-action-btn" onclick="return confirm('Delete this review by <?= htmlspecialchars(addslashes($r['full_name'])) ?>?');" title="Delete review">
+                                <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger admin-touch-action-btn" data-confirm="Permanently remove this review by <?= htmlspecialchars($r['full_name']) ?>?" data-confirm-title="Remove Review?" data-confirm-btn="Delete Review" data-confirm-type="danger" title="Delete review">
                                     <i class="bi bi-trash me-1"></i>Remove
                                 </a>
                             </div>
@@ -1946,7 +1946,7 @@ elseif ($view == 'reviews') {
                                         <?= date('M d, Y', strtotime($r['created_at'])) ?>
                                     </td>
                                     <td class="pe-3 py-3 text-end text-nowrap">
-                                        <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger py-1 px-2 d-inline-flex align-items-center gap-1" style="font-size: 0.78rem;" onclick="return confirm('Permanently remove this review by <?= htmlspecialchars(addslashes($r['full_name'])) ?>?');" title="Remove Review">
+                                        <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger py-1 px-2 d-inline-flex align-items-center gap-1" style="font-size: 0.78rem;" data-confirm="Permanently remove this review by <?= htmlspecialchars($r['full_name']) ?>?" data-confirm-title="Remove Review?" data-confirm-btn="Delete Review" data-confirm-type="danger" title="Remove Review">
                                             <i class="bi bi-trash"></i> <span>Remove</span>
                                         </a>
                                     </td>
@@ -2004,7 +2004,7 @@ elseif ($view == 'reviews') {
                                 <span class="badge bg-light text-muted border font-monospace" style="font-size: 0.7rem;">
                                     #<?= str_pad($r['id'], 4, '0', STR_PAD_LEFT) ?>
                                 </span>
-                                <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger admin-touch-action-btn d-flex align-items-center gap-1" onclick="return confirm('Permanently remove this review?');" title="Remove Review">
+                                <a href="actions/review_delete.php?id=<?= $r['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="btn btn-sm btn-outline-danger admin-touch-action-btn d-flex align-items-center gap-1" data-confirm="Permanently remove this review?" data-confirm-title="Remove Review?" data-confirm-btn="Delete Review" data-confirm-type="danger" title="Remove Review">
                                     <i class="bi bi-trash"></i> <span>Remove</span>
                                 </a>
                             </div>
@@ -2079,7 +2079,7 @@ elseif ($view == 'customer_details') {
                 <i class="bi bi-arrow-left"></i>
                 <span>Customers</span>
             </button>
-            <a href="actions/user_delete.php?id=<?= $user['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="admin-header-btn admin-header-btn-danger" onclick="return confirm('Delete user account <?= htmlspecialchars(addslashes($user['full_name'] ?? '')) ?>? This cannot be undone.');" title="Delete User Account">
+            <a href="actions/user_delete.php?id=<?= $user['id'] ?>&csrf_token=<?= get_csrf_token() ?>" class="admin-header-btn admin-header-btn-danger" data-confirm="Permanently delete user account for <?= htmlspecialchars($user['full_name'] ?? '') ?>? This cannot be undone." data-confirm-title="Delete User Account?" data-confirm-btn="Delete Account" data-confirm-type="danger" title="Delete User Account">
                 <i class="bi bi-trash"></i>
                 <span>Delete Account</span>
             </a>

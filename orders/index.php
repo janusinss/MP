@@ -182,7 +182,7 @@ include __DIR__ . '/../includes/header.php';
                                 </a>
 
                                 <?php if ($status == 'Pending'): ?>
-                                    <form action="<?= $rootPath ?>orders/cancel" method="POST" onsubmit="return confirm('Are you sure you want to cancel order #<?= $order['id'] ?>?');" class="order-cancel-form m-0">
+                                    <form action="<?= $rootPath ?>orders/cancel" method="POST" class="order-cancel-form m-0" data-confirm="Are you sure you want to cancel order #<?= $order['id'] ?>? This cannot be undone." data-confirm-title="Cancel Order #<?= $order['id'] ?>?" data-confirm-btn="Yes, Cancel Order" data-confirm-type="danger">
                                         <?= csrf_input() ?>
                                         <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
                                         <button type="submit" class="btn-order-cancel" aria-label="Cancel order #<?= $order['id'] ?>">

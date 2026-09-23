@@ -18490,3 +18490,174 @@ body.modal-open-freeze {
 .fc-modal-body {
     padding: 1.25rem 1.5rem 1.75rem 1.5rem;
 }
+
+/* ============================================================ */
+/* FRESHCONFIRM - GLOBAL CONFIRMATION MODAL SYSTEM              */
+/* ============================================================ */
+.fc-confirm-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    opacity: 0;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fc-confirm-backdrop.is-open {
+    display: flex;
+    opacity: 1;
+}
+
+.fc-confirm-dialog {
+    background: #ffffff;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transform: scale(0.94) translateY(12px);
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.fc-confirm-backdrop.is-open .fc-confirm-dialog {
+    transform: scale(1) translateY(0);
+}
+
+.fc-confirm-content {
+    padding: 2rem 1.75rem 1.25rem 1.75rem;
+    text-align: center;
+}
+
+.fc-confirm-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.65rem;
+    margin-bottom: 1.25rem;
+}
+
+.fc-confirm-icon-danger {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.fc-confirm-icon-warning {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.fc-confirm-icon-info {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+.fc-confirm-icon-success {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.fc-confirm-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+}
+
+.fc-confirm-message {
+    font-size: 0.925rem;
+    color: #475569;
+    margin: 0;
+    line-height: 1.55;
+}
+
+.fc-confirm-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.75rem 1.5rem 1.75rem;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+}
+
+.fc-confirm-btn {
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.65rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 42px;
+}
+
+.fc-confirm-btn-cancel {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+}
+
+.fc-confirm-btn-cancel:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+.fc-confirm-btn-danger {
+    background: #dc2626;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+.fc-confirm-btn-danger:hover {
+    background: #b91c1c;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35);
+}
+
+.fc-confirm-btn-primary {
+    background: #235338;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(35, 83, 56, 0.25);
+}
+
+.fc-confirm-btn-primary:hover {
+    background: #193e2a;
+}
+
+@media (max-width: 576px) {
+    .fc-confirm-dialog {
+        max-width: 100%;
+        border-radius: 18px;
+    }
+    .fc-confirm-content {
+        padding: 1.5rem 1.25rem 1rem 1.25rem;
+    }
+    .fc-confirm-actions {
+        padding: 0.875rem 1.25rem 1.25rem 1.25rem;
+        flex-direction: column-reverse;
+    }
+    .fc-confirm-btn {
+        width: 100%;
+    }
+}

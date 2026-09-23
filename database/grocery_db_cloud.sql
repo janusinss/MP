@@ -1,6 +1,6 @@
 -- FreshCart Cloud Database Schema & Initial Catalog
 -- Target Environment: InfinityFree MySQL Hosting
--- Generated on: 2026-09-23 12:37:28
+-- Generated on: 2026-09-23 12:48:41
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -51,7 +51,7 @@ CREATE TABLE `products` (
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
 INSERT INTO `products` (`id`, `name`, `price`, `image`, `stock_qty`, `image_url`, `category`) VALUES
-(1,'Red Apple',30.00,'692a82c013aab.png',97,NULL,'Fruits'),
+(1,'Red Apple',30.00,'692a82c013aab.png',95,NULL,'Fruits'),
 (2,'Banana Bundle',65.00,'692a82a036702.png',99,NULL,'Fruits'),
 (3,'Whole Milk',195.00,'692a8282ba25d.png',79,NULL,'Dairy'),
 (4,'Sourdough Bread',220.00,'692a8260a0462.png',94,NULL,'Bakery'),
