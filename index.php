@@ -232,7 +232,7 @@ $firstKey = array_key_first($aisleReels);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>FreshCart Market | Clean Organic Sourcing</title>
+    <title>FreshCart</title>
     <!-- Favicon & App Icons -->
     <link rel="icon" type="image/png" href="assets/images/favicon.png">
     <link rel="shortcut icon" href="favicon.ico">
